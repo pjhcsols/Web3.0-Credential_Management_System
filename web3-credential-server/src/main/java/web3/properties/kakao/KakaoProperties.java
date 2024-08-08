@@ -1,4 +1,4 @@
-package web3.controller.kakao;
+package web3.properties.kakao;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
