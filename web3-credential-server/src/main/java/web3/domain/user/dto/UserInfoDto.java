@@ -1,4 +1,4 @@
-package web3.domain.user;
+package web3.domain.user.dto;
 
 public class UserInfoDto {
     private long id;

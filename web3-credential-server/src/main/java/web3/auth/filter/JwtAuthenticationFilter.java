@@ -1,9 +1,9 @@
-package web3.config.jwt;
+package web3.auth.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import web3.util.JwtTokenUtil;
+import web3.auth.util.JwtTokenUtil;
 
 import java.io.IOException;
 

@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import web3.config.jwt.JwtAuthenticationFilter;
+import web3.auth.filter.JwtAuthenticationFilter;
 import web3.repository.user.UserRepository;
-import web3.util.JwtTokenUtil;
+import web3.auth.util.JwtTokenUtil;
 import web3.validation.LoginMemberArgumentResolver;
 
 import java.util.List;

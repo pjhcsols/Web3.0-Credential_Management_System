@@ -1,4 +1,4 @@
-package web3.util;
+package web3.auth.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

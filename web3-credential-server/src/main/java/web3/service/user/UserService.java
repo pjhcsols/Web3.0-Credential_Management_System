@@ -5,7 +5,7 @@ import web3.exception.user.InvalidCredentialsException;
 import web3.exception.user.UserAlreadyExistsException;
 import web3.exception.user.UserNotFoundException;
 import web3.repository.user.UserRepository;
-import web3.util.JwtTokenUtil;
+import web3.auth.util.JwtTokenUtil;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

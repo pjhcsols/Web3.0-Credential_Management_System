@@ -1,4 +1,4 @@
-package web3.config.jwt;
+package web3.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

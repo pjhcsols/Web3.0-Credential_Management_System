@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 import web3.controller.kakao.KakaoProperties;
 import web3.domain.user.User;
-import web3.domain.user.UserInfoDto;
+import web3.domain.user.dto.UserInfoDto;
 import web3.domain.wallet.Wallet;
 import web3.repository.wallet.WalletRepository;
 import web3.service.user.UserService;
