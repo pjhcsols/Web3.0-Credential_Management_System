@@ -15,7 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import web3.controller.kakao.KakaoProperties;
+import web3.controller.user.kakao.KakaoProperties;
 
 import java.util.HashMap;
 
