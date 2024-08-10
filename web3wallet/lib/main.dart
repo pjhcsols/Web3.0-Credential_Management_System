@@ -8,14 +8,51 @@ class WalletCard extends StatefulWidget {
   const WalletCard({Key? key}) : super(key: key);
 
   @override
-  _VerticalCardSliderState createState() => _VerticalCardSliderState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _VerticalCardSliderState extends State<WalletCard> {
-  List<Map<String, String>> cards = [
+class _MainPageState extends State<WalletCard> {
+  int _selectedIndex = 0;
+  final List<Map<String, String>> _cards = [
     {"title": "경북대학교 학생증", "description": "테스트 입니다"},
     {"title": "국제학생증", "description": "테스트 입니다"},
   ];
+
+  static const List<Widget> _placeholders = <Widget>[
+    Placeholder(),
+    Placeholder(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _selectedIndex == 0 ? VerticalCardSlider(cards: _cards) : _placeholders[_selectedIndex - 1],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+      ),
+    );
+  }
+}
+
+class VerticalCardSlider extends StatelessWidget {
+  final List<Map<String, String>> cards;
+
+  const VerticalCardSlider({Key? key, required this.cards}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
