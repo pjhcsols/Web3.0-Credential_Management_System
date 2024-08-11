@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import web3.domain.user.User;
 import web3.domain.wallet.Wallet;
 import web3.exception.wallet.WalletAlreadyExistsException;
+import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
 import web3.service.wallet.WalletService;
 import web3.validation.LoginMember;
 
@@ -103,4 +104,21 @@ public class WalletController {
         List<Wallet> wallets = walletService.getAllWallets();
         return ResponseEntity.ok(wallets);
     }
+
+    @GetMapping("{id}")
+    @Operation(
+            summary = "지갑 중 특정 내용 조회",
+            description = "지갑 중 특정 내용을 private key를 통해 인증을 걸친후 받아옵니다..",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "특정 지갑 반환")
+            }
+    )
+    public ResponseEntity<Wallet> getCertainWallet(
+            @PathVariable Long id,
+            @RequestBody String privateKey)
+            throws WalletPrivateKeyNotEqualsException {
+        Wallet wallet = walletService.getCertainWallet(id,privateKey);
+        return ResponseEntity.ok(wallet);
+    }
+
 }
