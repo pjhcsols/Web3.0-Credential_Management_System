@@ -16,6 +16,9 @@ public class Wallet {
     private User user;
 
     @Column(nullable = false)
+    private String pdfUrl;
+
+    @Column(nullable = false)
     private String privateKey;
 
     @Column(nullable = false)
