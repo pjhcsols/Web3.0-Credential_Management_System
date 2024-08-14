@@ -49,6 +49,10 @@ public class S3StorageService {
 
     public String uploadPdf(MultipartFile file, Wallet wallet) throws IOException {
         String fileName = wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+
+        // PDF 파일 확장자 검증
+        validatePdfFile(fileName);
+
         byte[] fileBytes = file.getBytes();
 
         try {
@@ -65,6 +69,13 @@ public class S3StorageService {
 
         return getFullImageUrl(fileName);
     }
+
+    private void validatePdfFile(String filename) {
+        if (filename == null || !filename.toLowerCase().endsWith(".pdf")) {
+            throw new IllegalArgumentException("Illegal end name. Only Pdf.");
+        }
+    }
+
 
     //예외처리하기
     public void deletePdf(String urlToDelete) {
