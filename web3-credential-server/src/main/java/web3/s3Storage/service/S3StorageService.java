@@ -62,12 +62,14 @@ public class S3StorageService {
                             .contentType(file.getContentType())
                             .build(),
                     RequestBody.fromBytes(fileBytes));
+
         } catch (S3Exception e) {
             // S3 작업 중 예외 발생 시 처리
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
         }
 
-        return getFullImageUrl(fileName);
+        wallet.setPdfUrl(getpdfUrl(fileName));
+        return getpdfUrl(fileName);
     }
 
     private void validatePdfFile(String filename) {
@@ -109,7 +111,7 @@ public class S3StorageService {
         return url.substring(index + 1);
     }
 
-    private String getFullImageUrl(String fileName) {
+    private String getpdfUrl(String fileName) {
         return bucketUrl + "/" + fileName;
     }
 

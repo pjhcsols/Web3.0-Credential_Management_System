@@ -27,6 +27,10 @@ public class Wallet {
     @Column(nullable = false)
     private String address;
 
+    public void setPdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
+    }
+
     //JPA 기본 생성자
     protected Wallet() {}
 
