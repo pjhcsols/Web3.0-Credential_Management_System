@@ -12,12 +12,10 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
-import web3.domain.user.User;
 import web3.domain.wallet.Wallet;
 import web3.repository.wallet.WalletRepository;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -49,7 +47,7 @@ public class S3StorageService {
 
     public String uploadPdf(MultipartFile file, Wallet wallet) throws IOException {
         String fileName = wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-
+        System.out.println("fileName = " + fileName);
         // PDF 파일 확장자 검증
         validatePdfFile(fileName);
 
@@ -64,11 +62,10 @@ public class S3StorageService {
                     RequestBody.fromBytes(fileBytes));
 
         } catch (S3Exception e) {
-            // S3 작업 중 예외 발생 시 처리
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
         }
-
-        wallet.setPdfUrl(getpdfUrl(fileName));
+        wallet.updatePdfUrl(getpdfUrl(fileName));
+        walletRepository.saveAndFlush(wallet);
         return getpdfUrl(fileName);
     }
 

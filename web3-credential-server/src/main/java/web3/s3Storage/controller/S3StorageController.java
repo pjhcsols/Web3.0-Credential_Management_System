@@ -12,8 +12,6 @@ import web3.s3Storage.service.S3StorageService;
 import web3.service.wallet.WalletService;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/wallets")

@@ -15,7 +15,7 @@ public class Wallet {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column
     private String pdfUrl;
 
     @Column(nullable = false)
@@ -48,6 +48,10 @@ public class Wallet {
         this.address = address;
     }
 
+    public void updatePdfUrl(String name) {
+        this.pdfUrl = pdfUrl;
+    }
+
     // Getter 메서드
     public Long getId() {
         return id;
@@ -56,6 +60,8 @@ public class Wallet {
     public User getUser() {
         return user;
     }
+
+    public String getPdfUrl() {return pdfUrl; }
 
     public String getPrivateKey() {
         return privateKey;
