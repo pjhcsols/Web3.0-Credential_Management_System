@@ -36,15 +36,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
             const Spacer(),
             AnimatedOpacity(
               opacity: _isTextVisible ? 1.0 : 0.0,
-              duration: const Duration(seconds: 1),  // 애니메이션 지속 시간
+              duration: const Duration(seconds: 1),
               child: AnimatedContainer(
-                duration: const Duration(seconds: 1),  // 애니메이션 지속 시간
+                duration: const Duration(seconds: 1),
                 transform: Matrix4.translationValues(
                   0.0,
-                  _isTextVisible ? 0.0 : 30.0,  // 위로 이동
+                  _isTextVisible ? 0.0 : 30.0,
                   0.0,
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     '간편한 공인인증서',
                     style: TextStyle(
@@ -64,7 +64,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   // 시작하기 버튼 -> 회원가입 페이지
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFE60000),
+                  backgroundColor: const Color(0xFFE60000),
                   minimumSize: const Size(300, 45),
                   elevation: 0,
                   shape: RoundedRectangleBorder(
