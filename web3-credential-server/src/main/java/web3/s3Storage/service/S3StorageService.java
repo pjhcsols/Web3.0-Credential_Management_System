@@ -79,6 +79,7 @@ public class S3StorageService {
     //예외처리하기
     public void deletePdf(String urlToDelete) {
         String key = extractKeyFromUrl(urlToDelete);
+        System.out.println("key = " + key);
         try {
             s3Client.deleteObject(DeleteObjectRequest.builder()
                     .bucket(bucketName)
@@ -105,7 +106,7 @@ public class S3StorageService {
     private String extractKeyFromUrl(String url) {
         // Assuming the URL is in the format: https://s3.ap-northeast-2.amazonaws.com/bucketName/fileName
         int index = url.lastIndexOf('/');
-        return url.substring(index + 1);
+        return url.substring(index+1);
     }
 
     private String getpdfUrl(String fileName) {

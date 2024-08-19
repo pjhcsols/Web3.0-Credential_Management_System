@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web3.domain.wallet.Wallet;
+import web3.s3Storage.dto.DeletePdfRequest;
 import web3.s3Storage.service.S3StorageService;
 import web3.service.wallet.WalletService;
 
@@ -40,7 +41,9 @@ public class S3StorageController {
 
 
     @DeleteMapping("/delete-pdf")
-    public ResponseEntity<Void> deletePdf(@RequestBody String urlToDelete) {
+    public ResponseEntity<Void> deletePdf(@RequestBody DeletePdfRequest request) {
+        String urlToDelete = request.getUrlToDelete();
+        System.out.println("urlToDelete = " + urlToDelete);
         s3StorageService.deletePdf(urlToDelete);
         return ResponseEntity.noContent().build();
     }
@@ -48,6 +51,7 @@ public class S3StorageController {
     @GetMapping("/get-pdf")
     public ResponseEntity<byte[]> getPdf(@RequestParam("pdfUrl") String pdfUrl) {
         try {
+            System.out.println("pdfUrl = " + pdfUrl);
             byte[] pdfData = s3StorageService.getPdf(pdfUrl).readAllBytes();
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdfData);
         } catch (IOException e) {
