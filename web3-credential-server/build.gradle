@@ -38,6 +38,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
     implementation 'software.amazon.awssdk:s3:2.17.84' // 사용하고자 하는 AWS SDK 버전에 맞게 변경
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.31'
 
 
 

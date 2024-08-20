@@ -48,7 +48,7 @@ public class Wallet {
         this.address = address;
     }
 
-    public void updatePdfUrl(String name) {
+    public void updatePdfUrl(String pdfUrl) {
         this.pdfUrl = pdfUrl;
     }
 

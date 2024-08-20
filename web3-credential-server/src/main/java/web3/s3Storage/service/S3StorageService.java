@@ -1,6 +1,7 @@
 package web3.s3Storage.service;
 
 import jakarta.annotation.PreDestroy;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,7 +16,7 @@ import software.amazon.awssdk.services.s3.model.*;
 import web3.domain.wallet.Wallet;
 import web3.repository.wallet.WalletRepository;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.UUID;
 
 @Service
@@ -24,6 +25,7 @@ public class S3StorageService {
     private final S3Client s3Client;
     private final String bucketName;
     private final String bucketUrl;
+    private final PDFMergerUtility merger;
 
     private final WalletRepository walletRepository;
 
@@ -42,16 +44,37 @@ public class S3StorageService {
         this.bucketName = bucketName;
         this.bucketUrl = bucketUrl;
         this.walletRepository = walletRepository;
+        this.merger = new PDFMergerUtility();
     }
 
-
     public String uploadPdf(MultipartFile file, Wallet wallet) throws IOException {
-        String fileName = wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        System.out.println("fileName = " + fileName);
-        // PDF 파일 확장자 검증
-        validatePdfFile(fileName);
+        String fileName;
+        byte[] result;
 
-        byte[] fileBytes = file.getBytes();
+        //첫 등록일때 => 생성해줘야함
+        if (wallet.getPdfUrl() == null){
+            fileName = wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            // PDF 파일 확장자 검증
+            validatePdfFile(fileName);
+            System.out.println("fileName = " + fileName);
+            result = file.getBytes();
+
+        }
+        else{
+            System.out.println("wallet.getPdfUrl = " + wallet.getPdfUrl());
+            //이미 있을시 -> pdf 병합
+            String destination = wallet.getPdfUrl();
+            fileName = extractKeyFromUrl(destination);
+            System.out.println("fileName " + fileName);
+
+
+            byte[] first = getPdf(destination).readAllBytes();//원래 파일
+            byte[] second = file.getBytes(); //뒤에 들어온 파일
+
+            result = mergePdfs(first, second);
+
+            System.out.println("merge Success");
+        }
 
         try {
             s3Client.putObject(PutObjectRequest.builder()
@@ -59,7 +82,7 @@ public class S3StorageService {
                             .key(fileName)
                             .contentType(file.getContentType())
                             .build(),
-                    RequestBody.fromBytes(fileBytes));
+                    RequestBody.fromBytes(result));
 
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
@@ -67,6 +90,25 @@ public class S3StorageService {
         wallet.updatePdfUrl(getpdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
         return getpdfUrl(fileName);
+    }
+
+    public byte[] mergePdfs(byte[] pdf1, byte[] pdf2) throws IOException {
+        PDFMergerUtility merger = new PDFMergerUtility();
+
+        // 첫 번째 PDF를 ByteArrayInputStream으로 변환하여 추가
+        ByteArrayInputStream inputStream1 = new ByteArrayInputStream(pdf1);
+        merger.addSource(inputStream1);
+
+        // 두 번째 PDF를 ByteArrayInputStream으로 변환하여 추가
+        ByteArrayInputStream inputStream2 = new ByteArrayInputStream(pdf2);
+        merger.addSource(inputStream2);
+
+        // 병합 결과를 ByteArrayOutputStream에 저장
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        merger.setDestinationStream(outputStream);
+        merger.mergeDocuments(null);
+
+        return outputStream.toByteArray();
     }
 
     private void validatePdfFile(String filename) {
