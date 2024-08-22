@@ -28,10 +28,10 @@ public class S3StorageController {
     }
 
     @PostMapping("/upload-pdf")
-    public ResponseEntity<String> uploadPdf(@RequestParam("file") MultipartFile file, @RequestParam("walletId") Long walletId) {
+    public ResponseEntity<String> uploadPdf(@RequestParam("file") MultipartFile file, @RequestParam("walletId") Long walletId,@RequestParam String pdfInfo) {
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
         try {
-            String pdfUrl = s3StorageService.uploadPdf(file, wallet);
+            String pdfUrl = s3StorageService.uploadPdf(file, wallet,pdfInfo);
             return ResponseEntity.ok(pdfUrl);
         } catch (IOException e) {
             e.printStackTrace();
