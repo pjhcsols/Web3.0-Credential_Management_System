@@ -1,5 +1,6 @@
 package web3.s3Storage.service;
 
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import jakarta.annotation.PreDestroy;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -53,11 +54,13 @@ public class S3StorageService {
     public String uploadPdf(MultipartFile file, Wallet wallet,String pdfInfo) throws IOException {
         String fileName;
         byte[] result;
-        Map<String, String> metadata = new HashMap<>();
+        HashMap<String, String> metadata = new HashMap<>();
+        int nowPage = 1;
 
         //첫 등록일때 => 생성해줘야함
         if (wallet.getPdfUrl() == null){
             fileName = wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            System.out.println("fileName = " + fileName);
             // PDF 파일 확장자 검증
             validatePdfFile(fileName);
             result = file.getBytes();
@@ -67,25 +70,35 @@ public class S3StorageService {
             //이미 있을시 -> pdf 병합
             String destination = wallet.getPdfUrl();
             fileName = extractKeyFromUrl(destination);
-
+            System.out.println("fileName = " + fileName);
 
             byte[] first = getPdf(destination).readAllBytes();//원래 파일
             byte[] second = file.getBytes(); //뒤에 들어온 파일
 
+            nowPage = getPdfPageCount(first)+1;
             result = mergePdfs(first, second);
             System.out.println("merge Success");
+
+
+            metadata= getPdfMetadata(bucketName, fileName);
         }
-        metadata = getPdfMetadata(bucketName, fileName);
-        metadata.put("page-info", getPdfPageCount(result) + " : " + pdfInfo);
+
+        String metadataKey = "page-" + nowPage; // 키 설정
+        metadata.put(metadataKey, pdfInfo); // 키-값 쌍으로 추가
+        System.out.println("metadata = " + metadata);
+
 
         try {
-            s3Client.putObject(PutObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(fileName)
-                            .contentType(file.getContentType())
-                            .metadata(metadata)
-                            .build(),
-                    RequestBody.fromBytes(result));
+            // S3에 PDF 파일 업로드
+            PutObjectRequest putRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .contentType(file.getContentType())
+                    .metadata(metadata) // 메타데이터 추가
+                    .build();
+
+            // PutObject 요청 수행
+            s3Client.putObject(putRequest, RequestBody.fromBytes(result));
 
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
@@ -110,8 +123,8 @@ public class S3StorageService {
         return outputStream.toByteArray();
     }
 
-    public Map<String, String> getPdfMetadata(String bucketName, String fileName) {
-        Map<String, String> metadata;
+    public HashMap<String, String> getPdfMetadata(String bucketName, String fileName) {
+        HashMap<String, String> metadata;
 
         try {
             HeadObjectResponse response = s3Client.headObject(
