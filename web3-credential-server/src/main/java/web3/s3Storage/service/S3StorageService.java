@@ -29,10 +29,8 @@ public class S3StorageService {
     private final S3Client s3Client;
     private final String bucketName;
     private final String bucketUrl;
-    private final PDFMergerUtility merger;
 
     private final WalletRepository walletRepository;
-
 
     @Autowired
     public S3StorageService(@Value("${cloud.aws.credentials.accessKey}") String accessKey,
@@ -48,7 +46,6 @@ public class S3StorageService {
         this.bucketName = bucketName;
         this.bucketUrl = bucketUrl;
         this.walletRepository = walletRepository;
-        this.merger = new PDFMergerUtility();
     }
 
     public String uploadPdf(MultipartFile file, Wallet wallet,String pdfInfo) throws IOException {
@@ -70,6 +67,7 @@ public class S3StorageService {
             //이미 있을시 -> pdf 병합
             String destination = wallet.getPdfUrl();
             fileName = extractKeyFromUrl(destination);
+            System.out.println("destination = " + destination);
             System.out.println("fileName = " + fileName);
 
             byte[] first = getPdf(destination).readAllBytes();//원래 파일
@@ -109,6 +107,7 @@ public class S3StorageService {
     }
 
     public byte[] mergePdfs(byte[] pdf1, byte[] pdf2) throws IOException {
+        PDFMergerUtility merger = new PDFMergerUtility();
 
         ByteArrayInputStream inputStream1 = new ByteArrayInputStream(pdf1);
         merger.addSource(inputStream1);
