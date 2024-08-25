@@ -59,7 +59,7 @@ public class S3StorageService {
             fileName = wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             System.out.println("fileName = " + fileName);
             // PDF 파일 확장자 검증
-            validatePdfFile(fileName);
+            //validatePdfFile(fileName);
             result = file.getBytes();
 
         }
