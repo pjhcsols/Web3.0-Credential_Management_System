@@ -1,6 +1,10 @@
+import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
+  KakaoSdk.init(nativeAppKey: 'ff0fcfcf568aacf8b5edf8bfb8a235d9');
   runApp(const MaterialApp(home: OnboardingPage()));
 }
 
@@ -24,6 +28,23 @@ class _OnboardingPageState extends State<OnboardingPage> {
     });
   }
 
+  Future<void> _loginWithKakao() async {
+    try {
+      final result = await UserApi.instance.loginWithKakaoTalk();
+
+      print(result);
+
+      final url = 'https://your_redirect_url';
+      if (await canLaunch(url)) {
+        await launch(url);
+      } else {
+        throw 'Could not launch $url';
+      }
+    } catch (e) {
+      print('Kakao login error: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +62,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 duration: const Duration(seconds: 1),
                 transform: Matrix4.translationValues(
                   0.0,
-                  _isTextVisible ? 0.0 : 30.0,
+                  _isTextVisible ? 0.0 : 30.0,  // 위로 이동
                   0.0,
                 ),
                 child: const Center(
@@ -57,6 +78,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
             const Spacer(flex: 1),
+
 
             Center(
               child: ElevatedButton(
@@ -84,9 +106,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
             const SizedBox(height: 10.0),
 
             InkWell(
-              onTap: () {
-                // 카카오 로그인 -> 카카오로 로그인해야함
-              },
+              onTap: _loginWithKakao,
               child: Center(
                 child: Image.asset(
                   'assets/images/kakao_login_medium_wide.png',
@@ -95,22 +115,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
             ),
             const SizedBox(height: 10.0),
 
-            GestureDetector(
-              onTap: () {
-                // 로그인 페이지로 이동
-              },
-              child: const Center(
-                child: Text(
-                  '로그인하기',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.grey,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 40.0),
+            // GestureDetector(
+            //   onTap: () {
+            //     // 로그인 페이지로 이동
+            //   },
+            //   child: const Center(
+            //     child: Text(
+            //       '로그인하기',
+            //       style: TextStyle(
+            //         fontSize: 14.0,
+            //         color: Colors.grey,
+            //         decoration: TextDecoration.underline,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            const SizedBox(height: 100.0),
           ],
         ),
       ),

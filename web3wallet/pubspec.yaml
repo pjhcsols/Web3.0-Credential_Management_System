@@ -12,6 +12,12 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.6
+  kakao_flutter_sdk: ^1.9.5
+  kakao_flutter_sdk_user: ^1.9.5
+  url_launcher: ^6.1.5
+  local_auth: ^2.1.6
+  pdfx: ^2.3.0
+  internet_file: ^1.2.0
 
 dev_dependencies:
   flutter_test:
