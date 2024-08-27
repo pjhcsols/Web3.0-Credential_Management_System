@@ -4,8 +4,6 @@ import jakarta.annotation.PreDestroy;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -169,6 +167,7 @@ public class S3StorageService {
 
         // PDF 합치기
         byte[] finalPdfBytes = mergeThreePdfs(frontPart, newPdfBytes, backPart);
+        HashMap<String, String> metadata = getPdfMetadata(bucketName, fileName);
 
         // 최종 PDF를 S3에 업로드
         try {
@@ -176,6 +175,7 @@ public class S3StorageService {
                     .bucket(bucketName)
                     .key(fileName)
                     .contentType(newPdfFile.getContentType())
+                    .metadata(metadata)
                     .build();
             s3Client.putObject(putRequest, RequestBody.fromBytes(finalPdfBytes));
 
