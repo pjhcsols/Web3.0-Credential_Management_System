@@ -142,7 +142,7 @@ public class S3StorageService {
         }
     }
 
-    public byte[] replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException {
+    public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException {
         // 원래 PDF 가져오기
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
@@ -185,7 +185,7 @@ public class S3StorageService {
             originalDocument.close();
         }
 
-        return finalPdfBytes; // 최종 PDF 바이트 배열 반환
+        return pdfUrl; // 최종 PDF 바이트 배열 반환
     }
 
     // 앞부분 PDF 바이트 배열 생성

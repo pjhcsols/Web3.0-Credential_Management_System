@@ -61,15 +61,15 @@ public class S3StorageController {
     }
 
     @PostMapping("/replace-pdf")
-    public ResponseEntity<byte[]> replacePdf(@RequestParam("file") MultipartFile file, @RequestParam("page") int page, @RequestParam("walletId") Long walletId) {
+    public ResponseEntity<String> replacePdf(@RequestParam("file") MultipartFile file, @RequestParam("page") int page, @RequestParam("walletId") Long walletId) {
         try {
             System.out.println("file = " + file);
             Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
-            byte[] pdfData = s3StorageService.replacePdfPage(wallet, page, file);
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdfData);
+            String pdfUrl = s3StorageService.replacePdfPage(wallet, page, file);
+            return ResponseEntity.ok(pdfUrl);
         }catch(IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to replace pdf: " + e.getMessage());
         }
     }
 
