@@ -13,6 +13,7 @@ import web3.s3Storage.service.S3StorageService;
 import web3.service.wallet.WalletService;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/wallets")
@@ -28,10 +29,13 @@ public class S3StorageController {
     }
 
     @PostMapping("/upload-pdf")
-    public ResponseEntity<String> uploadPdf(@RequestParam("file") MultipartFile file, @RequestParam("walletId") Long walletId,@RequestParam String pdfInfo) {
+    public ResponseEntity<String> uploadPdf(@RequestParam("file") MultipartFile file,
+                                            @RequestParam("walletId") Long walletId,
+                                            @RequestParam String pdfInfo,
+                                            @RequestParam String pdfKey) {
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
         try {
-            String pdfUrl = s3StorageService.uploadPdf(file, wallet,pdfInfo);
+            String pdfUrl = s3StorageService.uploadPdf(file, wallet,pdfInfo,pdfKey);
             return ResponseEntity.ok(pdfUrl);
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,6 +52,13 @@ public class S3StorageController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/certs")
+    public ResponseEntity<HashMap<String,String>> getCertList(@RequestParam("pdfUrl") String pdfUrl) {
+        HashMap<String, String> certList = s3StorageService.getCertList(pdfUrl);
+        return ResponseEntity.ok().body(certList);
+
+    }
+
     @GetMapping("/get-pdf")
     public ResponseEntity<byte[]> getPdf(@RequestParam("pdfUrl") String pdfUrl) {
         try {
@@ -61,7 +72,9 @@ public class S3StorageController {
     }
 
     @PostMapping("/replace-pdf")
-    public ResponseEntity<String> replacePdf(@RequestParam("file") MultipartFile file, @RequestParam("page") int page, @RequestParam("walletId") Long walletId) {
+    public ResponseEntity<String> replacePdf(@RequestParam("file") MultipartFile file,
+                                             @RequestParam("page") int page,
+                                             @RequestParam("walletId") Long walletId) {
         try {
             System.out.println("file = " + file);
             Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
@@ -72,6 +85,15 @@ public class S3StorageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to replace pdf: " + e.getMessage());
         }
     }
+
+    @GetMapping("/get-metadata")
+    public ResponseEntity<String> getMetadata(@RequestParam String pdfUrl,
+                                              @RequestParam int page) {
+        String metadata = s3StorageService.getMetadataForPage(pdfUrl, page);
+        return ResponseEntity.ok().body(metadata);
+    }
+
+
 
     /*//스케줄러 용
     @GetMapping("/all/photourl")

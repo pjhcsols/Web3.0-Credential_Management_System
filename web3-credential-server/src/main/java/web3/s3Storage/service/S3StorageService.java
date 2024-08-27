@@ -20,6 +20,7 @@ import web3.repository.wallet.WalletRepository;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -47,7 +48,7 @@ public class S3StorageService {
         this.walletRepository = walletRepository;
     }
 
-    public String uploadPdf(MultipartFile file, Wallet wallet,String pdfInfo) throws IOException {
+    public String uploadPdf(MultipartFile file, Wallet wallet,String pdfInfo,String pdfKey) throws IOException {
         String fileName;
         byte[] result;
         HashMap<String, String> metadata = new HashMap<>();
@@ -79,11 +80,12 @@ public class S3StorageService {
             System.out.println("merge Success");
 
 
-            metadata= getPdfMetadata(bucketName, fileName);
+            metadata= getPdfMetadata(fileName);
         }
 
         String page = "page-" + nowPage; // 키 설정
-        metadata.put(page,pdfInfo); // 키-값 쌍으로 추가
+        String value = pdfInfo + ":" + pdfKey;
+        metadata.put(page,value); // 키-값 쌍으로 추가
         System.out.println("metadata = " + metadata);
 
 
@@ -93,7 +95,7 @@ public class S3StorageService {
                     .bucket(bucketName)
                     .key(fileName)
                     .contentType(file.getContentType())
-                    .metadata(metadata) // 메타데이터 추가
+                    .metadata(metadata)
                     .build();
 
             // PutObject 요청 수행
@@ -167,7 +169,7 @@ public class S3StorageService {
 
         // PDF 합치기
         byte[] finalPdfBytes = mergeThreePdfs(frontPart, newPdfBytes, backPart);
-        HashMap<String, String> metadata = getPdfMetadata(bucketName, fileName);
+        HashMap<String, String> metadata = getPdfMetadata(fileName);
 
         // 최종 PDF를 S3에 업로드
         try {
@@ -240,9 +242,37 @@ public class S3StorageService {
         return outputStream.toByteArray(); // 최종 합쳐진 PDF 바이트 배열 반환
     }
 
+    //인증서 리스트 반환
+    public HashMap<String, String> getCertList(String pdfUrl) {
+        HashMap<String, String> metadata = getPdfMetadata(pdfUrl);
+        HashMap<String, String> certList = new HashMap<>();
 
-    public HashMap<String, String> getPdfMetadata(String bucketName, String fileName) {
+        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (value != null && value.contains(":")) {
+                String extractedValue = value.split(":")[0];
+
+                if (key.startsWith("page-")) {
+                    String pageNumber = key.substring("page-".length());
+                    certList.put(pageNumber, extractedValue);
+                } else {
+                    certList.put(key, extractedValue);
+                }
+            } else {
+                certList.put(key, value);
+            }
+        }
+
+        return certList;
+    }
+
+
+
+    public HashMap<String, String> getPdfMetadata( String pdfUrl) {
         HashMap<String, String> metadata;
+        String fileName = extractKeyFromUrl(pdfUrl);
 
         try {
             HeadObjectResponse response = s3Client.headObject(
@@ -264,6 +294,32 @@ public class S3StorageService {
 
         return metadata;
     }
+
+    public String getMetadataForPage(String pdfUrl, int pageNumber) {
+        System.out.println("pdfUrl = " + pdfUrl);
+        String fileName = extractKeyFromUrl(pdfUrl);
+
+        GetObjectRequest getRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+
+        GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
+
+        Map<String, String> metadata = getObjectResponse.metadata();
+
+        String pageKey = "page-" + pageNumber;
+
+        String result = metadata.get(pageKey);
+
+        // 내용 부분만 추출
+        if (result != null && result.contains(":")) {
+            return result.split(":")[0]; // ':'기준으로 분리
+        }
+
+        return null; // 결과가 없거나 ':'가 없는 경우 null 반환
+    }
+
 
 
     public int getPdfPageCount(byte[] pdfBytes) throws IOException {
