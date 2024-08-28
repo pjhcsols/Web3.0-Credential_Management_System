@@ -1,4 +1,4 @@
-# Web3.0-Credential_Management_System
+# :closed_lock_with_key: Web3.0-Credential_Management_System
 **Web 3.0 신원/자격증명 관리 시스템**
 
 ## git commit message head
@@ -94,14 +94,14 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 
 ### - Web3 지갑 생성
 
-지갑이 생성될 때 블록과 S3 스토리지의 PDF가 생성되며 블록과 PDF의 URL이 사용자 지갑에 저장된다. S3 스토리지에 실물 인증서와 블록에 신원인증 정보를 포함하여 개인의 디바이스에서 증명이 가능하다.
+지갑이 생성될 때 블록과 S3 스토리지의 PDF가 생성되며 블록과 PDF의 URL이 사용자 지갑에 저장됩니다. S3 스토리지에 실물 인증서와 블록에 신원인증 정보를 포함하여 개인의 디바이스에서 증명이 가능합니다.
 
 ![image](https://github.com/user-attachments/assets/3bcd06e9-3ee7-4bea-9444-caa2806a9155)
 
-1. 클라이언트가 사용자가 엑세스 토큰을 통해 Web3 지갑 생성을 요청
-2. 지갑에서 인증서 PDF와 메타데이터 Verifiable Credential (Credential Metadata, Claims, Proofs)를 S3 스토리지에 저장하고 개인 디바이스에 다운로드할 수 있다. 이때 데이터베이스에는 해당 사용자의 S3 PDF 주소값을 저장한다.
-3. 지갑에서 개인 디바이스의 블록이 생성되며 블록에는 추후 업로드하는 해당 증명에 관한 키 값을 저장하고 블록이 생성 및 추가되며 이를 통해 외부 인증과의 연동이 수행된다.
-4. 지갑에서 해당되는 인증서를 업로드 가능하며 PDF의 페이지 별 메타데이터를 별도로 관리하여 1페이지(주민등록증)는 Verifiable Credential로 관리된다.
+1. 클라이언트가 사용자가 엑세스 토큰을 통해 Web3 지갑 생성을 요청합니다.
+2. 지갑에서 인증서 PDF와 메타데이터 Verifiable Credential (Credential Metadata, Claims, Proofs)를 S3 스토리지에 저장하고 개인 디바이스에 다운로드할 수 있습니다. 이때 데이터베이스에는 해당 사용자의 S3 PDF 주소값을 저장합니다.
+3. 지갑에서 개인 디바이스의 블록이 생성되며 블록에는 추후 업로드하는 해당 증명에 관한 키 값을 저장하고 블록이 생성 및 추가되며 이를 통해 외부 인증과의 연동이 수행됩니다.
+4. 지갑에서 해당되는 인증서를 업로드 가능하며 PDF의 페이지 별 메타데이터를 별도로 관리하여 1페이지(주민등록증)는 Verifiable Credential로 관리합니다.
 
 ---
 
@@ -109,10 +109,10 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 
 ![image](https://github.com/user-attachments/assets/96e2e235-ea12-4360-8449-e30555901ae8)
 
-1. 클라이언트는 인증서 등록을 위해 2차 인증을 수행
-2. Web3 블록체인을 통해 인증서에 대한 Verifiable Credential 생성 및 신분증명 요청을 처리
-3. 외부 인증 API를 활용해 인증서 Verifiable Credential에 대한 신분 증명을 요청
-4. 서버는 등록된 인증서의 블록 URL을 저장하고 관리
+1. 클라이언트는 인증서 등록을 위해 2차 인증을 수행합니다.
+2. Web3 블록체인을 통해 인증서에 대한 Verifiable Credential 생성 및 신분증명 요청을 처리합니다.
+3. 외부 인증 API를 활용해 인증서 Verifiable Credential에 대한 신분 증명을 요청합니다.
+4. 서버는 등록된 인증서의 블록 URL을 저장하고 관리합니다.
 
 ---
 
@@ -120,10 +120,10 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 
 ![image](https://github.com/user-attachments/assets/4f154c47-4ab3-4a45-b07a-50ed825e7bfb)
 
-1. 클라이언트는 등록된 인증서에 접근하기 위해 2차 인증을 수행
-2. Web3 블록체인을 통해 인증서에 대한 인증을 요청하고 블록 URL을 반환
-3. 외부 인증 API를 활용해 인증서 Verifiable Credential에 대한 신분 증명을 요청하고 확인
-4. 서버는 인증이 완료된 인증서에 접근할 수 있도록 지원
+1. 클라이언트는 등록된 인증서에 접근하기 위해 2차 인증을 수행합니다.
+2. Web3 블록체인을 통해 인증서에 대한 인증을 요청하고 블록 URL을 반환합니다.
+3. 외부 인증 API를 활용해 인증서 Verifiable Credential에 대한 신분 증명을 요청하고 확인합니다.
+4. 서버는 인증이 완료된 인증서에 접근할 수 있도록 지원합니다.
 
 ---
 
@@ -131,11 +131,11 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 
 ![image](https://github.com/user-attachments/assets/ca75af9d-9d04-456d-99c1-c713910ba3cb)
 
-1. 클라이언트는 등록된 인증서에 접근하기 위해 2차 인증을 수행
-2. Web3 블록체인을 통해 인증서에서 Verifiable Credential을 찾아오고, 인증서 URL을 반환
-3. 서버로 인증서 URL을 요청
-4. URL을 통해 S3 스토리지에 있는 인증서에 접근해 해당 객체의 메타데이터에 접근
-5. 메타데이터 가공 후 클라이언트에게 목록 반환
+1. 클라이언트는 등록된 인증서에 접근하기 위해 2차 인증을 수행합니다.
+2. Web3 블록체인을 통해 인증서에서 Verifiable Credential을 찾아오고, 인증서 URL을 반환합니다.
+3. 서버로 인증서 URL을 요청합니다.
+4. URL을 통해 S3 스토리지에 있는 인증서에 접근해 해당 객체의 메타데이터에 접근합니다.
+5. 메타데이터 가공 후 클라이언트에게 목록 반환합니다.
 
 ---
 
@@ -143,19 +143,19 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 
 ![image](https://github.com/user-attachments/assets/610a4423-7311-4690-8f87-7c0ba3c7808f)
 
-1. S3 스토리지에 실물 인증서와 메타데이터에 외부 인증 Verifiable Credential을 저장하고 사용자가 어플리케이션을 재다운로드하면 해당 S3 스토리지의 인증서와 Verifiable Credential을 통해 블록을 생성하고 사용자의 디바이스에 저장한다.
+1. S3 스토리지에 실물 인증서와 메타데이터에 외부 인증 Verifiable Credential을 저장하고 사용자가 어플리케이션을 재다운로드하면 해당 S3 스토리지의 인증서와 Verifiable Credential을 통해 블록을 생성하고 사용자의 디바이스에 저장합니다.
 
 ![image](https://github.com/user-attachments/assets/a342c8d9-f8b7-4296-81c3-5126884a8fd5)
 ![image](https://github.com/user-attachments/assets/34af8fde-ea4f-4d23-beae-1c888972aced)
 
-2. Web3 블록체인의 블록에 외부 인증 값 및 정보 저장을 처리. 개인 디바이스의 블록에 외부 인증을 수행하는 Verifiable Credential, Credential Metadata, Claims, Proofs를 포함한 블록을 생성 관리.
-3. 외부 인증 API를 활용해 전자지갑의 인증서 사용 시, 외부 인증과의 연동을 수행한다.
+2. Web3 블록체인의 블록에 외부 인증 값 및 정보 저장을 처리합니다. 개인 디바이스의 블록에 외부 인증을 수행하는 Verifiable Credential, Credential Metadata, Claims, Proofs를 포함한 블록을 생성 관리합니다.
+3. 외부 인증 API를 활용해 전자지갑의 인증서 사용 시, 외부 인증과의 연동을 수행합니다.
 
 ---
 
 ### 1.5. 외부 API를 이용한 인증 (대학 재학 인증, 자격증, 주민등록증)
 
-사용자 및 인증서의 신뢰성을 위해 외부 API를 연동하여 대학 재학 인증, Qnet 자격증 확인서 및 주민등록 진위 여부 인증을 테스트하는 작업을 수행한다.
+사용자 및 인증서의 신뢰성을 위해 외부 API를 연동하여 대학 재학 인증, Qnet 자격증 확인서 및 주민등록 진위 여부 인증을 테스트하는 작업을 수행합니다.
 
 ---
 
@@ -163,7 +163,7 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 
 ![image](https://github.com/user-attachments/assets/1f153339-efc8-4fe4-9361-17b761c3e9bd)
 
-사용자가 특정 대학에 재학 중인지를 확인하기 위해 외부 API를 통해 사용자의 학적 정보를 확인할 수 있는 기능을 통합하였다. API 요청을 통해 사용자의 재학 상태를 검증하고, 인증기관 서버는 이 정보를 바탕으로 사용자가 제공한 정보의 진위를 확인한다. 성공적인 재학 인증 요청에 대해, 시스템은 사용자가 제공한 정보와 외부 API의 응답이 일치하는지를 확인하고, 재학 상태가 검증된 사용자로 표시한다.
+사용자가 특정 대학에 재학 중인지를 확인하기 위해 외부 API를 통해 사용자의 학적 정보를 확인할 수 있는 기능을 통합하였습니다. API 요청을 통해 사용자의 재학 상태를 검증하고, 인증기관 서버는 이 정보를 바탕으로 사용자가 제공한 정보의 진위를 확인합니다. 성공적인 재학 인증 요청에 대해, 시스템은 사용자가 제공한 정보와 외부 API의 응답이 일치하는지를 확인하고, 재학 상태가 검증된 사용자로 표시합니다.
 
 ![image](https://github.com/user-attachments/assets/90e2ea2a-582c-4c90-bbbe-f9dc51e952b0)
 
@@ -171,12 +171,12 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 
 ### 2. Qnet 자격증 확인서 인증 테스트
 
-Qnet 자격증 확인서는 특정 자격증 소지 여부를 검증하는 데 사용된다. 프로젝트에서는 Codef API를 통해 자격증 정보와 확인서를 검증하는 절차를 테스트하였다.
+Qnet 자격증 확인서는 특정 자격증 소지 여부를 검증하는 데 사용됩니다. 프로젝트에서는 Codef API를 통해 자격증 정보와 확인서를 검증하는 절차를 테스트하였습니다.
 <br>
 ![image](https://github.com/user-attachments/assets/4ac278be-1d8a-4bce-af94-c8c0f88aa80b)
 <br>
-API 요청을 통해 사용자가 소지한 자격증의 유효성을 확인하고, Qnet에서 반환한 응답 데이터를 바탕으로 사용자가 주장하는 자격증 소지가 올바른지를 검증하였다.
-API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증되었을 경우, 인증기관 서버는 해당 사용자를 신뢰할 수 있는 자격증 소지자로 식별한다.
+API 요청을 통해 사용자가 소지한 자격증의 유효성을 확인하고, Qnet에서 반환한 응답 데이터를 바탕으로 사용자가 주장하는 자격증 소지가 올바른지를 검증하였습니다.
+API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증되었을 경우, 인증기관 서버는 해당 사용자를 신뢰할 수 있는 자격증 소지자로 식별합니다.
 
 ---
 
@@ -185,9 +185,9 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
 
 ![image](https://github.com/user-attachments/assets/394a2f99-55e1-408e-b5df-685dd9631c2f)
 <br>
-주민등록 진위 여부를 확인하기 위해 외부 API를 연동하여 사용자의 주민등록 진위를 검증하는 작업을 수행하였다. 
+주민등록 진위 여부를 확인하기 위해 외부 API를 연동하여 사용자의 주민등록 진위를 검증하는 작업을 수행하였습니다.
 <br>
-이 API는 사용자가 제공한 주민등록번호가 실제로 존재하는지 검토하는 기능을 제공한다.
+이 API는 사용자가 제공한 주민등록번호가 실제로 존재하는지 검토하는 기능을 제공합니다.
 
 
 
