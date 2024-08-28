@@ -110,7 +110,7 @@ public class S3StorageService {
     }
 
     private static String getFileName(MultipartFile file, Wallet wallet) {
-        return wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        return wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + wallet.getAddress();
     }
 
     private static String getEmptyFilename(Wallet wallet) {
@@ -315,6 +315,30 @@ public class S3StorageService {
         // 내용 부분만 추출
         if (result != null && result.contains(":")) {
             return result.split(":")[0]; // ':'기준으로 분리
+        }
+
+        return null; // 결과가 없거나 ':'가 없는 경우 null 반환
+    }
+
+    public String getPdfKeyForPage(String pdfUrl, int pageNumber) {
+        String fileName = extractKeyFromUrl(pdfUrl);
+
+        GetObjectRequest getRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(fileName)
+                .build();
+
+        GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
+
+        Map<String, String> metadata = getObjectResponse.metadata();
+
+        String pageKey = "page-" + pageNumber;
+
+        String result = metadata.get(pageKey);
+
+        // pdfKey 부분만 추출
+        if (result != null && result.contains(":")) {
+            return result.split(":")[1]; // ':'기준으로 분리
         }
 
         return null; // 결과가 없거나 ':'가 없는 경우 null 반환

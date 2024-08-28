@@ -93,6 +93,13 @@ public class S3StorageController {
         return ResponseEntity.ok().body(metadata);
     }
 
+    @GetMapping("/get-pdfkey")
+    public ResponseEntity<String> getPdfKey(@RequestParam String pdfUrl,
+                                              @RequestParam int page) {
+        String metadata = s3StorageService.getPdfKeyForPage(pdfUrl, page);
+        return ResponseEntity.ok().body(metadata);
+    }
+
 
 
     /*//스케줄러 용
