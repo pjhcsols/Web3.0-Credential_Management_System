@@ -1,5 +1,7 @@
 # :closed_lock_with_key: Web3.0-Credential_Management_System
 **Web 3.0 신원/자격증명 관리 시스템**
+<br>
+<br>
 
 ## git commit message head
 Feat : 새로운 기능 추가, 기존의 기능을 요구 사항에 맞추어 수정  
@@ -10,6 +12,8 @@ Docs : 문서(주석) 수정
 Refactor : 기능의 변화가 아닌 코드 리팩터링 ex) 변수 이름 변경  
 Test : 테스트 코드 추가/수정  
 Init : 초기화  
+
+<br>
 
 ## 주제
 개인이 데이터를 직접 소유하고 관리하는 Web3 전자지갑 시스템 : “Web 3.0 신원/자격증명 관리 시스템"
@@ -25,44 +29,56 @@ Init : 초기화
 
 ![image](https://github.com/user-attachments/assets/0a312fe1-5f85-4f05-b948-eff5e3ccf505)
 
-이 시스템은 Web3와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공한다. 전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있다.
+이 시스템은 Web3와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
+전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있습니다.
+<br>
+<br>
 
 ## 전체적인 흐름
-
 ### 온보딩 화면 및 로그인 화면
----
+* 카카오 로그인 API를 사용하여 로그인을 진행합니다. 로그인이 완료되면 4자리 PIN 코드를 설정하고 생체 인증 여부를 확인하게 됩니다.
+* 생체 인증 동의 여부 화면에서 ‘다음에’를 클릭할 경우, 설정 화면에서 생체 인증을 활성화할 수 있습니다.
+
 ![image](https://github.com/user-attachments/assets/2740d93b-b644-4246-bbcb-234e392df0cf)
 ![image](https://github.com/user-attachments/assets/64fd6d22-0486-44ca-984f-726388d46ebf)
----
----
+
 ![image](https://github.com/user-attachments/assets/b9a1a8fd-32c8-4451-a0da-cf21e46dfb86)
 ![image](https://github.com/user-attachments/assets/2b7d8c7d-a741-468d-a13c-5372f848eb51)
 ![image](https://github.com/user-attachments/assets/49e76893-f710-48af-94f5-c48b3cadf8c2)
----
-카카오 로그인 API를 사용하여 로그인을 진행합니다. 로그인이 완료되면 4자리 PIN 코드를 설정하고 생체 인증 여부를 확인하게 됩니다. 생체 인증 동의 여부 화면에서 ‘다음에’를 클릭할 경우, 설정 화면에서 생체 인증을 활성화할 수 있습니다.
+
+<br>
+<br>
 
 ### 메인 화면
----
+* 로그인한 사용자의 신원 정보가 표시되는 화면입니다. 
+* 사용자의 이름과 인증서 만료일이 표시되며, 인증서를 클릭하면 인증서 사용 기록을 조회할 수 있습니다.
+* 사용 기록 조회 화면의 오른쪽 상단 내보내기 아이콘을 클릭 시 사용 기록을 전송할 수 있습니다.
+
 ![image](https://github.com/user-attachments/assets/76d7729d-c651-49bf-bace-4435072953e5)
 ![image](https://github.com/user-attachments/assets/de21b3b3-54a3-4f5e-943a-ed08b5469e1f)
----
-로그인한 사용자의 신원 정보가 표시되는 화면입니다. 사용자의 이름과 인증서 만료일이 표시되며, 인증서를 클릭하면 인증서 사용 기록을 조회할 수 있습니다. 사용 기록 조회 화면의 오른쪽 상단 내보내기 아이콘을 클릭 시 사용 기록을 전송할 수 있습니다.
+
+<br>
+<br>
 
 ### 전자 증명서 발급 화면
----
+* 메인 화면의 오른쪽 상단에 위치한 ‘+’ 버튼을 클릭하면, 각 증명서와 해당 발급처가 표시됩니다.
+* 본인이 발급을 원하는 증명서를 선택한 후, 동의 체크박스를 클릭하고 인증(생체 인증 또는 PIN 코드 인증)을 하면 사용자에게 PDF 형태로 인증서가 표시됩니다.
+
 ![image](https://github.com/user-attachments/assets/5ee28388-cd3f-490c-9ca9-05ef420aa525)
 ![image](https://github.com/user-attachments/assets/44cc151f-aba9-4b63-9c8c-dcd6673976f8)
 ![image](https://github.com/user-attachments/assets/43808704-c95f-4936-ae54-72c0a5d73a78)
----
 
-메인 화면의 오른쪽 상단에 위치한 ‘+’ 버튼을 클릭하면, 각 증명서와 해당 발급처가 표시됩니다. 본인이 발급을 원하는 증명서를 선택한 후, 동의 체크박스를 클릭하고 인증(생체 인증 또는 PIN 코드 인증)을 하면 사용자에게 PDF 형태로 인증서가 표시됩니다.
+<br>
+<br>
 
----
+
 ![image](https://github.com/user-attachments/assets/d9c18a77-75f4-4ec1-82e0-a8574109bfeb)
----
-해당 인증서의 목록을 S3 메타데이터로부터 받아와서 사용자에게 1차적으로 보여주고, 인증서를 클릭하면 블록과 메타데이터의 정보로 외부 API를 통해 인증서가 유효한지 확인을 요청하는 흐름입니다.
 
+* 해당 인증서의 목록을 S3 메타데이터로부터 받아와서 사용자에게 1차적으로 보여주고,  
+인증서를 클릭하면 블록과 메타데이터의 정보로 외부 API를 통해 인증서가 유효한지 확인을 요청하는 흐름입니다.
 
+<br>
+<br>
 
 ## 1. 주요 기능
 
