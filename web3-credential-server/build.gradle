@@ -36,6 +36,11 @@ dependencies {
     //testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
     testImplementation 'org.assertj:assertj-core:3.20.2'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    implementation 'software.amazon.awssdk:s3:2.17.84' // 사용하고자 하는 AWS SDK 버전에 맞게 변경
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.31'
+
+
 
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'

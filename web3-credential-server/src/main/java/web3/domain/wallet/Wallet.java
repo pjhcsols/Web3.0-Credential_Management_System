@@ -15,6 +15,9 @@ public class Wallet {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column
+    private String pdfUrl;
+
     @Column(nullable = false)
     private String privateKey;
 
@@ -23,6 +26,10 @@ public class Wallet {
 
     @Column(nullable = false)
     private String address;
+
+    public void setPdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
+    }
 
     //JPA 기본 생성자
     protected Wallet() {}
@@ -41,6 +48,10 @@ public class Wallet {
         this.address = address;
     }
 
+    public void updatePdfUrl(String pdfUrl) {
+        this.pdfUrl = pdfUrl;
+    }
+
     // Getter 메서드
     public Long getId() {
         return id;
@@ -49,6 +60,8 @@ public class Wallet {
     public User getUser() {
         return user;
     }
+
+    public String getPdfUrl() {return pdfUrl; }
 
     public String getPrivateKey() {
         return privateKey;

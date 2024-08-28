@@ -9,6 +9,7 @@ import web3.exception.user.InvalidCredentialsException;
 import web3.exception.user.UserAlreadyExistsException;
 import web3.exception.user.UserNotFoundException;
 import web3.exception.wallet.WalletAlreadyExistsException;
+import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(WalletAlreadyExistsException.class)
     public ResponseEntity<String> handleWalletAlreadyExistsException(WalletAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(WalletPrivateKeyNotEqualsException.class)
+    public ResponseEntity<String> handleWalletPrivateKeyNotEqualsException(WalletAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 

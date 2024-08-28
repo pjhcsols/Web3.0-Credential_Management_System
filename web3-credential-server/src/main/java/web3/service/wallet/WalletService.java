@@ -1,10 +1,12 @@
 package web3.service.wallet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import web3.domain.user.User;
 import web3.domain.wallet.Wallet;
 import web3.exception.wallet.WalletAlreadyExistsException;
+import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
 import web3.repository.wallet.WalletRepository;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Optional;
 public class WalletService {
 
     private final WalletRepository walletRepository;
+
 
     @Autowired
     public WalletService(WalletRepository walletRepository) {
@@ -57,4 +60,21 @@ public class WalletService {
     public List<Wallet> getAllWallets() {
         return walletRepository.findAll();
     }
+
+    public Wallet getCertainWallet(Long id, String privateKey) throws WalletPrivateKeyNotEqualsException{
+        Wallet wallet = walletRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+       /* // 사용자 로컬 프라이빗키 <-> wallet 프라이빗 키 대조
+        if(!matchPrivateKey(privateKey, wallet)){
+            throw new WalletPrivateKeyNotEqualsException("Private key does not match");
+        }*/
+
+        return wallet;
+    }
+
+    private boolean matchPrivateKey(String privateKey, Wallet wallet) {
+        return wallet.getPrivateKey().equals(privateKey);
+    }
+
 }

@@ -10,6 +10,7 @@ CREATE TABLE users (
 CREATE TABLE wallets (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
                          user_id BIGINT NOT NULL,
+                         pdfUrl VARCHAR(255),
                          privateKey VARCHAR(255) NOT NULL,
                          publicKey VARCHAR(255) NOT NULL,
                          address VARCHAR(255) NOT NULL,
