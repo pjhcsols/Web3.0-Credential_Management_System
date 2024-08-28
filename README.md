@@ -172,7 +172,9 @@ Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthent
 ### 2. Qnet 자격증 확인서 인증 테스트
 
 Qnet 자격증 확인서는 특정 자격증 소지 여부를 검증하는 데 사용된다. 프로젝트에서는 Codef API를 통해 자격증 정보와 확인서를 검증하는 절차를 테스트하였다.
+<br>
 ![image](https://github.com/user-attachments/assets/4ac278be-1d8a-4bce-af94-c8c0f88aa80b)
+<br>
 API 요청을 통해 사용자가 소지한 자격증의 유효성을 확인하고, Qnet에서 반환한 응답 데이터를 바탕으로 사용자가 주장하는 자격증 소지가 올바른지를 검증하였다.
 API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증되었을 경우, 인증기관 서버는 해당 사용자를 신뢰할 수 있는 자격증 소지자로 식별한다.
 
@@ -182,8 +184,9 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
 
 
 ![image](https://github.com/user-attachments/assets/394a2f99-55e1-408e-b5df-685dd9631c2f)
+<br>
 주민등록 진위 여부를 확인하기 위해 외부 API를 연동하여 사용자의 주민등록 진위를 검증하는 작업을 수행하였다. 
-
+<br>
 이 API는 사용자가 제공한 주민등록번호가 실제로 존재하는지 검토하는 기능을 제공한다.
 
 
