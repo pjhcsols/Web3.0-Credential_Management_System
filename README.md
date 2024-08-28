@@ -1,6 +1,12 @@
-# :closed_lock_with_key: Web3.0-Credential_Management_System
-**Web 3.0 신원/자격증명 관리 시스템**
+# :closed_lock_with_key: [경북멋쟁이] Web 3.0 신원/자격증명 관리 시스템 
+**Web3.0-Credential_Management_System**
 <br>
+<br>
+
+## 주제
+개인이 데이터를 직접 소유하고 관리하는 Web3 전자지갑 시스템 : “Web 3.0 신원/자격증명 관리 시스템"
+<br>
+
 <br>
 
 ## git commit message head
@@ -15,11 +21,7 @@ Init : 초기화
 
 <br>
 
-## 주제
-개인이 데이터를 직접 소유하고 관리하는 Web3 전자지갑 시스템 : “Web 3.0 신원/자격증명 관리 시스템"
-<br>
-<br>
-<br>
+
 
 ## 시연영상 Youtube
 [[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtube.com/shorts/GkWBhS6io44?feature=share)]
@@ -31,6 +33,7 @@ Init : 초기화
 
 이 시스템은 Web3와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
 전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있습니다.
+<br>
 <br>
 <br>
 
@@ -82,7 +85,7 @@ Init : 초기화
 
 ## 1. 주요 기능
 
-### - OAuth 2.0 소셜 로그인
+### OAuth 2.0 소셜 로그인
 
 ![image](https://github.com/user-attachments/assets/5994c56f-0d6c-4caa-94f6-9e9bad855472)
 
@@ -92,9 +95,10 @@ Init : 초기화
 
 이후 해당 정보를 바탕으로 사용자의 회원가입 절차를 자동화하거나, 기존 회원이라면 바로 로그인 처리하여 사용자의 편의성을 극대화하였습니다. 또한, 이 과정에서 사용자 동의 절차를 거쳐 필요한 정보만을 수집하며, 개인정보 보호와 관련된 법적 요구 사항을 철저히 준수합니다.
 
----
+<br>
+<br>
 
-### - 2차 인증: 생체 인증 등 전자 지갑 생성을 위한 2차 인증 절차를 포함
+### 2차 인증: 생체 인증 등 전자 지갑 생성을 위한 2차 인증 절차를 포함
 
 ![image](https://github.com/user-attachments/assets/611bc384-68b3-4350-b2b9-8b959bc05d67)
 
