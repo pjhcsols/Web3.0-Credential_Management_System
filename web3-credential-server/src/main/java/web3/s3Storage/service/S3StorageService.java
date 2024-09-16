@@ -1,21 +1,18 @@
 package web3.s3Storage.service;
 
 import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import web3.domain.wallet.Wallet;
+import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
 
 import java.io.*;
@@ -23,28 +20,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class S3StorageService {
 
+    private final S3Properties s3Properties;
     private final S3Client s3Client;
-    private final String bucketName;
-    private final String bucketUrl;
-
     private final WalletRepository walletRepository;
 
-    @Autowired
-    public S3StorageService(@Value("${cloud.aws.credentials.accessKey}") String accessKey,
-                            @Value("${cloud.aws.credentials.secretKey}") String secretKey,
-                            @Value("${cloud.aws.s3.bucket}") String bucketName,
-                            @Value("${cloud.aws.s3.bucket.url}") String bucketUrl,
-                            WalletRepository walletRepository) {
-        this.s3Client = S3Client.builder()
-                .region(Region.AP_NORTHEAST_2) // 원하는 리전을 지정해야 합니다.
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
-                .build();
-        this.bucketName = bucketName;
-        this.bucketUrl = bucketUrl;
+    public S3StorageService(S3Properties s3Properties, WalletRepository walletRepository) {
+        this.s3Properties = s3Properties;
+        this.s3Client = s3Properties.getS3Client();
         this.walletRepository = walletRepository;
     }
 
@@ -56,10 +42,12 @@ public class S3StorageService {
 
         //첫 등록일때 => 생성해줘야함
         if (wallet.getPdfUrl() == null){
-            System.out.println("file = " + file);
+            log.info("file = {}", file);
 
             fileName = (file.getSize() > 0) ? getFileName(file, wallet): getEmptyFilename(wallet);
-            System.out.println("fileName = " + fileName);
+
+            log.info("fileName = {}", fileName);
+
             // PDF 파일 확장자 검증
             //validatePdfFile(fileName);
             result = (file.getSize() > 0) ? file.getBytes():createEmptyPdf();
@@ -69,15 +57,15 @@ public class S3StorageService {
             //이미 있을시 -> pdf 병합
             String destination = wallet.getPdfUrl();
             fileName = extractKeyFromUrl(destination);
-            System.out.println("destination = " + destination);
-            System.out.println("fileName = " + fileName);
+            log.info("destination = {}", destination);
+            log.info("fileName = {}", fileName);
 
             byte[] first = getPdf(destination).readAllBytes();//원래 파일
             byte[] second = (file.getSize() > 0) ? file.getBytes() : createEmptyPdf(); //뒤에 들어온 파일
 
             nowPage = getPdfPageCount(first)+1;
             result = mergePdfs(first, second);
-            System.out.println("merge Success");
+            log.info("merge Success");
 
 
             metadata= getPdfMetadata(fileName);
@@ -86,26 +74,26 @@ public class S3StorageService {
         String page = "page-" + nowPage; // 키 설정
         String value = pdfInfo + ":" + pdfKey;
         metadata.put(page,value); // 키-값 쌍으로 추가
-        System.out.println("metadata = " + metadata);
-
+        log.info("metadata = {}", metadata);
 
         try {
             // S3에 PDF 파일 업로드
             PutObjectRequest putRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(s3Properties.getS3BucketName())
                     .key(fileName)
                     .contentType(file.getContentType())
                     .metadata(metadata)
                     .build();
 
-            // PutObject 요청 수행
             s3Client.putObject(putRequest, RequestBody.fromBytes(result));
 
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
         }
+
         wallet.updatePdfUrl(getpdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
+
         return getpdfUrl(fileName);
     }
 
@@ -174,7 +162,7 @@ public class S3StorageService {
         // 최종 PDF를 S3에 업로드
         try {
             PutObjectRequest putRequest = PutObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(s3Properties.getS3BucketName())
                     .key(fileName)
                     .contentType(newPdfFile.getContentType())
                     .metadata(metadata)
@@ -277,7 +265,7 @@ public class S3StorageService {
         try {
             HeadObjectResponse response = s3Client.headObject(
                     HeadObjectRequest.builder()
-                            .bucket(bucketName)
+                            .bucket(s3Properties.getS3BucketName())
                             .key(fileName)
                             .build());
 
@@ -300,7 +288,7 @@ public class S3StorageService {
         String fileName = extractKeyFromUrl(pdfUrl);
 
         GetObjectRequest getRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
                 .build();
 
@@ -324,7 +312,7 @@ public class S3StorageService {
         String fileName = extractKeyFromUrl(pdfUrl);
 
         GetObjectRequest getRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
                 .build();
 
@@ -365,7 +353,7 @@ public class S3StorageService {
         System.out.println("key = " + key);
         try {
             s3Client.deleteObject(DeleteObjectRequest.builder()
-                    .bucket(bucketName)
+                    .bucket(s3Properties.getS3BucketName())
                     .key(key)
                     .build());
         } catch (S3Exception e) {
@@ -376,7 +364,7 @@ public class S3StorageService {
     public ResponseInputStream<GetObjectResponse> getPdf(String pdfUrl) {
         String key = extractKeyFromUrl(pdfUrl);
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(bucketName)
+                .bucket(s3Properties.getS3BucketName())
                 .key(key)
                 .build();
         return s3Client.getObject(getObjectRequest);
@@ -399,7 +387,7 @@ public class S3StorageService {
     }
 
     private String getpdfUrl(String fileName) {
-        return bucketUrl + "/" + fileName;
+        return s3Properties.getS3BucketUrl() + "/" + fileName;
     }
 
     @PreDestroy

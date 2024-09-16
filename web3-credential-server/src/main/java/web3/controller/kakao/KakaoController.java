@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import web3.properties.kakao.KakaoProperties;
+import web3.properties.KakaoProperties;
 import web3.domain.user.User;
-import web3.common.dto.user.UserInfoDto;
+import web3.service.dto.user.UserInfoDto;
 import web3.service.kakao.KakaoService;
 import web3.validation.LoginMember;
 

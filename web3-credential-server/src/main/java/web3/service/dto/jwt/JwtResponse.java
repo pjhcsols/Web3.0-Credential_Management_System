@@ -1,4 +1,4 @@
-package web3.common.dto.jwt;
+package web3.service.dto.jwt;
 
 public class JwtResponse {
     private String accessToken;

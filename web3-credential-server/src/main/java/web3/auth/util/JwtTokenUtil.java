@@ -5,17 +5,20 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import web3.properties.JwtProperties;
+import web3.properties.KakaoProperties;
 
 import java.util.Date;
 
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenUtil {
 
-    @Value("${jwt.key}")
-    private String secretKey;
+    private final JwtProperties jwtProperties;
 
     @Value("${jwt.access-token-validity}")
     private long accessTokenValidityMilliseconds;
@@ -39,7 +42,7 @@ public class JwtTokenUtil {
         try {
 
             Jwts.parserBuilder()
-                    .setSigningKey(secretKey.getBytes())
+                    .setSigningKey(jwtProperties.key().getBytes())
                     .build()
                     .parseClaimsJws(token);
 
@@ -56,7 +59,7 @@ public class JwtTokenUtil {
 
     public Claims getClaimsFromToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(secretKey.getBytes())
+                .setSigningKey(jwtProperties.key().getBytes())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -70,7 +73,7 @@ public class JwtTokenUtil {
                 .setSubject(email)
                 .setIssuedAt(now)
                 .setExpiration(validity)
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(jwtProperties.key().getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }
 }

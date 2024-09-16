@@ -100,13 +100,4 @@ public class S3StorageController {
         return ResponseEntity.ok().body(metadata);
     }
 
-
-
-    /*//스케줄러 용
-    @GetMapping("/all/photourl")
-    public ResponseEntity<List<String>> getAllImageUrls() {
-        List<String> imageUrls = s3StorageService.getAllImageUrls();
-        return ResponseEntity.ok(imageUrls);
-    }*/
-
 }
