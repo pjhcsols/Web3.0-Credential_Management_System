@@ -42,7 +42,7 @@ public class S3StorageService {
 
         //첫 등록일때 => 생성해줘야함
         if (wallet.getPdfUrl() == null){
-            fileName = (file.getSize() > 0) ? getFileName(file, wallet): getEmptyFilename(wallet);
+            fileName = (file.getSize() > 0) ? getFileName(wallet): getEmptyFilename(wallet);
 
             // PDF 파일 확장자 검증
             //validatePdfFile(fileName);
@@ -69,7 +69,6 @@ public class S3StorageService {
         log.info("metadata = {}", metadata);
 
         try {
-            // S3에 PDF 파일 업로드
             uploadToS3(file, fileName, metadata, result);
 
         } catch (S3Exception e) {
@@ -93,7 +92,7 @@ public class S3StorageService {
         s3Client.putObject(putRequest, RequestBody.fromBytes(result));
     }
 
-    private static String getFileName(MultipartFile file, Wallet wallet) {
+    private static String getFileName(Wallet wallet) {
         return wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + wallet.getAddress();
     }
 
@@ -148,8 +147,8 @@ public class S3StorageService {
         byte[] newPdfBytes = newPdfFile.getInputStream().readAllBytes();
 
         // 앞부분과 뒷부분 PDF 바이트 배열 생성
-        byte[] frontPart = createPdfBytesFrontPart(originalDocument, pageIndexToRemove);
-        byte[] backPart = createPdfBytesBackPart(originalDocument, pageIndexToRemove);
+        byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
+        byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
 
         // PDF 합치기
         byte[] finalPdfBytes = mergeThreePdfs(frontPart, newPdfBytes, backPart);
@@ -167,37 +166,21 @@ public class S3StorageService {
         return pdfUrl; // 최종 PDF 바이트 배열 반환
     }
 
-    // 앞부분 PDF 바이트 배열 생성
-    private byte[] createPdfBytesFrontPart(PDDocument document, int pageIndexToRemove) throws IOException {
+    private byte[] createPdfBytesPart(PDDocument document, int startIndex, int endIndex) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PDDocument frontPart = new PDDocument();
+        PDDocument partDocument = new PDDocument();
 
-        // 앞부분 (제거할 페이지 이전까지)
-        for (int i = 0; i < pageIndexToRemove; i++) {
+        // 지정된 인덱스 범위에 따라 페이지 추가
+        for (int i = startIndex; i < endIndex; i++) {
             PDPage page = document.getPage(i);
-            frontPart.addPage(page);
+            partDocument.addPage(page);
         }
 
-        frontPart.save(outputStream); // 앞부분 PDF 저장
-        frontPart.close();
+        partDocument.save(outputStream);
+        partDocument.close();
         return outputStream.toByteArray();
     }
 
-    // 뒷부분 PDF 바이트 배열 생성
-    private byte[] createPdfBytesBackPart(PDDocument document, int pageIndexToRemove) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PDDocument backPart = new PDDocument();
-
-        // 뒷부분 (제거할 페이지 이후부터)
-        for (int i = pageIndexToRemove + 1; i < document.getNumberOfPages(); i++) {
-            PDPage page = document.getPage(i);
-            backPart.addPage(page);
-        }
-
-        backPart.save(outputStream);
-        backPart.close();
-        return outputStream.toByteArray();
-    }
 
     // 세 개의 PDF 바이트 배열을 합치는 메서드
     public byte[] mergeThreePdfs(byte[] pdf1, byte[] pdf2, byte[] pdf3) throws IOException {
