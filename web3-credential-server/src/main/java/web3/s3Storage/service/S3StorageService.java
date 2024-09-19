@@ -42,11 +42,7 @@ public class S3StorageService {
 
         //첫 등록일때 => 생성해줘야함
         if (wallet.getPdfUrl() == null){
-            log.info("file = {}", file);
-
             fileName = (file.getSize() > 0) ? getFileName(file, wallet): getEmptyFilename(wallet);
-
-            log.info("fileName = {}", fileName);
 
             // PDF 파일 확장자 검증
             //validatePdfFile(fileName);
@@ -57,16 +53,12 @@ public class S3StorageService {
             //이미 있을시 -> pdf 병합
             String destination = wallet.getPdfUrl();
             fileName = extractKeyFromUrl(destination);
-            log.info("destination = {}", destination);
-            log.info("fileName = {}", fileName);
 
             byte[] first = getPdf(destination).readAllBytes();//원래 파일
             byte[] second = (file.getSize() > 0) ? file.getBytes() : createEmptyPdf(); //뒤에 들어온 파일
 
             nowPage = getPdfPageCount(first)+1;
             result = mergePdfs(first, second);
-            log.info("merge Success");
-
 
             metadata= getPdfMetadata(fileName);
         }
@@ -78,14 +70,7 @@ public class S3StorageService {
 
         try {
             // S3에 PDF 파일 업로드
-            PutObjectRequest putRequest = PutObjectRequest.builder()
-                    .bucket(s3Properties.getS3BucketName())
-                    .key(fileName)
-                    .contentType(file.getContentType())
-                    .metadata(metadata)
-                    .build();
-
-            s3Client.putObject(putRequest, RequestBody.fromBytes(result));
+            uploadToS3(file, fileName, metadata, result);
 
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
@@ -95,6 +80,17 @@ public class S3StorageService {
         walletRepository.saveAndFlush(wallet);
 
         return getpdfUrl(fileName);
+    }
+
+    private void uploadToS3(MultipartFile file, String fileName, HashMap<String, String> metadata, byte[] result) {
+        PutObjectRequest putRequest = PutObjectRequest.builder()
+                .bucket(s3Properties.getS3BucketName())
+                .key(fileName)
+                .contentType(file.getContentType())
+                .metadata(metadata)
+                .build();
+
+        s3Client.putObject(putRequest, RequestBody.fromBytes(result));
     }
 
     private static String getFileName(MultipartFile file, Wallet wallet) {
@@ -161,14 +157,7 @@ public class S3StorageService {
 
         // 최종 PDF를 S3에 업로드
         try {
-            PutObjectRequest putRequest = PutObjectRequest.builder()
-                    .bucket(s3Properties.getS3BucketName())
-                    .key(fileName)
-                    .contentType(newPdfFile.getContentType())
-                    .metadata(metadata)
-                    .build();
-            s3Client.putObject(putRequest, RequestBody.fromBytes(finalPdfBytes));
-
+            uploadToS3(newPdfFile, fileName, metadata, finalPdfBytes);
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
         } finally {
