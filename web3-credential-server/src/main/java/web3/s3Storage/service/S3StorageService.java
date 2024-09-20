@@ -341,17 +341,6 @@ public class S3StorageService {
                 .build();
         return s3Client.getObject(getObjectRequest);
     }
-
-    public String getPageByKey(HashMap<String, String> metadata, String key) {
-        return metadata.get(key);
-    }
-
-
-
-    private String generateFileName(String originalFileName) {
-        return UUID.randomUUID().toString() + "-" + originalFileName;
-    }
-
     private String extractKeyFromUrl(String url) {
         // Assuming the URL is in the format: https://s3.ap-northeast-2.amazonaws.com/bucketName/fileName
         int index = url.lastIndexOf('/');
