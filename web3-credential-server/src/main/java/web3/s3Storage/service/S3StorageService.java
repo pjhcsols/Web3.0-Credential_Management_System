@@ -351,7 +351,7 @@ public class S3StorageService {
         byte[] finalPdfBytes = mergePdfs(frontPart,backPart);
         HashMap<String, String> metadata = getPdfMetadata(fileName);
 
-        //메타데이터 수정 로직 필요
+        metadata.remove("page-" + pageNumberToRemove);
 
         // 최종 PDF를 S3에 업로드
         try {

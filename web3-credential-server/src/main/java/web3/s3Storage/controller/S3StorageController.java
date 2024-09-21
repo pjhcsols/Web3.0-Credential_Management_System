@@ -69,7 +69,7 @@ public class S3StorageController {
             @Parameter(description = "지울 지갑 ID",required = true)
             @RequestBody Long walletId,
             @Parameter(description = "지울 페이지 번호",required = true)
-            @RequestBody int page) {
+            @RequestBody int page) throws IOException {
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
         s3StorageService.deletePdfForPage(wallet,page);
         return ResponseEntity.noContent().build();
