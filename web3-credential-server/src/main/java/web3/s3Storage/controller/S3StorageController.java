@@ -30,7 +30,7 @@ public class S3StorageController {
         this.walletService = walletService;
     }
 
-    @Operation(summary = "pdf 업로드",description = "s3 스토리지에 pdf 파일을 업로드 합니다.")
+    @Operation(summary = "인증서(pdf) 업로드",description = "인증서를 업로드합니다. 즉,s3 스토리지에 pdf 파일을 업로드 합니다.")
     @PostMapping("/upload-pdf")
     public ResponseEntity<String> uploadPdf(
             @Parameter(description = "업로드할 pdf 파일",required = true)
@@ -52,14 +52,26 @@ public class S3StorageController {
     }
 
 
-    @Operation(summary = "pdf 업로드",description = "s3 스토리지에 pdf 파일을 업로드 합니다.")
+    @Operation(summary = "모든 인증서 삭제(지갑 삭제)",description = "모든 인증서를 삭제합니다. 즉,s3 스토리지에 pdf 파일을 모두 삭제합니다.")
     @DeleteMapping("/delete-pdf")
-    public ResponseEntity<Void> deletePdf(
+    public ResponseEntity<Void> deleteWallet(
             @Parameter(description = "지울 pdf 파일 경로 관련 Dto",required = true)
             @RequestBody DeletePdfRequest request) {
         String urlToDelete = request.getUrlToDelete();
         System.out.println("urlToDelete = " + urlToDelete);
         s3StorageService.deletePdf(urlToDelete);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "특정 인증서 삭제",description = "지갑에서 특정 인증서를 삭제합니다. 즉,S3 스토리지에 pdf 파일에서 특정 페이지를 삭제합니다.")
+    @DeleteMapping("/delete-onepdf")
+    public ResponseEntity<Void> deleteCertForPage(
+            @Parameter(description = "지울 지갑 ID",required = true)
+            @RequestBody Long walletId,
+            @Parameter(description = "지울 페이지 번호",required = true)
+            @RequestBody int page) {
+        Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
+        s3StorageService.deletePdfForPage(wallet,page);
         return ResponseEntity.noContent().build();
     }
 

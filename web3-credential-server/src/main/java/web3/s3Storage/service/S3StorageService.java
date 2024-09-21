@@ -18,7 +18,6 @@ import web3.repository.wallet.WalletRepository;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -69,7 +68,7 @@ public class S3StorageService {
         log.info("metadata = {}", metadata);
 
         try {
-            uploadToS3(file, fileName, metadata, result);
+            uploadToS3(fileName, metadata, result);
 
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
@@ -81,11 +80,11 @@ public class S3StorageService {
         return getpdfUrl(fileName);
     }
 
-    private void uploadToS3(MultipartFile file, String fileName, HashMap<String, String> metadata, byte[] result) {
+    private void uploadToS3(String fileName, HashMap<String, String> metadata, byte[] result) {
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
-                .contentType(file.getContentType())
+                .contentType("application/pdf")
                 .metadata(metadata)
                 .build();
 
@@ -156,7 +155,7 @@ public class S3StorageService {
 
         // 최종 PDF를 S3에 업로드
         try {
-            uploadToS3(newPdfFile, fileName, metadata, finalPdfBytes);
+            uploadToS3(fileName, metadata, finalPdfBytes);
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
         } finally {
@@ -227,8 +226,6 @@ public class S3StorageService {
 
         return certList;
     }
-
-
 
     public HashMap<String, String> getPdfMetadata( String pdfUrl) {
         HashMap<String, String> metadata;
@@ -318,11 +315,8 @@ public class S3StorageService {
         }
     }
 
-
-    //예외처리하기
     public void deletePdf(String urlToDelete) {
         String key = extractKeyFromUrl(urlToDelete);
-        System.out.println("key = " + key);
         try {
             s3Client.deleteObject(DeleteObjectRequest.builder()
                     .bucket(s3Properties.getS3BucketName())
@@ -333,6 +327,43 @@ public class S3StorageService {
         }
     }
 
+    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException {
+        String pdfUrl = wallet.getPdfUrl();
+        byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
+        String fileName = extractKeyFromUrl(pdfUrl);
+
+        // 기존 PDF 로드
+        PDDocument originalDocument = PDDocument.load(new ByteArrayInputStream(originalPdfBytes));
+        int totalPages = originalDocument.getNumberOfPages();
+
+        // 페이지 번호는 0부터 시작하므로 1을 빼줌
+        int pageIndexToRemove = pageNumberToRemove - 1;
+
+        // 페이지가 존재하는지 확인
+        if (pageIndexToRemove < 0 || pageIndexToRemove >= totalPages) {
+            throw new IllegalArgumentException("Page number out of range: " + pageNumberToRemove);
+        }
+
+        byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
+        byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
+
+        // PDF 합치기
+        byte[] finalPdfBytes = mergePdfs(frontPart,backPart);
+        HashMap<String, String> metadata = getPdfMetadata(fileName);
+
+        //메타데이터 수정 로직 필요
+
+        // 최종 PDF를 S3에 업로드
+        try {
+            uploadToS3(fileName, metadata, finalPdfBytes);
+        } catch (S3Exception e) {
+            throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
+        } finally {
+            originalDocument.close();
+        }
+
+    }
+
     public ResponseInputStream<GetObjectResponse> getPdf(String pdfUrl) {
         String key = extractKeyFromUrl(pdfUrl);
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -341,6 +372,7 @@ public class S3StorageService {
                 .build();
         return s3Client.getObject(getObjectRequest);
     }
+
     private String extractKeyFromUrl(String url) {
         // Assuming the URL is in the format: https://s3.ap-northeast-2.amazonaws.com/bucketName/fileName
         int index = url.lastIndexOf('/');
