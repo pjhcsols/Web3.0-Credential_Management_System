@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web3.domain.wallet.Wallet;
+import web3.s3Storage.dto.DeleteCertRequest;
 import web3.s3Storage.dto.DeletePdfRequest;
 import web3.s3Storage.service.S3StorageService;
 import web3.service.wallet.WalletService;
@@ -64,12 +65,14 @@ public class S3StorageController {
     }
 
     @Operation(summary = "특정 인증서 삭제",description = "지갑에서 특정 인증서를 삭제합니다. 즉,S3 스토리지에 pdf 파일에서 특정 페이지를 삭제합니다.")
-    @DeleteMapping("/delete-onepdf")
+    @PatchMapping ("/delete-one")
     public ResponseEntity<Void> deleteCertForPage(
-            @Parameter(description = "지울 지갑 ID",required = true)
-            @RequestBody Long walletId,
-            @Parameter(description = "지울 페이지 번호",required = true)
-            @RequestBody int page) throws IOException {
+            @Parameter(description = "walletId와 삭제할 page가 담긴 Dto",required = true)
+            @RequestBody DeleteCertRequest request
+    ) throws IOException {
+        System.out.println("request = " + request);
+        Long walletId = request.getWalletId();
+        int page = request.getPage();
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
         s3StorageService.deletePdfForPage(wallet,page);
         return ResponseEntity.noContent().build();

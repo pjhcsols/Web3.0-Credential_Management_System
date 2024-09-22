@@ -6,6 +6,7 @@ import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -327,6 +328,7 @@ public class S3StorageService {
         }
     }
 
+    @Transactional
     public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException {
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
