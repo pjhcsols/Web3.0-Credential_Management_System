@@ -342,9 +342,7 @@ public class S3StorageService {
         int pageIndexToRemove = pageNumberToRemove - 1;
 
         // 페이지가 존재하는지 확인
-        if (pageIndexToRemove < 0 || pageIndexToRemove >= totalPages) {
-            throw new IllegalArgumentException("Page number out of range: " + pageNumberToRemove);
-        }
+        checkPageExist(pageIndexToRemove < 0, pageIndexToRemove >= totalPages, "Page number out of range: " + pageNumberToRemove);
 
         byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
         byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
@@ -352,7 +350,7 @@ public class S3StorageService {
         // PDF 합치기
         byte[] finalPdfBytes = mergePdfs(frontPart,backPart);
         HashMap<String, String> metadata = getPdfMetadata(fileName);
-
+        log.info("metadata = {}",metadata);
         metadata.remove("page-" + pageNumberToRemove);
 
         // 최종 PDF를 S3에 업로드
@@ -364,6 +362,12 @@ public class S3StorageService {
             originalDocument.close();
         }
 
+    }
+
+    private static void checkPageExist(boolean pageIndexToRemove, boolean pageIndexToRemove1, String pageNumberToRemove) {
+        if (pageIndexToRemove || pageIndexToRemove1) {
+            throw new IllegalArgumentException(pageNumberToRemove);
+        }
     }
 
     public ResponseInputStream<GetObjectResponse> getPdf(String pdfUrl) {
