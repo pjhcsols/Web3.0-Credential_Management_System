@@ -354,6 +354,20 @@ public class S3StorageService {
         HashMap<String, String> metadata = getPdfMetadata(fileName);
 
         // 기존 키들을 리스트로 변환 후 정렬
+        HashMap<String, String> newMetadata = changeForNewMetadata(pageNumberToRemove, metadata);
+
+        // 최종 PDF를 S3에 업로
+        try {
+            uploadToS3(fileName, newMetadata, finalPdfBytes);
+        } catch (S3Exception e) {
+            throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
+        } finally {
+            originalDocument.close();
+        }
+
+    }
+
+    private HashMap<String, String> changeForNewMetadata(int pageNumberToRemove, HashMap<String, String> metadata) {
         List<Integer> pageNumbers = new ArrayList<>();
         for (String key : metadata.keySet()) {
             // "page-" 뒤의 숫자 추출
@@ -362,7 +376,6 @@ public class S3StorageService {
                 pageNumbers.add(pageNum); //pageNumbers 리스트에 페이지 넘버 다 넣기
             }
         }
-        System.out.println("metadata = " + metadata);
         // 페이지 번호 정렬
         pageNumbers.sort(Integer::compareTo);
         int pageSize = getPageSize(pageNumberToRemove, pageNumbers);
@@ -387,23 +400,11 @@ public class S3StorageService {
         for (int newPageNum : newPageNumbers) {
             if(newPageNum + pageSize > pageNumberToRemove) {
                 newMetadata.put("page-" + newPageNum, metadata.get("page-" + (newPageNum+pageSize)));
-                System.out.println("newPageNum+pageSize = " + newPageNum+pageSize);
             }else{
                 newMetadata.put("page-" + newPageNum, metadata.get("page-" + newPageNum));
-                System.out.println("newPageNum = " + newPageNum);
             }
         }
-        System.out.println("newMetadata = " + newMetadata);
-
-        // 최종 PDF를 S3에 업로
-        try {
-            uploadToS3(fileName, newMetadata, finalPdfBytes);
-        } catch (S3Exception e) {
-            throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
-        } finally {
-            originalDocument.close();
-        }
-
+        return newMetadata;
     }
 
     //삭제할 인증서의 페이지 수 구하기
