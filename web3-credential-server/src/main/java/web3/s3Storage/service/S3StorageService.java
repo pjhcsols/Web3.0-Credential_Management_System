@@ -362,29 +362,38 @@ public class S3StorageService {
                 pageNumbers.add(pageNum); //pageNumbers 리스트에 페이지 넘버 다 넣기
             }
         }
-
+        System.out.println("metadata = " + metadata);
         // 페이지 번호 정렬
         pageNumbers.sort(Integer::compareTo);
         int pageSize = getPageSize(pageNumberToRemove, pageNumbers);
 
         pageNumbers.removeIf(pageNum -> pageNum == pageNumberToRemove);
+        List<Integer> newPageNumbers = new ArrayList<>();
 
-        for (int i = 0; i < pageNumbers.size(); i++) {
-            if (pageNumbers.get(i) > pageNumberToRemove) {
-                pageNumbers.set(i, pageNumbers.get(i) - pageSize);
+
+        for (Integer pageNumber : pageNumbers) {
+            if (pageNumber > pageNumberToRemove) {
+                newPageNumbers.add(pageNumber - pageSize);
+            } else {
+                newPageNumbers.add(pageNumber);
             }
         }
-        System.out.println("pageNumbers = " + pageNumbers);
+        System.out.println("pageSize = " + pageSize);
 
         // 새로운 메타데이터 해시맵 생성
         HashMap<String, String> newMetadata = new HashMap<>();
-        int newPageNumber = 1;
 
         // 기존 메타데이터의 값을 유지하면서 새로운 키로 추가
-        for (int oldPageNum : pageNumbers) {
-            newMetadata.put("page-" + newPageNumber, metadata.get("page-" + oldPageNum));
-            newPageNumber++;
+        for (int newPageNum : newPageNumbers) {
+            if(newPageNum + pageSize > pageNumberToRemove) {
+                newMetadata.put("page-" + newPageNum, metadata.get("page-" + (newPageNum+pageSize)));
+                System.out.println("newPageNum+pageSize = " + newPageNum+pageSize);
+            }else{
+                newMetadata.put("page-" + newPageNum, metadata.get("page-" + newPageNum));
+                System.out.println("newPageNum = " + newPageNum);
+            }
         }
+        System.out.println("newMetadata = " + newMetadata);
 
         // 최종 PDF를 S3에 업로
         try {
