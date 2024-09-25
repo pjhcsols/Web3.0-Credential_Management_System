@@ -17,7 +17,9 @@ import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -329,7 +331,7 @@ public class S3StorageService {
     }
 
     @Transactional
-    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException {
+    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException{
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
         String fileName = extractKeyFromUrl(pdfUrl);
@@ -350,12 +352,43 @@ public class S3StorageService {
         // PDF 합치기
         byte[] finalPdfBytes = mergePdfs(frontPart,backPart);
         HashMap<String, String> metadata = getPdfMetadata(fileName);
-        log.info("metadata = {}",metadata);
-        metadata.remove("page-" + pageNumberToRemove);
 
-        // 최종 PDF를 S3에 업로드
+        // 기존 키들을 리스트로 변환 후 정렬
+        List<Integer> pageNumbers = new ArrayList<>();
+        for (String key : metadata.keySet()) {
+            // "page-" 뒤의 숫자 추출
+            if (key.startsWith("page-")) {
+                int pageNum = Integer.parseInt(key.substring(5));
+                pageNumbers.add(pageNum); //pageNumbers 리스트에 페이지 넘버 다 넣기
+            }
+        }
+
+        // 페이지 번호 정렬
+        pageNumbers.sort(Integer::compareTo);
+        int pageSize = getPageSize(pageNumberToRemove, pageNumbers);
+
+        pageNumbers.removeIf(pageNum -> pageNum == pageNumberToRemove);
+
+        for (int i = 0; i < pageNumbers.size(); i++) {
+            if (pageNumbers.get(i) > pageNumberToRemove) {
+                pageNumbers.set(i, pageNumbers.get(i) - pageSize);
+            }
+        }
+        System.out.println("pageNumbers = " + pageNumbers);
+
+        // 새로운 메타데이터 해시맵 생성
+        HashMap<String, String> newMetadata = new HashMap<>();
+        int newPageNumber = 1;
+
+        // 기존 메타데이터의 값을 유지하면서 새로운 키로 추가
+        for (int oldPageNum : pageNumbers) {
+            newMetadata.put("page-" + newPageNumber, metadata.get("page-" + oldPageNum));
+            newPageNumber++;
+        }
+
+        // 최종 PDF를 S3에 업로
         try {
-            uploadToS3(fileName, metadata, finalPdfBytes);
+            uploadToS3(fileName, newMetadata, finalPdfBytes);
         } catch (S3Exception e) {
             throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
         } finally {
@@ -364,7 +397,20 @@ public class S3StorageService {
 
     }
 
-    private static void checkPageExist(boolean pageIndexToRemove, boolean pageIndexToRemove1, String pageNumberToRemove) {
+    //삭제할 인증서의 페이지 수 구하기
+    private int getPageSize(int pageNumberToRemove, List<Integer> pageNumbers) {
+        //삭제할 인증서와 다음 인증서의 차 구하기 (삭제할 인증서의 페이지 수 구하기)
+        for (int i = 0; i< pageNumbers.size(); i++){
+            if (pageNumbers.get(i) == pageNumberToRemove){
+                if (i != pageNumbers.size()-1){
+                    return pageNumbers.get(i+1) - pageNumbers.get(i);
+                }
+            }
+        }
+        return 0;
+    }
+
+    private void checkPageExist(boolean pageIndexToRemove, boolean pageIndexToRemove1, String pageNumberToRemove) {
         if (pageIndexToRemove || pageIndexToRemove1) {
             throw new IllegalArgumentException(pageNumberToRemove);
         }
