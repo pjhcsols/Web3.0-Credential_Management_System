@@ -97,7 +97,6 @@ public class S3StorageController {
             @Parameter(description = "pdf 파일 경로",required = true)
             @RequestParam("pdfUrl") String pdfUrl) {
         try {
-            System.out.println("pdfUrl = " + pdfUrl);
             byte[] pdfData = s3StorageService.getPdf(pdfUrl).readAllBytes();
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdfData);
         } catch (IOException e) {
@@ -134,6 +133,7 @@ public class S3StorageController {
             @Parameter(description = "페이지 번호",required = true)
             @RequestParam int page) {
         String metadata = s3StorageService.getMetadataForPage(pdfUrl, page);
+
         return ResponseEntity.ok().body(metadata);
     }
 

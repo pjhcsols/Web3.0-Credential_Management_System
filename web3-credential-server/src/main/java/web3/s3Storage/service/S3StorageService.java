@@ -279,10 +279,12 @@ public class S3StorageService {
         GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
 
         Map<String, String> metadata = getObjectResponse.metadata();
+        HashMap<String, String> decodedMetadata = decodeMetadata(metadata);
+        System.out.println("decodedMetadata = " + decodedMetadata);
 
         String pageKey = "page-" + pageNumber;
 
-        String result = metadata.get(pageKey);
+        String result = decodedMetadata.get(pageKey);
 
         // 내용 부분만 추출
         if (result != null && result.contains(":")) {
