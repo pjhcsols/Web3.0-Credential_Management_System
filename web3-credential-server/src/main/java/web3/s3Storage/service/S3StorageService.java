@@ -17,6 +17,8 @@ import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
 
 import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,12 +86,20 @@ public class S3StorageService {
     }
 
     private void uploadToS3(String fileName, HashMap<String, String> metadata, byte[] result) {
+
+        HashMap<String, String> encodedMetadata = new HashMap<>();
+        for (String key : metadata.keySet()) {
+            //UTF_8로 인코딩
+            encodedMetadata.put(key, URLEncoder.encode(metadata.get(key), StandardCharsets.UTF_8));
+        }
+
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
                 .contentType("application/pdf")
-                .metadata(metadata)
+                .metadata(encodedMetadata)
                 .build();
+
 
         s3Client.putObject(putRequest, RequestBody.fromBytes(result));
     }
@@ -208,6 +218,7 @@ public class S3StorageService {
     public HashMap<String, String> getCertList(String pdfUrl) {
         HashMap<String, String> metadata = getPdfMetadata(pdfUrl);
         HashMap<String, String> certList = new HashMap<>();
+
 
         for (Map.Entry<String, String> entry : metadata.entrySet()) {
             String key = entry.getKey();
