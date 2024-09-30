@@ -17,6 +17,7 @@ import web3.service.wallet.WalletService;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/wallets")
@@ -84,7 +85,9 @@ public class S3StorageController {
             @Parameter(description = "pdf 파일 경로",required = true)
             @RequestParam("pdfUrl") String pdfUrl) {
         HashMap<String, String> certList = s3StorageService.getCertList(pdfUrl);
-        return ResponseEntity.ok().body(certList);
+        HashMap<String, String> decodedMetadata = s3StorageService.decodeMetadata(certList);
+        //return ResponseEntity.ok().body(certList);
+        return ResponseEntity.ok().body(decodedMetadata);
 
     }
 

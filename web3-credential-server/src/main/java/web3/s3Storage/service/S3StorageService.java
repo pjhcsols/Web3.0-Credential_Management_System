@@ -17,6 +17,7 @@ import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -435,6 +436,23 @@ public class S3StorageService {
         if (pageIndexToRemove || pageIndexToRemove1) {
             throw new IllegalArgumentException(pageNumberToRemove);
         }
+    }
+
+    // 메타데이터 디코딩 메서드
+    // 메타데이터 디코딩 메서드
+    public HashMap<String, String> decodeMetadata(Map<String, String> metadata) {
+        HashMap<String, String> decodedMetadata = new HashMap<>();
+        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+            String key = entry.getKey();
+            try {
+                // URL 디코딩
+                String value = URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name());
+                decodedMetadata.put(key, value);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace(); // 예외 처리
+            }
+        }
+        return decodedMetadata;
     }
 
     public ResponseInputStream<GetObjectResponse> getPdf(String pdfUrl) {
