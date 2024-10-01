@@ -57,7 +57,7 @@ public class UnivCertApiTest {
                 "  \"key\": \"43086994-92b9-4caa-8b3e-be2510051c8e\",\n" +
                 "  \"email\": \"solhappy2000@knu.ac.kr\",\n" +
                 "  \"univName\": \"경북대학교\",\n" +
-                "  \"code\": 7123\n" +
+                "  \"code\": 1032\n" +
                 "}";
 
         // Set Headers
