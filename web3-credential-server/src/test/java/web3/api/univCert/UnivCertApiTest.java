@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class UnivCertApiTest {
 
     @Autowired
@@ -20,7 +22,7 @@ public class UnivCertApiTest {
     void shouldSendCertificationCodeSuccessfully() {
         // JSON Request Payload
         String jsonRequest = "{\n" +
-                "  \"key\": \"43086994-92b9-4caa-8b3e-be2510051c8e\",\n" +
+                "  \"key\": \"0572d205-ba30-4260-beb7-87577c91e30a\",\n" +
                 "  \"email\": \"solhappy2000@knu.ac.kr\",\n" +
                 "  \"univName\": \"경북대학교\",\n" +
                 "  \"univ_check\": true\n" +

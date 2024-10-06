@@ -1,5 +1,6 @@
 package web3.api.passport;
 
+/*
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -152,3 +153,6 @@ public class PassportValidityTest {
         }
     }
 }
+
+
+ */

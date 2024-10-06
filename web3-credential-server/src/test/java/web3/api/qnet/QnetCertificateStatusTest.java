@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+
 @SpringBootApplication
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class QnetCertificateStatusTest {
@@ -214,3 +215,5 @@ public class QnetCertificateStatusTest {
         }
     }
 }
+
+
