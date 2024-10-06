@@ -22,7 +22,7 @@ public class UnivCertApiTest {
     void shouldSendCertificationCodeSuccessfully() {
         // JSON Request Payload
         String jsonRequest = "{\n" +
-                "  \"key\": \"0572d205-ba30-4260-beb7-87577c91e30a\",\n" +
+                "  \"key\": \"43086994-92b9-4caa-8b3e-be2510051c8e\",\n" +
                 "  \"email\": \"solhappy2000@knu.ac.kr\",\n" +
                 "  \"univName\": \"경북대학교\",\n" +
                 "  \"univ_check\": true\n" +
@@ -147,6 +147,39 @@ public class UnivCertApiTest {
         System.out.println("Response Body: " + response.getBody());
 
         // Validate Response
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("\"success\":true");
+    }
+
+    @Test
+    @DisplayName("인증 요청할 대학명 전송에 성공해야 합니다.")
+    void shouldSendUnivNameSuccessfully() {
+        // JSON Request Payload
+        String jsonRequest = """
+                {
+                  "univName" : "경북대학교"
+                }
+                """;
+
+        // Set Headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create HttpEntity
+        HttpEntity<String> request = new HttpEntity<>(jsonRequest, headers);
+
+        // Send POST request to the /check endpoint
+        ResponseEntity<String> response = restTemplate.exchange(
+                "https://univcert.com/api/v1/check",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+
+        // 로그에 응답 본문 출력
+        System.out.println("Response Body: " + response.getBody());
+
+        // Validate Response for success
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("\"success\":true");
     }
