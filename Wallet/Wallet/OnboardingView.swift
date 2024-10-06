@@ -24,15 +24,9 @@ struct OnboardingView: View {
             Spacer()
             Button(action: {
             }) {
-                Text("카카오 로그인")
-                    .font(.headline)
-                    .foregroundColor(.black)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color(red: 254/255, green: 229/255, blue: 0/255))
-                    .cornerRadius(10)
+                Image("images/kakao_login_medium_wide")
             }
-            .padding([.leading, .bottom, .trailing], 40)
+            .padding(.bottom, 40)
         }
     }
 }
