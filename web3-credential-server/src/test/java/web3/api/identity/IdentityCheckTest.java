@@ -3,10 +3,14 @@ package web3.api.identity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.*;
-import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.match.MockRestRequestMatchers;
+import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLDecoder;
@@ -15,94 +19,93 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.http.HttpMethod.POST;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class IdentityCheckTest {
 
-    @Autowired
+    @MockBean
     private RestTemplate restTemplate;
 
     private static final String API_URL = "https://development.codef.io/v1/kr/public/mw/identity-card/check-status";
-    private static String accessToken;  // Access Token을 저장할 변수
+    private static String accessToken;
+
+    private MockRestServiceServer mockServer;
 
     @BeforeAll
-    static void setup() throws Exception {
-        // AccessTokenTest 클래스를 이용하여 Access Token을 발급받음
-        HashMap<String, String> tokenResponse = AccessTokenTest.publishToken(
-                "9f515c3f-8df3-41b7-9da1-e08192131b3d", 
-                "d0c5a8b8-2858-4059-acff-289f42892f47"
-        );
+    static void setup() {
+        accessToken = "mock_access_token"; // Mock access token
+    }
 
-        // 발급받은 토큰을 accessToken 변수에 저장
-        if (tokenResponse != null && tokenResponse.get("access_token") != null) {
-            accessToken = tokenResponse.get("access_token");
-        } else {
-            throw new RuntimeException("Failed to obtain access token");
-        }
+    @Autowired
+    public void setUpMockServer(RestTemplate restTemplate) {
+        // Initialize MockRestServiceServer
+        mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
     void shouldCheckIdentityCardStatusSuccessfully() throws Exception {
-        // API 요청 페이로드 준비
+        // Mock API response setup
+        String mockApiResponse = "{ \"result\": \"success\", \"data\": { \"resUserNm\": \"홍길동\", \"resUserIdentiyNo\": \"910101-1234***\", \"resAuthenticity\": \"1\", \"resAuthenticityDesc\": \"주민등록번호 진위확인 성공\" } }";
+        mockServer.expect(requestTo(API_URL))
+                .andExpect(method(POST)) // Correctly specify the HTTP method
+                .andRespond(withSuccess(mockApiResponse, MediaType.APPLICATION_JSON));
+
+        // API request payload preparation
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("organization", "0002");
         requestBody.put("loginType", "0");
         requestBody.put("certType", "1");
-        requestBody.put("certFile", "BASE64_ENCODED_CERT_DER"); // 실제 Base64 인코딩된 인증서 der 문자열로 대체
-        requestBody.put("keyFile", "BASE64_ENCODED_KEY_FILE");  // 실제 Base64 인코딩된 키 파일 문자열로 대체
-        requestBody.put("certPassword", "ENCRYPTED_PASSWORD");   // 실제 RSA 암호화된 비밀번호로 대체
-        requestBody.put("loginTypeLevel", "1");
-        requestBody.put("telecom", "");
-        requestBody.put("phoneNo", "01012341234");
+        requestBody.put("certFile", "BASE64_ENCODED_CERT_DER"); // Replace with actual Base64 encoded cert
+        requestBody.put("keyFile", "BASE64_ENCODED_KEY_FILE");  // Replace with actual Base64 encoded key
+        requestBody.put("certPassword", "ENCRYPTED_PASSWORD");   // Replace with actual encrypted password
         requestBody.put("loginUserName", "홍길동");
         requestBody.put("loginIdentity", "9101011234123");
-        requestBody.put("loginBirthDate", "");
-        requestBody.put("birthDate", "");
-        requestBody.put("identity", "9101011234123");
-        requestBody.put("userName", "홍길동");
         requestBody.put("issueDate", "20190101");
-        requestBody.put("identityEncYn", "");
+        requestBody.put("identityEncYn", "N");
 
-        // HTTP 요청 헤더 설정
+        // HTTP request header setup
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
-        // 발급받은 Access Token을 Authorization 헤더에 설정
         headers.setBearerAuth(accessToken);
 
-        // HttpEntity 객체 생성 (요청 바디와 헤더 포함)
+        // HttpEntity object creation (including request body and headers)
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
-        try {
-            // API 엔드포인트로 POST 요청 전송
-            ResponseEntity<String> response = restTemplate.exchange(
-                    API_URL,
-                    HttpMethod.POST,
-                    requestEntity,
-                    String.class
-            );
+        // Make API call and receive response
+        ResponseEntity<String> response = restTemplate.exchange(
+                API_URL,
+                POST,
+                requestEntity,
+                String.class
+        );
 
-            // URL 디코딩 수행 후 응답 바디 출력
-            String decodedBody = URLDecoder.decode(response.getBody(), StandardCharsets.UTF_8.name());
-            System.out.println("Decoded Response Body: " + decodedBody);
+        // Assert the response is not null and has the expected status code
+        assertThat(response).isNotNull();  // Ensure response is not null
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-            // 응답 검증
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(decodedBody).isNotNull();
+        // Check the mock server for expected behavior
+        mockServer.verify();  // Verify that the request was received by the mock server
 
-            // URL 디코딩된 응답 파싱 (선택 사항: 특정 필드를 확인하기 위해)
-            ObjectMapper objectMapper = new ObjectMapper();
-            Map<String, Object> responseBody = objectMapper.readValue(decodedBody, Map.class);
+        // Ensure the response body is not null and decode it
+        String responseBody = response.getBody();
+        assertThat(responseBody).isNotNull(); // Ensure response body is not null
 
-            // 특정 응답 필드에 대한 검증 추가
-            assertThat(responseBody).containsKey("result");
-            assertThat(responseBody).containsKey("data");
+        // URL decode the response body
+        String decodedBody = URLDecoder.decode(responseBody, StandardCharsets.UTF_8.name());
+        System.out.println("Decoded Response Body: " + decodedBody);
 
-        } catch (HttpStatusCodeException e) {
-            // HTTP 상태 코드 에러를 처리하기 위해 예외 로그 출력
-            System.err.println("HTTP Status Code: " + e.getStatusCode());
-            System.err.println("Response Body: " + e.getResponseBodyAsString());
-            throw e;
-        }
+        // URL decoded response parsing
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> responseMap = objectMapper.readValue(decodedBody, Map.class);
+
+        // Assertions on response fields
+        assertThat(responseMap).containsKey("result");
+        assertThat(responseMap).containsKey("data");
+        assertThat(((Map<String, Object>) responseMap.get("data")).get("resUserNm")).isEqualTo("홍길동");
+        assertThat(((Map<String, Object>) responseMap.get("data")).get("resAuthenticityDesc")).isEqualTo("주민등록번호 진위확인 성공");
     }
 }

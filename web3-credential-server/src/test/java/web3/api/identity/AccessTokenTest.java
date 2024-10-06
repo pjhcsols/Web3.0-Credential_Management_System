@@ -3,7 +3,11 @@ package web3.api.identity;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -15,12 +19,16 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+//@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AccessTokenTest {
 
+    @Autowired
+    private RestTemplate restTemplate;
+
     private static final String TOKEN_URL = "https://oauth.codef.io/oauth/token";
-    private static final String CLIENT_ID = "9f515c3f-8df3-41b7-9da1-e08192131b3d";
-    private static final String CLIENT_SECRET = "d0c5a8b8-2858-4059-acff-289f42892f47";
+    private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
+    private static final String CLIENT_SECRET = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
 
     @Test
     void shouldPublishAccessTokenSuccessfully() throws Exception {
@@ -28,7 +36,7 @@ public class AccessTokenTest {
 
         assertThat(tokenResponse).isNotNull();
         assertThat(tokenResponse.get("access_token")).isNotNull();
-        
+
         System.out.println("Access Token: " + tokenResponse.get("access_token"));
     }
 
