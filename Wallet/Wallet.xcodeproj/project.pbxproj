@@ -18,10 +18,12 @@
 		A27B12F82CA9C696004AAF23 /* KnuTruth.otf in Resources */ = {isa = PBXBuildFile; fileRef = A27B12F72CA9C696004AAF23 /* KnuTruth.otf */; };
 		A27B12F92CA9C696004AAF23 /* KnuTruth.otf in Resources */ = {isa = PBXBuildFile; fileRef = A27B12F72CA9C696004AAF23 /* KnuTruth.otf */; };
 		A27B12FA2CA9C696004AAF23 /* KnuTruth.otf in Resources */ = {isa = PBXBuildFile; fileRef = A27B12F72CA9C696004AAF23 /* KnuTruth.otf */; };
-		A27B12FD2CA9D71D004AAF23 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B12FC2CA9D71D004AAF23 /* HistoryView.swift */; };
 		A27B13092CB0E721004AAF23 /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B13082CB0E721004AAF23 /* HistoryListView.swift */; };
 		A27B130A2CB0E721004AAF23 /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B13082CB0E721004AAF23 /* HistoryListView.swift */; };
 		A27B130B2CB0E721004AAF23 /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B13082CB0E721004AAF23 /* HistoryListView.swift */; };
+		A27B130D2CB0EF2D004AAF23 /* CertificateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B130C2CB0EF2D004AAF23 /* CertificateView.swift */; };
+		A27B130E2CB0EF2D004AAF23 /* CertificateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B130C2CB0EF2D004AAF23 /* CertificateView.swift */; };
+		A27B130F2CB0EF2D004AAF23 /* CertificateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B130C2CB0EF2D004AAF23 /* CertificateView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,8 +57,8 @@
 		A27B12EA2CA95265004AAF23 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		A27B12F22CA9C4D8004AAF23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		A27B12F72CA9C696004AAF23 /* KnuTruth.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = KnuTruth.otf; sourceTree = "<group>"; };
-		A27B12FC2CA9D71D004AAF23 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		A27B13082CB0E721004AAF23 /* HistoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListView.swift; sourceTree = "<group>"; };
+		A27B130C2CB0EF2D004AAF23 /* CertificateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificateView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,8 +113,8 @@
 				A27B12C02CA94BDB004AAF23 /* WalletApp.swift */,
 				A27B12C22CA94BDB004AAF23 /* ContentView.swift */,
 				A27B12EA2CA95265004AAF23 /* OnboardingView.swift */,
-				A27B12FC2CA9D71D004AAF23 /* HistoryView.swift */,
 				A27B13082CB0E721004AAF23 /* HistoryListView.swift */,
+				A27B130C2CB0EF2D004AAF23 /* CertificateView.swift */,
 				A27B12C42CA94BDC004AAF23 /* Assets.xcassets */,
 				A27B12DA2CA94BDC004AAF23 /* WalletUITests */,
 				A27B12C62CA94BDC004AAF23 /* Preview Content */,
@@ -296,7 +298,7 @@
 			files = (
 				A27B13092CB0E721004AAF23 /* HistoryListView.swift in Sources */,
 				A27B12EB2CA95265004AAF23 /* OnboardingView.swift in Sources */,
-				A27B12FD2CA9D71D004AAF23 /* HistoryView.swift in Sources */,
+				A27B130D2CB0EF2D004AAF23 /* CertificateView.swift in Sources */,
 				A27B12C32CA94BDB004AAF23 /* ContentView.swift in Sources */,
 				A27B12C12CA94BDB004AAF23 /* WalletApp.swift in Sources */,
 			);
@@ -308,6 +310,7 @@
 			files = (
 				A27B12D22CA94BDC004AAF23 /* WalletTests.swift in Sources */,
 				A27B130A2CB0E721004AAF23 /* HistoryListView.swift in Sources */,
+				A27B130E2CB0EF2D004AAF23 /* CertificateView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,6 +320,7 @@
 			files = (
 				A27B130B2CB0E721004AAF23 /* HistoryListView.swift in Sources */,
 				A27B12DC2CA94BDC004AAF23 /* WalletUITests.swift in Sources */,
+				A27B130F2CB0EF2D004AAF23 /* CertificateView.swift in Sources */,
 				A27B12DE2CA94BDC004AAF23 /* WalletUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

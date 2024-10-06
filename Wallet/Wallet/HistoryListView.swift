@@ -24,7 +24,6 @@ struct HistoryListView: View {
                 }
             }
         }
-        .background(Color.white)
         .scrollContentBackground(.hidden)
     }
 }
