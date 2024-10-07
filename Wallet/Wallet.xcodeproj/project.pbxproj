@@ -20,6 +20,7 @@
 		A27AE29B2CB28A2E005F9A31 /* KakaoSDKTemplate in Frameworks */ = {isa = PBXBuildFile; productRef = A27AE29A2CB28A2E005F9A31 /* KakaoSDKTemplate */; };
 		A27AE29D2CB28A2E005F9A31 /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = A27AE29C2CB28A2E005F9A31 /* KakaoSDKUser */; };
 		A27AE29F2CB28A6A005F9A31 /* KakaoSDKFriendResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A27AE29E2CB28A6A005F9A31 /* KakaoSDKFriendResources.bundle */; };
+		A27AE2A12CB3B8ED005F9A31 /* LockByCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27AE2A02CB3B8ED005F9A31 /* LockByCodeView.swift */; };
 		A27B12C12CA94BDB004AAF23 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B12C02CA94BDB004AAF23 /* WalletApp.swift */; };
 		A27B12C32CA94BDB004AAF23 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B12C22CA94BDB004AAF23 /* ContentView.swift */; };
 		A27B12C52CA94BDC004AAF23 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A27B12C42CA94BDC004AAF23 /* Assets.xcassets */; };
@@ -58,6 +59,7 @@
 
 /* Begin PBXFileReference section */
 		A27AE29E2CB28A6A005F9A31 /* KakaoSDKFriendResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = KakaoSDKFriendResources.bundle; path = "../../../../Library/Developer/Xcode/DerivedData/Wallet-fvsvhaaqqzrubtbjvgzidkaovghx/SourcePackages/checkouts/kakao-ios-sdk/Sources/KakaoSDKFriendCore/KakaoSDKFriendResources.bundle"; sourceTree = "<group>"; };
+		A27AE2A02CB3B8ED005F9A31 /* LockByCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockByCodeView.swift; sourceTree = "<group>"; };
 		A27B12BD2CA94BDB004AAF23 /* Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A27B12C02CA94BDB004AAF23 /* WalletApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletApp.swift; sourceTree = "<group>"; };
 		A27B12C22CA94BDB004AAF23 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				A27B12EA2CA95265004AAF23 /* OnboardingView.swift */,
 				A27B13082CB0E721004AAF23 /* HistoryListView.swift */,
 				A27B130C2CB0EF2D004AAF23 /* CertificateView.swift */,
+				A27AE2A02CB3B8ED005F9A31 /* LockByCodeView.swift */,
 				A27B12C42CA94BDC004AAF23 /* Assets.xcassets */,
 				A27B12DA2CA94BDC004AAF23 /* WalletUITests */,
 				A27B12C62CA94BDC004AAF23 /* Preview Content */,
@@ -346,6 +349,7 @@
 				A27B130D2CB0EF2D004AAF23 /* CertificateView.swift in Sources */,
 				A27B12C32CA94BDB004AAF23 /* ContentView.swift in Sources */,
 				A27B12C12CA94BDB004AAF23 /* WalletApp.swift in Sources */,
+				A27AE2A12CB3B8ED005F9A31 /* LockByCodeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,7 +18,7 @@ struct WalletApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            LockByCodeView()
         }
     }
 }
