@@ -7,6 +7,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>knu.cool.Wallet</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao39d3dd59edaf61b248a1aedf5fcc15e3</string>
@@ -15,6 +17,8 @@
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>knu.cool.Wallet</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao39d3dd59edaf61b248a1aedf5fcc15e3:oauth</string>
@@ -26,6 +30,7 @@
 		<string>kakaokompassauth</string>
 		<string>kakaolink</string>
 		<string>kakaoplus</string>
+		<string>kakaotalk</string>
 	</array>
 	<key>UIAppFonts</key>
 	<array>

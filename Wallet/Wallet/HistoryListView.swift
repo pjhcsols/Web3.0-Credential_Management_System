@@ -35,7 +35,7 @@ struct HistoryListView: View {
 let histories: [History] = [
     History(name: "정부 24 간편인증", types: "(생체인증)", organ: "발급처: 정부 24", time: "사용일시: 2024.08.17 14:36"),
     History(name: "정부 24 간편인증", types: "(생체인증)", organ: "발급처: 정부 24", time: "사용일시: 2024.09.17 15:36"),
-    History(name: "정부 24 간편인증", types: "(생체인증)", organ: "발급처: 정부 24", time: "사용일시: 2024.10.17 14:36"),
+//    History(name: "정부 24 간편인증", types: "(생체인증)", organ: "발급처: 정부 24", time: "사용일시: 2024.10.17 14:36"),
 ]
 
 struct History: Identifiable {
