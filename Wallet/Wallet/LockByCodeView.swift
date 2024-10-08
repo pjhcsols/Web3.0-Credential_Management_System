@@ -1,3 +1,10 @@
+//
+//  LockByCodeView.swift
+//  Wallet
+//
+//  Created by Seah Kim on 10/7/24.
+//
+
 import SwiftUI
 
 struct LockByCodeView: View {
