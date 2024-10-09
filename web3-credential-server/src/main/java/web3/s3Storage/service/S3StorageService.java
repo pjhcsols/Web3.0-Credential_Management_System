@@ -20,10 +20,7 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -39,51 +36,73 @@ public class S3StorageService {
         this.walletRepository = walletRepository;
     }
 
-    public String uploadPdf(MultipartFile file, Wallet wallet,String pdfInfo,String pdfKey) throws IOException {
+    @Transactional
+    public String uploadPdf(MultipartFile file, Wallet wallet, String pdfInfo, String pdfKey) {
         String fileName;
         byte[] result;
         HashMap<String, String> metadata = new HashMap<>();
         int nowPage = 1;
 
-        //첫 등록일때 => 생성해줘야함
-        if (wallet.getPdfUrl() == null){
-            fileName = (file.getSize() > 0) ? getFileName(wallet): getEmptyFilename(wallet);
-
-            // PDF 파일 확장자 검증
-            //validatePdfFile(fileName);
-            result = (file.getSize() > 0) ? file.getBytes():createEmptyPdf();
-
-        }
-        else{
-            //이미 있을시 -> pdf 병합
+        // 첫 등록일 때 => 생성해줘야 함
+        if (wallet.getPdfUrl() == null) {
+            fileName = (file.getSize() > 0) ? getFileName(wallet) : getEmptyFilename(wallet);
+            result = (file.getSize() > 0) ? getFileBytes(file) : createEmptyPdf();
+        } else {
+            // 이미 있을 시 -> PDF 병합
             String destination = wallet.getPdfUrl();
             fileName = extractKeyFromUrl(destination);
 
-            byte[] first = getPdf(destination).readAllBytes();//원래 파일
-            byte[] second = (file.getSize() > 0) ? file.getBytes() : createEmptyPdf(); //뒤에 들어온 파일
+            byte[] first = new byte[0]; // 원래 파일
+            first = getBytes(destination);
+            byte[] second = (file.getSize() > 0) ? getFileBytes(file) : createEmptyPdf(); // 뒤에 들어온 파일
 
-            nowPage = getPdfPageCount(first)+1;
+            nowPage = getPdfPageCount(first) + 1;
             result = mergePdfs(first, second);
 
-            metadata= getPdfMetadata(fileName);
+            metadata = decodeMetadata(getPdfMetadata(fileName));
         }
 
         String page = "page-" + nowPage; // 키 설정
         String value = pdfInfo + ":" + pdfKey;
-        metadata.put(page,value); // 키-값 쌍으로 추가
+        metadata.put(page, value); // 키-값 쌍으로 추가
+
         log.info("metadata = {}", metadata);
 
-        try {
-            uploadToS3(fileName, metadata, result);
-
-        } catch (S3Exception e) {
-            throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
-        }
+        uploadCert(fileName, metadata, result);
 
         wallet.updatePdfUrl(getpdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
 
         return getpdfUrl(fileName);
+    }
+
+
+
+    private byte[] getBytes(String destination) {
+        byte[] first;
+        try {
+            first = getPdf(destination).readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return first;
+    }
+
+    // 파일 바이트 배열을 가져오는 메서드 추가 (오류 처리 포함)
+    private byte[] getFileBytes(MultipartFile file) {
+        try {
+            return file.getBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to get file bytes: " + e.getMessage(), e);
+        }
+    }
+
+    private void uploadCert(String fileName, HashMap<String, String> metadata, byte[] result) {
+        try {
+            uploadToS3(fileName, metadata, result);
+        } catch (S3Exception e) {
+            throw new RuntimeException("Failed to upload pdf to S3: " + e.getMessage(), e);
+        }
     }
 
     private void uploadToS3(String fileName, HashMap<String, String> metadata, byte[] result) {
@@ -97,6 +116,7 @@ public class S3StorageService {
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
+
                 .contentType("application/pdf")
                 .metadata(encodedMetadata)
                 .build();
@@ -113,7 +133,7 @@ public class S3StorageService {
         return wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + "empty.pdf";
     }
 
-    public byte[] mergePdfs(byte[] pdf1, byte[] pdf2) throws IOException {
+    public byte[] mergePdfs(byte[] pdf1, byte[] pdf2){
         PDFMergerUtility merger = new PDFMergerUtility();
 
         ByteArrayInputStream inputStream1 = new ByteArrayInputStream(pdf1);
@@ -124,28 +144,36 @@ public class S3StorageService {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         merger.setDestinationStream(outputStream);
-        merger.mergeDocuments(null);
+        try {
+            merger.mergeDocuments(null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return outputStream.toByteArray();
     }
 
-    private byte[] createEmptyPdf() throws IOException {
+    private byte[] createEmptyPdf(){
         try (PDDocument document = new PDDocument()) {
             document.addPage(new PDPage()); // 빈 페이지 추가
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             document.save(outputStream);
             return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException {
+    @Transactional
+    public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) {
         // 원래 PDF 가져오기
         String pdfUrl = wallet.getPdfUrl();
-        byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
+        byte[] originalPdfBytes = getOriginalPdfBytes(pdfUrl);
         String fileName = extractKeyFromUrl(pdfUrl);
 
-        // 기존 PDF 로드
-        PDDocument originalDocument = PDDocument.load(new ByteArrayInputStream(originalPdfBytes));
+        // 기존 PDF 로드와 리소스 관리
+        PDDocument originalDocument = loadOriginalDocument(originalPdfBytes);
+
         int totalPages = originalDocument.getNumberOfPages();
 
         // 페이지 번호는 0부터 시작하므로 1을 빼줌
@@ -157,7 +185,7 @@ public class S3StorageService {
         }
 
         // 새로운 PDF 파일 로드
-        byte[] newPdfBytes = newPdfFile.getInputStream().readAllBytes();
+        byte[] newPdfBytes = getFileBytes(newPdfFile);
 
         // 앞부분과 뒷부분 PDF 바이트 배열 생성
         byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
@@ -168,18 +196,38 @@ public class S3StorageService {
         HashMap<String, String> metadata = getPdfMetadata(fileName);
 
         // 최종 PDF를 S3에 업로드
+        uploadCert(fileName, metadata, finalPdfBytes);
+
         try {
-            uploadToS3(fileName, metadata, finalPdfBytes);
-        } catch (S3Exception e) {
-            throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
-        } finally {
-            originalDocument.close();
+            originalDocument.close(); // 리소스 닫기
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        return pdfUrl; // 최종 PDF 바이트 배열 반환
+        return pdfUrl; // 최종 PDF URL 반환
     }
 
-    private byte[] createPdfBytesPart(PDDocument document, int startIndex, int endIndex) throws IOException {
+    // PDF 문서를 로드하는 메서드 (예외 처리 포함)
+    private PDDocument loadOriginalDocument(byte[] originalPdfBytes) {
+        try {
+            return PDDocument.load(new ByteArrayInputStream(originalPdfBytes));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load original PDF: " + e.getMessage(), e);
+        }
+    }
+
+    private byte[] getOriginalPdfBytes(String pdfUrl) {
+        byte[] originalPdfBytes;
+        try {
+            originalPdfBytes = getPdf(pdfUrl).readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return originalPdfBytes;
+    }
+
+
+    private byte[] createPdfBytesPart(PDDocument document, int startIndex, int endIndex) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PDDocument partDocument = new PDDocument();
 
@@ -189,14 +237,18 @@ public class S3StorageService {
             partDocument.addPage(page);
         }
 
-        partDocument.save(outputStream);
-        partDocument.close();
+        try {
+            partDocument.save(outputStream);
+            partDocument.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return outputStream.toByteArray();
     }
 
 
     // 세 개의 PDF 바이트 배열을 합치는 메서드
-    public byte[] mergeThreePdfs(byte[] pdf1, byte[] pdf2, byte[] pdf3) throws IOException {
+    private byte[] mergeThreePdfs(byte[] pdf1, byte[] pdf2, byte[] pdf3){
         PDFMergerUtility merger = new PDFMergerUtility();
 
         ByteArrayInputStream inputStream1 = new ByteArrayInputStream(pdf1);
@@ -210,7 +262,11 @@ public class S3StorageService {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         merger.setDestinationStream(outputStream);
-        merger.mergeDocuments(null);
+        try {
+            merger.mergeDocuments(null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return outputStream.toByteArray(); // 최종 합쳐진 PDF 바이트 배열 반환
     }
@@ -242,6 +298,7 @@ public class S3StorageService {
         return certList;
     }
 
+    @Transactional
     public HashMap<String, String> getPdfMetadata( String pdfUrl) {
         HashMap<String, String> metadata;
         String fileName = extractKeyFromUrl(pdfUrl);
@@ -256,19 +313,18 @@ public class S3StorageService {
             metadata = new HashMap<>(response.metadata());
 
             if (metadata.isEmpty()) {
-                System.out.println("No user-defined metadata found for this object.");
+                throw new RuntimeException("No user-defined metadata found for this object.");
             }
 
         } catch (S3Exception e) {
-            System.err.println("Failed to retrieve metadata: " + e.getMessage());
-            return new HashMap<>();
+            throw new RuntimeException("Failed to retrieve metadata: " + e.getMessage());
         }
 
         return metadata;
     }
 
+    @Transactional
     public String getMetadataForPage(String pdfUrl, int pageNumber) {
-        System.out.println("pdfUrl = " + pdfUrl);
         String fileName = extractKeyFromUrl(pdfUrl);
 
         GetObjectRequest getRequest = GetObjectRequest.builder()
@@ -280,7 +336,6 @@ public class S3StorageService {
 
         Map<String, String> metadata = getObjectResponse.metadata();
         HashMap<String, String> decodedMetadata = decodeMetadata(metadata);
-        System.out.println("decodedMetadata = " + decodedMetadata);
 
         String pageKey = "page-" + pageNumber;
 
@@ -320,9 +375,11 @@ public class S3StorageService {
 
 
 
-    public int getPdfPageCount(byte[] pdfBytes) throws IOException {
+    public int getPdfPageCount(byte[] pdfBytes){
         try (PDDocument document = PDDocument.load(pdfBytes)) {
             return document.getNumberOfPages();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -340,46 +397,45 @@ public class S3StorageService {
                     .key(key)
                     .build());
         } catch (S3Exception e) {
-            System.err.println("Failed to delete photo from S3: " + e.getMessage());
+            throw new RuntimeException("Failed to delete photo from S3: " + e.getMessage());
         }
     }
 
     @Transactional
-    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException{
+    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException {
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
         String fileName = extractKeyFromUrl(pdfUrl);
 
-        // 기존 PDF 로드
-        PDDocument originalDocument = PDDocument.load(new ByteArrayInputStream(originalPdfBytes));
-        int totalPages = originalDocument.getNumberOfPages();
+        // 기존 PDF 로드와 리소스 관리
+        try (PDDocument originalDocument = PDDocument.load(new ByteArrayInputStream(originalPdfBytes))) {
+            int totalPages = originalDocument.getNumberOfPages();
 
-        // 페이지 번호는 0부터 시작하므로 1을 빼줌
-        int pageIndexToRemove = pageNumberToRemove - 1;
+            // 페이지 번호는 0부터 시작하므로 1을 빼줌
+            int pageIndexToRemove = pageNumberToRemove - 1;
 
-        // 페이지가 존재하는지 확인
-        checkPageExist(pageIndexToRemove < 0, pageIndexToRemove >= totalPages, "Page number out of range: " + pageNumberToRemove);
+            // 페이지가 존재하는지 확인
+            checkPageExist(pageIndexToRemove < 0, pageIndexToRemove >= totalPages, "Page number out of range: " + pageNumberToRemove);
 
-        byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
-        byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
+            byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
+            byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
 
-        // PDF 합치기
-        byte[] finalPdfBytes = mergePdfs(frontPart,backPart);
-        HashMap<String, String> metadata = getPdfMetadata(fileName);
+            // PDF 합치기
+            byte[] finalPdfBytes = mergePdfs(frontPart, backPart);
+            HashMap<String, String> metadata = getPdfMetadata(fileName);
 
-        // 기존 키들을 리스트로 변환 후 정렬
-        HashMap<String, String> newMetadata = changeForNewMetadata(pageNumberToRemove, metadata);
+            // 기존 키들을 리스트로 변환 후 정렬
+            HashMap<String, String> newMetadata = changeForNewMetadata(pageNumberToRemove, metadata);
 
-        // 최종 PDF를 S3에 업로
-        try {
-            uploadToS3(fileName, newMetadata, finalPdfBytes);
-        } catch (S3Exception e) {
-            throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
-        } finally {
-            originalDocument.close();
+            // 최종 PDF를 S3에 업로드
+            try {
+                uploadToS3(fileName, newMetadata, finalPdfBytes);
+            } catch (S3Exception e) {
+                throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
+            }
         }
-
     }
+
 
     private HashMap<String, String> changeForNewMetadata(int pageNumberToRemove, HashMap<String, String> metadata) {
         List<Integer> pageNumbers = new ArrayList<>();
@@ -405,7 +461,6 @@ public class S3StorageService {
                 newPageNumbers.add(pageNumber);
             }
         }
-        System.out.println("pageSize = " + pageSize);
 
         // 새로운 메타데이터 해시맵 생성
         HashMap<String, String> newMetadata = new HashMap<>();
@@ -440,19 +495,14 @@ public class S3StorageService {
         }
     }
 
-    // 메타데이터 디코딩 메서드
-    // 메타데이터 디코딩 메서드
-    public HashMap<String, String> decodeMetadata(Map<String, String> metadata) {
-        HashMap<String, String> decodedMetadata = new HashMap<>();
+    // 메타 데이터 디코딩 메서드
+    public LinkedHashMap<String, String> decodeMetadata(Map<String, String> metadata) {
+        LinkedHashMap<String, String> decodedMetadata = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : metadata.entrySet()) {
             String key = entry.getKey();
-            try {
-                // URL 디코딩
-                String value = URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name());
-                decodedMetadata.put(key, value);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace(); // 예외 처리
-            }
+            // URL 디코딩
+            String value = URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8);
+            decodedMetadata.put(key, value);
         }
         return decodedMetadata;
     }

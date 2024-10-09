@@ -44,13 +44,9 @@ public class S3StorageController {
             @Parameter(description = "pdf 키값",required = true)
             @RequestParam String pdfKey) {
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
-        try {
-            String pdfUrl = s3StorageService.uploadPdf(file, wallet,pdfInfo,pdfKey);
-            return ResponseEntity.ok(pdfUrl);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload pdf: " + e.getMessage());
-        }
+        String pdfUrl = s3StorageService.uploadPdf(file, wallet,pdfInfo,pdfKey);
+        return ResponseEntity.ok(pdfUrl);
+
     }
 
 
@@ -114,15 +110,12 @@ public class S3StorageController {
             @RequestParam("page") int page,
             @Parameter(description = "사용자 지갑ID",required = true)
             @RequestParam("walletId") Long walletId) {
-        try {
-            System.out.println("file = " + file);
-            Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
-            String pdfUrl = s3StorageService.replacePdfPage(wallet, page, file);
-            return ResponseEntity.ok(pdfUrl);
-        }catch(IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to replace pdf: " + e.getMessage());
-        }
+
+        System.out.println("file = " + file);
+        Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
+        String pdfUrl = s3StorageService.replacePdfPage(wallet, page, file);
+        return ResponseEntity.ok(pdfUrl);
+
     }
 
     @Operation(summary = "메타데이터 얻기",description = "사용자의 모든 메타데이터의 정보들을 가져옵니다.")
