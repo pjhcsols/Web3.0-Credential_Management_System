@@ -13,6 +13,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import web3.domain.wallet.Wallet;
+import web3.exception.S3.S3UploadException;
 import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
 
@@ -402,7 +403,7 @@ public class S3StorageService {
     }
 
     @Transactional
-    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException {
+    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException,S3UploadException {
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
         String fileName = extractKeyFromUrl(pdfUrl);
@@ -431,7 +432,7 @@ public class S3StorageService {
             try {
                 uploadToS3(fileName, newMetadata, finalPdfBytes);
             } catch (S3Exception e) {
-                throw new IOException("Failed to upload pdf to S3: " + e.getMessage());
+                throw new S3UploadException("Failed to upload pdf to S3: " + e.getMessage());
             }
         }
     }
