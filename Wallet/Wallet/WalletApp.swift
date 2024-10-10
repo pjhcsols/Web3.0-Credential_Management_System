@@ -18,7 +18,10 @@ struct WalletApp: App {
     
     var body: some Scene {
         WindowGroup {
-            LockByCodeView()
+            OnboardingView()
+            .onOpenURL(perform: { url in
+                OnboardingView().handleOpenURL(url)
+            })
         }
     }
 }
@@ -26,6 +29,7 @@ struct WalletApp: App {
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        print("Received URL kkkkk: \(url)")
         if (AuthApi.isKakaoTalkLoginUrl(url)) {
             return AuthController.handleOpenUrl(url: url)
         }

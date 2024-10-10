@@ -14,16 +14,6 @@
 				<string>kakao39d3dd59edaf61b248a1aedf5fcc15e3</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>knu.cool.Wallet</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>kakao39d3dd59edaf61b248a1aedf5fcc15e3:oauth</string>
-			</array>
-		</dict>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
