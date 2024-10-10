@@ -65,7 +65,6 @@ public class UserService {
         userRepository.save(newUser);
 
         // 지갑 객체 생성하기
-
         // 토큰 생성
         return generateJwtToken(newUser);
     }

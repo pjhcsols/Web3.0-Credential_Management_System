@@ -62,7 +62,6 @@ public class S3StorageService {
 
             metadata = decodeMetadata(getPdfMetadata(fileName));
         }
-
         String page = "page-" + nowPage; // 키 설정
         String value = pdfInfo + ":" + pdfKey;
         metadata.put(page, value); // 키-값 쌍으로 추가
@@ -71,13 +70,11 @@ public class S3StorageService {
 
         uploadCert(fileName, metadata, result);
 
-        wallet.updatePdfUrl(getpdfUrl(fileName));
+        wallet.updatePdfUrl(getPdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
 
-        return getpdfUrl(fileName);
+        return getPdfUrl(fileName);
     }
-
-
 
     private byte[] getBytes(String destination) {
         byte[] first;
@@ -89,7 +86,7 @@ public class S3StorageService {
         return first;
     }
 
-    // 파일 바이트 배열을 가져오는 메서드 추가 (오류 처리 포함)
+    // 파일 바이트 배열을 가져오는 메서드
     private byte[] getFileBytes(MultipartFile file) {
         try {
             return file.getBytes();
@@ -110,7 +107,6 @@ public class S3StorageService {
 
         HashMap<String, String> encodedMetadata = new HashMap<>();
         for (String key : metadata.keySet()) {
-            //UTF_8로 인코딩
             encodedMetadata.put(key, URLEncoder.encode(metadata.get(key), StandardCharsets.UTF_8));
         }
 
@@ -518,12 +514,12 @@ public class S3StorageService {
     }
 
     private String extractKeyFromUrl(String url) {
-        // Assuming the URL is in the format: https://s3.ap-northeast-2.amazonaws.com/bucketName/fileName
+        //예상 포맷: https://s3.ap-northeast-2.amazonaws.com/bucketName/fileName
         int index = url.lastIndexOf('/');
         return url.substring(index+1);
     }
 
-    private String getpdfUrl(String fileName) {
+    private String getPdfUrl(String fileName) {
         return s3Properties.getS3BucketUrl() + "/" + fileName;
     }
 

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web3.domain.wallet.Wallet;
+import web3.exception.S3.S3UploadException;
 import web3.s3Storage.dto.DeleteCertRequest;
 import web3.s3Storage.dto.DeletePdfRequest;
 import web3.s3Storage.service.S3StorageService;
@@ -66,7 +67,7 @@ public class S3StorageController {
     public ResponseEntity<Void> deleteCertForPage(
             @Parameter(description = "walletId와 삭제할 page가 담긴 Dto",required = true)
             @RequestBody DeleteCertRequest request
-    ) throws IOException {
+    ) throws IOException, S3UploadException {
         System.out.println("request = " + request);
         Long walletId = request.getWalletId();
         int page = request.getPage();
