@@ -43,7 +43,7 @@ public class S3StorageController {
             @Parameter(description = "pdf 정보",required = true)
             @RequestParam String pdfInfo,
             @Parameter(description = "pdf 키값",required = true)
-            @RequestParam String pdfKey) {
+            @RequestParam String pdfKey) throws IOException {
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
         String pdfUrl = s3StorageService.uploadPdf(file, wallet,pdfInfo,pdfKey);
         return ResponseEntity.ok(pdfUrl);
@@ -57,7 +57,6 @@ public class S3StorageController {
             @Parameter(description = "지울 pdf 파일 경로 관련 Dto",required = true)
             @RequestBody DeletePdfRequest request) {
         String urlToDelete = request.getUrlToDelete();
-        System.out.println("urlToDelete = " + urlToDelete);
         s3StorageService.deletePdf(urlToDelete);
         return ResponseEntity.noContent().build();
     }
@@ -68,7 +67,6 @@ public class S3StorageController {
             @Parameter(description = "walletId와 삭제할 page가 담긴 Dto",required = true)
             @RequestBody DeleteCertRequest request
     ) throws IOException, S3UploadException {
-        System.out.println("request = " + request);
         Long walletId = request.getWalletId();
         int page = request.getPage();
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
@@ -110,9 +108,8 @@ public class S3StorageController {
             @Parameter(description = "페이지 번호",required = true)
             @RequestParam("page") int page,
             @Parameter(description = "사용자 지갑ID",required = true)
-            @RequestParam("walletId") Long walletId) {
+            @RequestParam("walletId") Long walletId) throws IOException {
 
-        System.out.println("file = " + file);
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
         String pdfUrl = s3StorageService.replacePdfPage(wallet, page, file);
         return ResponseEntity.ok(pdfUrl);

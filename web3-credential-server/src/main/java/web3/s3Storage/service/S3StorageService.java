@@ -152,7 +152,6 @@ public class S3StorageService {
 
     @Transactional
     public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException{
-
         // 원래 PDF 가져오기
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getOriginalPdfBytes(pdfUrl);
@@ -359,8 +358,6 @@ public class S3StorageService {
 
         return null; // 결과가 없거나 ':'가 없는 경우 null 반환
     }
-
-
 
     public int getPdfPageCount(byte[] pdfBytes){
         try (PDDocument document = PDDocument.load(pdfBytes)) {
