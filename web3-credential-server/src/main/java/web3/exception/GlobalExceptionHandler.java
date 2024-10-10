@@ -11,6 +11,7 @@ import web3.exception.user.UserNotFoundException;
 import web3.exception.wallet.WalletAlreadyExistsException;
 import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

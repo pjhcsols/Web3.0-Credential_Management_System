@@ -13,6 +13,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import web3.domain.wallet.Wallet;
+import web3.exception.S3.GetFileException;
 import web3.exception.S3.S3UploadException;
 import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
@@ -38,7 +39,7 @@ public class S3StorageService {
     }
 
     @Transactional
-    public String uploadPdf(MultipartFile file, Wallet wallet, String pdfInfo, String pdfKey) {
+    public String uploadPdf(MultipartFile file, Wallet wallet, String pdfInfo, String pdfKey) throws IOException {
         String fileName;
         byte[] result;
         HashMap<String, String> metadata = new HashMap<>();
@@ -68,7 +69,7 @@ public class S3StorageService {
 
         log.info("metadata = {}", metadata);
 
-        uploadCert(fileName, metadata, result);
+        uploadToS3(fileName, metadata, result);
 
         wallet.updatePdfUrl(getPdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
@@ -87,20 +88,8 @@ public class S3StorageService {
     }
 
     // 파일 바이트 배열을 가져오는 메서드
-    private byte[] getFileBytes(MultipartFile file) {
-        try {
-            return file.getBytes();
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to get file bytes: " + e.getMessage(), e);
-        }
-    }
-
-    private void uploadCert(String fileName, HashMap<String, String> metadata, byte[] result) {
-        try {
-            uploadToS3(fileName, metadata, result);
-        } catch (S3Exception e) {
-            throw new RuntimeException("Failed to upload pdf to S3: " + e.getMessage(), e);
-        }
+    private byte[] getFileBytes(MultipartFile file) throws IOException {
+        return file.getBytes();
     }
 
     private void uploadToS3(String fileName, HashMap<String, String> metadata, byte[] result) {
@@ -162,7 +151,8 @@ public class S3StorageService {
     }
 
     @Transactional
-    public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) {
+    public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException{
+
         // 원래 PDF 가져오기
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getOriginalPdfBytes(pdfUrl);
@@ -193,7 +183,7 @@ public class S3StorageService {
         HashMap<String, String> metadata = getPdfMetadata(fileName);
 
         // 최종 PDF를 S3에 업로드
-        uploadCert(fileName, metadata, finalPdfBytes);
+        uploadToS3(fileName, metadata, finalPdfBytes);
 
         try {
             originalDocument.close(); // 리소스 닫기
