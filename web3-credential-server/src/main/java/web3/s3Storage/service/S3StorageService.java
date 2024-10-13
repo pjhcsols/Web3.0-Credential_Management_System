@@ -267,27 +267,22 @@ public class S3StorageService {
         return outputStream.toByteArray(); // 최종 합쳐진 PDF 바이트 배열 반환
     }
 
+    @Transactional
     //인증서 리스트 반환
     public HashMap<String, String> getCertList(String pdfUrl) {
         HashMap<String, String> metadata = getPdfMetadata(pdfUrl);
         HashMap<String, String> certList = new HashMap<>();
 
-
         for (Map.Entry<String, String> entry : metadata.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
 
-            if (value != null && value.contains(":")) {
-                String extractedValue = value.split(":")[0];
-
-                if (key.startsWith("page-")) {
-                    String pageNumber = key.substring("page-".length());
-                    certList.put(pageNumber, extractedValue);
-                } else {
-                    certList.put(key, extractedValue);
+            if (key != null && key.contains("_")) {
+                String lastTwoChars = key.substring(key.length() - 2);
+                System.out.println("lastTwoChars = " + lastTwoChars);
+                if (lastTwoChars.equals("_0")){
+                    certList.put(key, value);
                 }
-            } else {
-                certList.put(key, value);
             }
         }
 

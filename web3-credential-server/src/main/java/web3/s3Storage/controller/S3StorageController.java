@@ -82,7 +82,6 @@ public class S3StorageController {
             @RequestParam("pdfUrl") String pdfUrl) {
         HashMap<String, String> certList = s3StorageService.getCertList(pdfUrl);
         HashMap<String, String> decodedMetadata = s3StorageService.decodeMetadata(certList);
-        //return ResponseEntity.ok().body(certList);
         return ResponseEntity.ok().body(decodedMetadata);
 
     }
