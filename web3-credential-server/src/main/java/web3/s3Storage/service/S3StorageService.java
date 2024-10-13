@@ -189,7 +189,7 @@ public class S3StorageService {
 
         // PDF 합치기
         byte[] finalPdfBytes = mergeThreePdfs(frontPart, newPdfBytes, backPart);
-        HashMap<String, String> metadata = getPdfMetadata(fileName);
+        HashMap<String, String> metadata = decodeMetadata(getPdfMetadata(fileName));
 
         // 최종 PDF를 S3에 업로드
         uploadToS3(fileName, metadata, finalPdfBytes);
