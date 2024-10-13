@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct AddCertificationView: View {
+    @State private var showSheet = false
+    @State private var selectedCertification: Certification? = nil
+    
     let certificationArray = certifications
     var body: some View {
         VStack {
@@ -30,6 +33,8 @@ struct AddCertificationView: View {
             
             List(certificationArray) { item in
                 Button(action: {
+                    selectedCertification = item
+                    showSheet = true
                     print("\(item.name) 클릭됨")
                 }) {
                     HStack {
@@ -56,7 +61,11 @@ struct AddCertificationView: View {
             .scrollContentBackground(.hidden)
         }
         .padding(.top)
-        .frame(maxHeight: .infinity, alignment: .top)
+        .sheet(isPresented: $showSheet) {
+            if let certification = selectedCertification {
+                CertificationDetailView(certification: certification)
+            }
+        }
     }
 }
 
@@ -73,6 +82,42 @@ struct Certification: Identifiable {
     let name: String
     let organ: String
 }
+
+struct CertificationDetailView: View {
+    let certification: Certification
+    @State var allAgree = false
+    @State var item1Checked = false
+    
+    var body: some View {
+        VStack {
+            Text(certification.name)
+                .font(.title3)
+                .fontWeight(.bold)
+            VStack(alignment: .leading){
+                Button(action: {
+                    allAgree.toggle()
+                    item1Checked = allAgree
+                }) {
+                    HStack {
+                        Image(allAgree ? "images/checked" : "images/unchecked")
+                        Text("전체동의하기")
+                            .font(.body)
+                            .fontWeight(.bold)
+                            .foregroundColor(.black)
+                    }
+                }
+                HStack {
+                    Image(item1Checked ? "images/checked" : "images/unchecked")
+                    Text("[필수] 경북멋쟁이 개인정보 제공 동의")
+                        .font(.body)
+                }
+            }
+            
+        }
+        .presentationDetents([.fraction(0.33)])
+    }
+}
+
 
 #Preview {
     AddCertificationView()
