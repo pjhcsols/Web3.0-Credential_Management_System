@@ -39,33 +39,42 @@ public class S3StorageService {
     }
 
     @Transactional
-    public String uploadPdf(MultipartFile file, Wallet wallet, String pdfInfo, String pdfKey) throws IOException {
+    public String uploadPdf(MultipartFile file, Wallet wallet,String certName,Map<String,String> certContents) throws IOException {
         String fileName;
         byte[] result;
         HashMap<String, String> metadata = new HashMap<>();
-        int nowPage = 1;
-
+        int page;
         // 첫 등록일 때 => 생성해줘야 함
         if (wallet.getPdfUrl() == null) {
             fileName = (file.getSize() > 0) ? getFileName(wallet) : getEmptyFilename(wallet);
             result = (file.getSize() > 0) ? getFileBytes(file) : createEmptyPdf();
+            page = getPdfPageCount(result);
         } else {
             // 이미 있을 시 -> PDF 병합
             String destination = wallet.getPdfUrl();
             fileName = extractKeyFromUrl(destination);
 
-            byte[] first = new byte[0]; // 원래 파일
+            byte[] first; // 원래 파일
             first = getBytes(destination);
             byte[] second = (file.getSize() > 0) ? getFileBytes(file) : createEmptyPdf(); // 뒤에 들어온 파일
 
-            nowPage = getPdfPageCount(first) + 1;
             result = mergePdfs(first, second);
 
             metadata = decodeMetadata(getPdfMetadata(fileName));
+            page = getPdfPageCount(second);
         }
-        String page = "page-" + nowPage; // 키 설정
-        String value = pdfInfo + ":" + pdfKey;
-        metadata.put(page, value); // 키-값 쌍으로 추가
+
+        // contents 해시맵의 키-값 쌍을 ':'로 구분하여 value에 추가
+        StringBuilder valueBuilder = new StringBuilder();
+        for (Map.Entry<String, String> entry : certContents.entrySet()) {
+            valueBuilder.append(entry.getKey()).append(":").append(entry.getValue()).append("/");
+        }
+
+        for(int now = 0; now < page; now ++){
+            String key = certName + "_" + wallet.getId() + "_" + now; // 키 설정
+            String value = valueBuilder.toString();
+            metadata.put(key, value); // 키-값 쌍으로 추가
+        }
 
         log.info("metadata = {}", metadata);
 
@@ -92,23 +101,24 @@ public class S3StorageService {
         return file.getBytes();
     }
 
-    private void uploadToS3(String fileName, HashMap<String, String> metadata, byte[] result) {
+    private void uploadToS3(String fileName, Map<String, String> metadata, byte[] result) {
 
         HashMap<String, String> encodedMetadata = new HashMap<>();
         for (String key : metadata.keySet()) {
-            encodedMetadata.put(key, URLEncoder.encode(metadata.get(key), StandardCharsets.UTF_8));
+            encodedMetadata.put(URLEncoder.encode(key,StandardCharsets.UTF_8), URLEncoder.encode(metadata.get(key), StandardCharsets.UTF_8));
         }
 
         PutObjectRequest putRequest = PutObjectRequest.builder()
                 .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
-
                 .contentType("application/pdf")
                 .metadata(encodedMetadata)
                 .build();
-
-
-        s3Client.putObject(putRequest, RequestBody.fromBytes(result));
+        try {
+            s3Client.putObject(putRequest, RequestBody.fromBytes(result));
+        } catch (S3Exception e) {
+            System.err.println("S3 upload failed: " + e.awsErrorDetails().errorMessage());
+        }
     }
 
     private static String getFileName(Wallet wallet) {
@@ -483,7 +493,7 @@ public class S3StorageService {
     public LinkedHashMap<String, String> decodeMetadata(Map<String, String> metadata) {
         LinkedHashMap<String, String> decodedMetadata = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : metadata.entrySet()) {
-            String key = entry.getKey();
+            String key = URLDecoder.decode(entry.getKey(),StandardCharsets.UTF_8);
             // URL 디코딩
             String value = URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8);
             decodedMetadata.put(key, value);

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web3.domain.wallet.Wallet;
 import web3.exception.S3.S3UploadException;
+import web3.s3Storage.dto.CertDto;
 import web3.s3Storage.dto.DeleteCertRequest;
 import web3.s3Storage.dto.DeletePdfRequest;
 import web3.s3Storage.service.S3StorageService;
@@ -36,16 +37,16 @@ public class S3StorageController {
     @Operation(summary = "인증서(pdf) 업로드",description = "인증서를 업로드합니다. 즉,s3 스토리지에 pdf 파일을 업로드 합니다.")
     @PostMapping("/upload-pdf")
     public ResponseEntity<String> uploadPdf(
-            @Parameter(description = "업로드할 pdf 파일",required = true)
             @RequestParam("file") MultipartFile file,
-            @Parameter(description = "사용자 지갑ID",required = true)
             @RequestParam("walletId") Long walletId,
-            @Parameter(description = "pdf 정보",required = true)
-            @RequestParam String pdfInfo,
-            @Parameter(description = "pdf 키값",required = true)
-            @RequestParam String pdfKey) throws IOException {
+            @RequestParam("certName") String certName,
+            @RequestParam Map<String, String> certContents) throws IOException {
+        certContents.remove("walletId");
+        certContents.remove("file");
+        certContents.remove("certName");
+        //나중에 입력부분 바꾸는거 고려
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
-        String pdfUrl = s3StorageService.uploadPdf(file, wallet,pdfInfo,pdfKey);
+        String pdfUrl = s3StorageService.uploadPdf(file, wallet,certName,certContents);
         return ResponseEntity.ok(pdfUrl);
 
     }
