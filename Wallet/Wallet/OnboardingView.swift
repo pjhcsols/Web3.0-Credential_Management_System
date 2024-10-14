@@ -23,7 +23,7 @@ struct OnboardingView: View {
     var body: some View {
         Group {
             if isLoggedIn {
-                ContentView()
+                LockByCodeView()
             } else {
                 VStack {
                     Spacer()
@@ -37,7 +37,7 @@ struct OnboardingView: View {
                         }
                     Spacer()
                     Button(action: {
-                        loginWithKakaoAccount()
+                        KakaoLogin()
                     }) {
                         Image("images/kakao_login_medium_wide")
                             .resizable()
@@ -51,42 +51,75 @@ struct OnboardingView: View {
                             .padding()
                     }
                 }
-//                .onOpenURL { url in
-//                    handleOpenURL(url)
-//                }
-            }
-        }
-    }
-    
-    private func loginWithKakaoAccount() {
-        UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
-            if let error = error {
-                self.errorMessage = "로그인 실패: \(error.localizedDescription)"
-                print("로그인 실패: \(error.localizedDescription)")
-            } else {
-                print("loginWithKakaoAccount() success.")
-                
-                self.accessToken = oauthToken?.accessToken
-                self.refreshToken = oauthToken?.refreshToken
-                
-                if let authCode = oauthToken?.tokenType {
-                    self.authCode = authCode
-                    print("인증 코드: \(self.authCode ?? "")")
+                .onOpenURL { url in
+                    handleOpenURL(url)
                 }
-                
-                print("액세스 토큰: \(self.accessToken ?? "없음")")
-                print("리프레시 토큰: \(self.refreshToken ?? "없음")")
-
-                self.isLoggedIn = true
-                fetchUserInfo()
             }
         }
     }
     
-    private func fetchUserInfo() {
+    private func handleOpenURL(_ url: URL) {
+        if url.scheme == "kakao39d3dd59edaf61b248a1aedf5fcc15e3" {
+            let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
+            if let codeItem = queryItems?.first(where: { $0.name == "code" }) {
+                authCode = codeItem.value
+                print("인증 코드: \(authCode ?? "")")
+                AuthApi.shared.token(code: authCode ?? "") { oauthToken, error in
+                    if let error = error {
+                        print("토큰 요청 실패: \(error.localizedDescription)")
+                        self.errorMessage = "토큰 요청 실패: \(error.localizedDescription)"
+                    } else if let oauthToken = oauthToken {
+                        print("Access Token: \(oauthToken.accessToken)")
+                        print("Refresh Token: \(oauthToken.refreshToken)")
+                        self.accessToken = oauthToken.accessToken
+                        self.refreshToken = oauthToken.refreshToken
+                        self.isLoggedIn = true
+                    }
+                }
+            } else {
+                print("인증 코드가 없습니다.")
+            }
+        }
+    }
+
+    
+    func KakaoLogin() {
+        if (UserApi.isKakaoTalkLoginAvailable()) {
+            kakaoLonginWithApp()
+        } else {
+            kakaoLoginWithAccount()
+        }
+    }
+    
+    private func kakaoLonginWithApp() {
+        UserApi.shared.loginWithKakaoTalk {(oauthToken, error) in
+            if let error = error {
+                print(error)
+            }
+            else {
+                print("loginWithKakaoTalk() success.")
+                self.kakaoGetUserInfo()
+            }
+        }
+    }
+    
+    private func kakaoLoginWithAccount() {
+        UserApi.shared.loginWithKakaoAccount {(oauthToken, error) in
+            if let error = error {
+                print(error)
+            } else if let oauthToken = oauthToken {
+                print("Access Token: \(oauthToken.accessToken)")
+                print("Refresh Token: \(oauthToken.refreshToken)")
+                accessToken = oauthToken.accessToken
+                refreshToken = oauthToken.refreshToken
+                isLoggedIn = true
+            }
+        }
+    }
+    
+    private func kakaoGetUserInfo() {
         UserApi.shared.me { user, error in
             if let error = error {
-                self.errorMessage = "사용자 정보 가져오기 실패: \(error.localizedDescription)"
                 print("사용자 정보 가져오기 실패: \(error.localizedDescription)")
             } else if let user = user {
                 let nickname = user.kakaoAccount?.profile?.nickname ?? "닉네임 없음"
@@ -94,17 +127,25 @@ struct OnboardingView: View {
             }
         }
     }
-
-    func handleOpenURL(_ url: URL) {
-        print("woooo: \(url)")
-        
-        print("woooo:")
-        if url.scheme == "kakao39d3dd59edaf61b248a1aedf5fcc15e3" {
-            let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
-            if let codeItem = queryItems?.first(where: { $0.name == "code" }) {
-                print("인증 코드: \(codeItem.value ?? "")")
-            } else {
-                print("인증 코드가 없습니다.")
+    
+    private func kakaoLogout() {
+        UserApi.shared.logout {(error) in
+            if let error = error {
+                print(error)
+            }
+            else {
+                print("logout() success.")
+            }
+        }
+    }
+    
+    private func kakaoUnlink() {
+        UserApi.shared.unlink {(error) in
+            if let error = error {
+                print(error)
+            }
+            else {
+                print("unlink() success.")
             }
         }
     }

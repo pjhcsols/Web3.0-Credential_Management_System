@@ -8,9 +8,11 @@
 import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
+//import OAuthSwift
 
 @main
 struct WalletApp: App {
+//    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init() {
         KakaoSDK.initSDK(appKey: "39d3dd59edaf61b248a1aedf5fcc15e3")
@@ -19,9 +21,7 @@ struct WalletApp: App {
     var body: some Scene {
         WindowGroup {
             OnboardingView()
-            .onOpenURL(perform: { url in
-                OnboardingView().handleOpenURL(url)
-            })
+            .preferredColorScheme(.light)
         }
     }
 }
@@ -29,10 +29,10 @@ struct WalletApp: App {
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        print("Received URL kkkkk: \(url)")
         if (AuthApi.isKakaoTalkLoginUrl(url)) {
             return AuthController.handleOpenUrl(url: url)
         }
+
         return false
     }
 }
