@@ -318,10 +318,7 @@ public class S3StorageService {
     public String getMetadataForPage(String pdfUrl, int pageNumber) {
         String fileName = extractKeyFromUrl(pdfUrl);
 
-        GetObjectRequest getRequest = GetObjectRequest.builder()
-                .bucket(s3Properties.getS3BucketName())
-                .key(fileName)
-                .build();
+        GetObjectRequest getRequest = getGetObjectRequest(fileName);
 
         GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
 
@@ -340,28 +337,46 @@ public class S3StorageService {
         return null; // 결과가 없거나 ':'가 없는 경우 null 반환
     }
 
-    public String getPdfKeyForPage(String pdfUrl, int pageNumber) {
+    public List<Map.Entry<String, String>> getContentsForCertName(String pdfUrl, String certName) {
         String fileName = extractKeyFromUrl(pdfUrl);
+        GetObjectRequest getRequest = getGetObjectRequest(fileName);
+        GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
+        String value = null;
+        List<Map.Entry<String, String>> tuples = new ArrayList<>();
+        System.out.println("certName = " + certName);
+        System.out.println("pdfUrl = " + pdfUrl);
+        Map<String, String> metadata = decodeMetadata(getObjectResponse.metadata());
+        for (String key : metadata.keySet()) {
 
+            if (key.startsWith(certName + "_") && key.endsWith("_0")){
+                value = metadata.get(key);
+
+                break;
+            }
+        }
+
+        // '/'로 분리
+        String[] pairs = Objects.requireNonNull(value).split("/");
+
+        // 각 쌍을 (key, value) 형태로 변환하여 리스트에 추가
+        for (String pair : pairs) {
+            if (!pair.isEmpty()) { // 빈 문자열 체크
+                String[] keyValue = pair.split(":");
+                if (keyValue.length == 2) {
+                    tuples.add(new AbstractMap.SimpleEntry<>(keyValue[0], keyValue[1]));
+                }
+            }
+        }
+        System.out.println("tuples = " + tuples);
+        return tuples;
+    }
+
+    private GetObjectRequest getGetObjectRequest(String fileName) {
         GetObjectRequest getRequest = GetObjectRequest.builder()
                 .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
                 .build();
-
-        GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
-
-        Map<String, String> metadata = getObjectResponse.metadata();
-
-        String pageKey = "page-" + pageNumber;
-
-        String result = metadata.get(pageKey);
-
-        // pdfKey 부분만 추출
-        if (result != null && result.contains(":")) {
-            return result.split(":")[1]; // ':'기준으로 분리
-        }
-
-        return null; // 결과가 없거나 ':'가 없는 경우 null 반환
+        return getRequest;
     }
 
     public int getPdfPageCount(byte[] pdfBytes){
@@ -498,10 +513,7 @@ public class S3StorageService {
 
     public ResponseInputStream<GetObjectResponse> getPdf(String pdfUrl) {
         String key = extractKeyFromUrl(pdfUrl);
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(s3Properties.getS3BucketName())
-                .key(key)
-                .build();
+        GetObjectRequest getObjectRequest = getGetObjectRequest(key);
         return s3Client.getObject(getObjectRequest);
     }
 

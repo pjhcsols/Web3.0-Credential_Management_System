@@ -19,6 +19,7 @@ import web3.service.wallet.WalletService;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -109,11 +110,9 @@ public class S3StorageController {
             @RequestParam("page") int page,
             @Parameter(description = "사용자 지갑ID",required = true)
             @RequestParam("walletId") Long walletId) throws IOException {
-
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
         String pdfUrl = s3StorageService.replacePdfPage(wallet, page, file);
         return ResponseEntity.ok(pdfUrl);
-
     }
 
     @Operation(summary = "메타데이터 얻기",description = "사용자의 모든 메타데이터의 정보들을 가져옵니다.")
@@ -128,15 +127,16 @@ public class S3StorageController {
         return ResponseEntity.ok().body(metadata);
     }
 
-    @Operation(summary = "pdf key값 얻기",description = "사용자의 pdf에서 원하는 페이지의 key값을 가져옵니다.")
-    @GetMapping("/get-pdfkey")
-    public ResponseEntity<String> getPdfKey(
+    @Operation(summary = "메타데이터 내용부분 얻기",description = "사용자의 인증서 목록중 원하는 인증서의 내용들을 가져옵니다.")
+    @GetMapping("/get-content")
+    public ResponseEntity<List<Map.Entry<String, String>>> getPdfKey(
             @Parameter(description = "pdf 파일 경로",required = true)
             @RequestParam String pdfUrl,
             @Parameter(description = "페이지 번호",required = true)
-            @RequestParam int page) {
-        String metadata = s3StorageService.getPdfKeyForPage(pdfUrl, page);
-        return ResponseEntity.ok().body(metadata);
+            @RequestParam String certName) {
+
+        List<Map.Entry<String, String>> contentsForCertName = s3StorageService.getContentsForCertName(pdfUrl, certName);
+        return ResponseEntity.ok().body(contentsForCertName);
     }
 
 }
