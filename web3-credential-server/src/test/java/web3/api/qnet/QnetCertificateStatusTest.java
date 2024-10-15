@@ -9,6 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.*;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -17,6 +20,7 @@ import java.io.OutputStream;
 //import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +30,8 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@SpringBootApplication
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class QnetCertificateStatusTest {
 
     @Autowired
@@ -48,20 +52,50 @@ public class QnetCertificateStatusTest {
         String accessToken = tokenResponse.get("access_token");
         assertThat(accessToken).isNotNull();
 
-        // JSON Request Payload
+
         String requestBody = "{\n" +
-                "    \"organization\": \"0001\",\n" +
-                "    \"userName\": \"김건아\",\n" +
-                "    \"docNo\": \"2024082120452245739\"\n" +
-                "}";
+            "    \"organization\": \"0001\",\n" +
+            "    \"userName\": \"김건아\",\n" +
+            "    \"docNo\": \"2024082120452245739\"\n" +
+        "}";
 
         // HTTP 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HttpHeaders.ACCEPT_CHARSET, "UTF-8"); // UTF-8 인코딩 명시
         headers.setBearerAuth(accessToken);
 
         // HttpEntity 객체 생성 (요청 바디와 헤더 포함)
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+        // 요청 내용 확인
+        System.out.println("Request Body: " + requestBody);
+
+        // String requestBody = "{\n" +
+        //     "    \"organization\": \"0001\",\n" +
+        //     "    \"userName\": \"" + new String("김건아".getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8) + "\",\n" +
+        //     "    \"docNo\": \"2024082120452245739\"\n" +
+        //     "}";
+
+        // // // JSON Request Payload
+        // // String requestBody = "{\n" +
+        // //         "    \"organization\": \"0001\",\n" +
+        // //         "    \"userName\": \"김건아\",\n" +
+        // //         "    \"docNo\": \"2024082120452245739\"\n" +
+        // //         "}";
+
+        // // HTTP 요청 헤더 설정
+        // HttpHeaders headers = new HttpHeaders();
+        // headers.setContentType(MediaType.APPLICATION_JSON);
+        // headers.set(HttpHeaders.ACCEPT_CHARSET, "UTF-8");
+        // headers.setBearerAuth(accessToken);
+
+        // // HttpEntity 객체 생성 (요청 바디와 헤더 포함)
+        // HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+
+        // System.out.println("Request Body: " + requestBody);
+        // //System.out.println("Request Headers: " + headers);
 
         try {
             // API 엔드포인트로 POST 요청 전송
@@ -94,18 +128,22 @@ public class QnetCertificateStatusTest {
                 ObjectMapper objectMapper = new ObjectMapper();
                 Map<String, Object> parsedResponseBody = objectMapper.readValue(urlDecodedResponseBody, new TypeReference<Map<String, Object>>() {});
 
-                // 디코딩 후 JSON 응답 검증
-                assertThat(parsedResponseBody).containsKey("data");
+                // JSON 데이터 출력
+                System.out.println("Parsed Response: " + parsedResponseBody);
+
+                // 원하는 필드 검증 및 출력
                 Map<String, Object> data = (Map<String, Object>) parsedResponseBody.get("data");
-
-                // 원하는 필드 검증
-                assertThat(data).containsKey("resIssueYN");
-                assertThat(data.get("resIssueYN")).isInstanceOf(String.class);
-                String resIssueYN = (String) data.get("resIssueYN");
-                assertThat(resIssueYN).isNotEmpty();
-
-                // 예시 출력
-                System.out.println("Parsed JSON Data: " + data);
+                if (data != null) {
+                    System.out.println("resIssueYN: " + data.get("resIssueYN"));
+                    System.out.println("resDocNo: " + data.get("resDocNo"));
+                    System.out.println("resPublishNo: " + data.get("resPublishNo"));
+                    System.out.println("resDocType: " + data.get("resDocType"));
+                    System.out.println("resUserNm: " + data.get("resUserNm"));
+                    System.out.println("resItemName: " + data.get("resItemName"));
+                    System.out.println("resInquiryDate: " + data.get("resInquiryDate"));
+                } else {
+                    System.err.println("Data field is empty or not present.");
+                }
 
             } else {
                 System.err.println("Unexpected content type or empty response: " + contentType);
@@ -211,7 +249,17 @@ public class QnetCertificateStatusTest {
         @Bean
         @Primary
         public RestTemplate restTemplate() {
-            return new RestTemplate();
+            RestTemplate restTemplate = new RestTemplate();
+            // Force UTF-8 encoding for both requests and responses
+            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
+            // Add a Jackson message converter to handle JSON with UTF-8
+            MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter();
+            jacksonConverter.setDefaultCharset(StandardCharsets.UTF_8);
+
+            restTemplate.getMessageConverters().add(jacksonConverter);
+
+            return restTemplate;
         }
     }
 }

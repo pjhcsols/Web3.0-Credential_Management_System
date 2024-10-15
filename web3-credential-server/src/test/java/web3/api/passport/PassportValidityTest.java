@@ -1,37 +1,41 @@
 package web3.api.passport;
 
-/*
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
-import web3.api.passport.config.RestTemplateConfig;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import org.springframework.web.client.RestTemplate;
 
-@SpringBootTest(classes = {PassportValidityApplication.class, RestTemplateConfig.class}) 
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class PassportValidityTest {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    // RestTemplate을 수동으로 생성
+    private RestTemplate restTemplate = new RestTemplate();
 
     private static final String ACCESS_TOKEN_URL = "https://oauth.codef.io/oauth/token";
     private static final String API_URL = "https://development.codef.io/v1/kr/public/mw/passport-data/status";
 
     private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
     private static final String CLIENT_SECRET = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
+
 
     @Test
     void shouldCheckPassportValiditySuccessfully() throws Exception {
@@ -74,31 +78,33 @@ public class PassportValidityTest {
                     String.class
             );
 
-            // 문자열 응답 본문 출력
-            String responseBody = response.getBody();
-            System.out.println("Response Body: " + responseBody);
+        // URL 인코딩된 응답 본문 디코딩
+        String responseBody = URLDecoder.decode(response.getBody(), StandardCharsets.UTF_8);
 
-            // Content-Type 확인
-            MediaType contentType = response.getHeaders().getContentType();
-            System.out.println("Content-Type: " + contentType);
+        // 디코딩된 응답 본문 출력
+        System.out.println("Decoded Response Body: " + responseBody);
 
-            // 응답 검증
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-            assertThat(responseBody).isNotNull();
+        // Content-Type 확인
+        MediaType contentType = response.getHeaders().getContentType();
+        System.out.println("Content-Type: " + contentType);
 
-            // JSON 파싱 시도 (Content-Type이 JSON일 경우만)
-            if (contentType != null && contentType.equals(MediaType.APPLICATION_JSON)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> parsedResponseBody = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {});
+        // 응답 검증
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(responseBody).isNotNull();
 
-                // 필드 검증
-                assertThat(parsedResponseBody).containsKey("resAuthenticity");
-                assertThat(parsedResponseBody.get("resAuthenticity")).isInstanceOf(String.class);
-                String resAuthenticity = (String) parsedResponseBody.get("resAuthenticity");
-                assertThat(resAuthenticity).isNotEmpty();
-            } else {
-                System.err.println("Unexpected content type: " + contentType);
-            }
+        // JSON 파싱 시도 (Content-Type이 JSON일 경우만)
+        if (contentType != null && contentType.equals(MediaType.APPLICATION_JSON)) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            Map<String, Object> parsedResponseBody = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {});
+
+            // 필드 검증
+            assertThat(parsedResponseBody).containsKey("resAuthenticity");
+            assertThat(parsedResponseBody.get("resAuthenticity")).isInstanceOf(String.class);
+            String resAuthenticity = (String) parsedResponseBody.get("resAuthenticity");
+            assertThat(resAuthenticity).isNotEmpty();
+        } else {
+            System.err.println("Unexpected content type: " + contentType);
+        }
 
         } catch (Exception e) {
             // 오류 로그 출력
@@ -153,6 +159,3 @@ public class PassportValidityTest {
         }
     }
 }
-
-
- */
