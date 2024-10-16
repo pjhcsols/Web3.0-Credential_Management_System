@@ -29,6 +29,8 @@ public class UnivCertService {
     }
 
     // 인증 코드 검증 메서드
+    // 검증 완료되면 사용자 초기화 후 지갑 생성 후 지갑 id를 포함해서 재학증_walletId_0을 저장한다
+    // 재학증을 새로 등록 할때마다 -> 재학증_walletId_0 -> 재학증_walletId_1 -> 재학증_walletId_2 처럼 +1씩 증가되어서 블록에 키로 저장됨
     public Mono<String> verifyCertificationCode(String email, String univName, int code) {
         String jsonRequest = "{\n" +
                 "  \"key\": \"" + CERT_KEY + "\",\n" +

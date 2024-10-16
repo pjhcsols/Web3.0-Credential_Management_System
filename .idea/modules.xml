@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Web3.0-Credential_Management_System.iml" filepath="$PROJECT_DIR$/.idea/Web3.0-Credential_Management_System.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/web3-credential-server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/web3-credential-server.main.iml" />
     </modules>
   </component>
 </project>
