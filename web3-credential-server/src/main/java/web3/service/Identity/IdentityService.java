@@ -24,17 +24,14 @@ public class IdentityService {
     private static final Logger logger = LoggerFactory.getLogger(IdentityService.class);
     private Gateway gateway;
     private Network network;
-
+/*
     public IdentityService() {
         try {
-            // Wallet 설정 및 connection.yaml 로드
             Path walletPath = Paths.get("wallet");
             Wallet wallet = Wallets.newFileSystemWallet(walletPath);
 
-            // InputStream을 통해 connection.yaml 로드
             InputStream networkConfigStream = new ClassPathResource("connection.yaml").getInputStream();
 
-            // "admin" ID 확인
             if (wallet.get("admin") == null) {
                 throw new IllegalArgumentException("Identity 'admin' not found in wallet.");
             }
@@ -50,6 +47,8 @@ public class IdentityService {
             throw new RuntimeException("블록체인 네트워크 초기화 실패", e);
         }
     }
+
+ */
 
 
     // 재학증 등록

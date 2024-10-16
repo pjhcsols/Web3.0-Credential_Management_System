@@ -64,10 +64,8 @@ test {
 }
 
 //log 에러 나중에 s3로그 한개로 통합하면 지우기
-/*
 configurations {
     all {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
 }
- */
