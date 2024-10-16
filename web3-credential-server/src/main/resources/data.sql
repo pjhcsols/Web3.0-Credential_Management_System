@@ -6,4 +6,4 @@ VALUES
 INSERT INTO wallets (user_id, pdfUrl,privateKey, publicKey, address)
 VALUES
     (1, 'https://web3credentialbucket.s3.ap-northeast-2.amazonaws.com/ssa_1727764703278_ssa','privateKeyForUser1', 'publicKeyForUser1', 'addressForUser1'),
-    (2, 'https://web3credentialbucket.s3.ap-northeast-2.amazonaws.com/ssa_1727764703278_ssa','privateKeyForUser2', 'publicKeyForUser2', 'addressForUser2');
+    (2,null,'privateKeyForUser2', 'publicKeyForUser2', 'addressForUser2');
