@@ -110,7 +110,20 @@ struct OnboardingView: View {
                 do {
                     let userInfo = try JSONDecoder().decode(UserInfo.self, from: data)
                     DispatchQueue.main.async {
+                        
+                        /*
+                        print("ID: \(userInfo.id)")
+                        print("닉네임: \(userInfo.nickname)")
+                        print("이메일: \(userInfo.email)")
+                        print("액세스 토큰: \(userInfo.accessToken)")
+                        print("JWT 토큰: \(userInfo.jwtToken)")
+                        print("리프레시 토큰: \(userInfo.refreshToken)")
+                        print("서버 유저 ID: \(userInfo.serverUserId)")
+                        print("서버 유저 이메일: \(userInfo.serverUserEmail)")
+                        */
+                        
                         UserDefaults.standard.set(userInfo.nickname, forKey: "userNickname")
+                        UserDefaults.standard.set(userInfo.jwtToken, forKey: "jwtToken")
                     }
                 } catch {
                     print("Failed to decode JSON: \(error.localizedDescription)")
