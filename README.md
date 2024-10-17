@@ -5,7 +5,7 @@
 <br>
 ![image](https://github.com/user-attachments/assets/0a312fe1-5f85-4f05-b948-eff5e3ccf505)
 
-이 시스템은 Web3와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
+이 시스템은 Web3 구조와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
 전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있습니다.
 <br>
 
@@ -102,8 +102,8 @@
 
 1. 클라이언트가 사용자가 엑세스 토큰을 통해 Web3 지갑 생성을 요청합니다.
 2. 지갑에서 인증서 PDF와 메타데이터 Verifiable Credential (Credential Metadata, Claims, Proofs)를 S3 스토리지에 저장하고 개인 디바이스에 다운로드할 수 있습니다. 이때 데이터베이스에는 해당 사용자의 S3 PDF 주소값을 저장합니다.
-3. 지갑에서 개인 디바이스의 블록이 생성되며 블록에는 추후 업로드하는 해당 증명에 관한 키 값을 저장하고 블록이 생성 및 추가되며 이를 통해 외부 인증과의 연동이 수행됩니다.
-4. 지갑에서 해당되는 인증서를 업로드 가능하며 PDF의 페이지 별 메타데이터를 별도로 관리하여 1페이지(주민등록증)는 Verifiable Credential로 관리합니다.
+3. 지갑에서 개인 디바이스의 블록(PDF)이 생성되며 블록(PDF)에는 추후 업로드하는 해당 증명에 관한 key : value 값을 저장하고 블록(PDF)이 생성 및 추가되며 이를 통해 외부 인증과의 연동이 수행됩니다.
+4. 지갑에서 해당되는 인증서를 업로드 가능하며 PDF의 페이지 별 메타데이터를 별도로 관리하며 인증과정을 수행하는 메타데이터는 key : value 값으로 Verifiable Credential로 관리합니다.
 
 <br>
 
@@ -114,9 +114,9 @@
 ![image](https://github.com/user-attachments/assets/96e2e235-ea12-4360-8449-e30555901ae8)
 
 1. 클라이언트는 인증서 등록을 위해 2차 인증을 수행합니다.
-2. Web3 블록체인을 통해 인증서에 대한 Verifiable Credential 생성 및 신분증명 요청을 처리합니다.
+2. Web3 환경의 PDF를 통해 인증서에 대한 Verifiable Credential 생성 및 신분증명 요청을 처리합니다.
 3. 외부 인증 API를 활용해 인증서 Verifiable Credential에 대한 신분 증명을 요청합니다.
-4. 서버는 등록된 인증서의 블록 URL을 저장하고 관리합니다.
+4. 서버는 등록된 인증서의 블록(PDF) URL을 저장하고 관리합니다.
 
 <br>
 
@@ -125,7 +125,7 @@
 ![image](https://github.com/user-attachments/assets/4f154c47-4ab3-4a45-b07a-50ed825e7bfb)
 
 1. 클라이언트는 등록된 인증서에 접근하기 위해 2차 인증을 수행합니다.
-2. Web3 블록체인을 통해 인증서에 대한 인증을 요청하고 블록 URL을 반환합니다.
+2. Web3 환경의 PDF를 통해 인증서에 대한 인증을 요청하고 증명서 URL을 반환합니다.
 3. 외부 인증 API를 활용해 인증서 Verifiable Credential에 대한 신분 증명을 요청하고 확인합니다.
 4. 서버는 인증이 완료된 인증서에 접근할 수 있도록 지원합니다.
 
@@ -136,7 +136,7 @@
 ![image](https://github.com/user-attachments/assets/ca75af9d-9d04-456d-99c1-c713910ba3cb)
 
 1. 클라이언트는 등록된 인증서에 접근하기 위해 2차 인증을 수행합니다.
-2. Web3 블록체인을 통해 인증서에서 Verifiable Credential을 찾아오고, 인증서 URL을 반환합니다.
+2. Web3 환경의 PDF를 통해 인증서에서 Verifiable Credential을 찾아오고, 인증서 URL을 반환합니다.
 3. 서버로 인증서 URL을 요청합니다.
 4. URL을 통해 S3 스토리지에 있는 인증서에 접근해 해당 객체의 메타데이터에 접근합니다.
 5. 메타데이터 가공 후 클라이언트에게 목록 반환합니다.
@@ -154,7 +154,7 @@
 <br>
 ![image](https://github.com/user-attachments/assets/34af8fde-ea4f-4d23-beae-1c888972aced)
 
-2. Web3 블록체인의 블록에 외부 인증 값 및 정보 저장을 처리합니다. 개인 디바이스의 블록에 외부 인증을 수행하는 Verifiable Credential, Credential Metadata, Claims, Proofs를 포함한 블록을 생성 관리합니다.
+2. Web3 블록체인의 블록(PDF)에 외부 인증 값 및 정보 저장을 처리합니다. 개인 디바이스의 블록에 외부 인증을 수행하는 Verifiable Credential, Credential Metadata, Claims, Proofs를 포함한 블록을 생성 관리합니다.
 3. 외부 인증 API를 활용해 전자지갑의 인증서 사용 시, 외부 인증과의 연동을 수행합니다.
 
 <br>
