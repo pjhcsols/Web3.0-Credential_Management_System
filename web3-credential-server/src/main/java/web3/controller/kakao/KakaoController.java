@@ -39,6 +39,14 @@ public class KakaoController {
         return kakaoService.kakaoLogin(authorizationCode);
     }
 
+    @Operation(summary = "카카오 로그인", description = "카카오 엑세스 토큰으로 사용자를 인증합니다.")
+    @PostMapping("/login/access")
+    public UserInfoDto kakao(
+            @Parameter(description = "카카오 인증 코드", required = true)
+            @RequestParam("accessToken") String accessToken) {
+        return kakaoService.kakaoLoginToken(accessToken);
+    }
+
     @Operation(summary = "카카오 지갑 정보 전송", description = "카카오 API를 통해 지갑 정보를 전송합니다.")
     @PostMapping("/wallets")
     @ResponseStatus(HttpStatus.CREATED)

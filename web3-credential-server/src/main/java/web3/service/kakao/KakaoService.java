@@ -90,6 +90,43 @@ public class KakaoService {
         }
     }
 
+    public UserInfoDto kakaoLoginToken(String accessToken) {
+        logger.info("kakaoLogin 시작 - accessToken: {}", accessToken);
+
+        try {
+            UserInfoDto userInfoDto = getUserInfoDto(accessToken);
+
+            Long id = userInfoDto.getId();
+            String email = userInfoDto.getEmail();
+            logger.info("사용자 정보 조회: id={}, email={}", id, email);
+
+            User user = userService.findOrCreateUser(id, email);
+            logger.info("사용자 조회 또는 생성: id={}, email={}", user.getId(), user.getEmail());
+
+            Map<String, String> tokens = userService.generateJwtToken(user);
+
+            // Update userInfoDto with additional information
+            userInfoDto = new UserInfoDto(
+                    userInfoDto.getId(),
+                    userInfoDto.getNickname(),
+                    userInfoDto.getEmail(),
+                    accessToken,
+                    tokens.get("jwt_token"),
+                    tokens.get("jwt_refresh"),
+                    user.getId(),
+                    user.getEmail()
+            );
+
+            logger.info("kakaoLogin 성공 - 사용자: {}", user.getId());
+            return userInfoDto;
+
+        } catch (RestClientException e) {
+            logger.error("요청 실패", e);
+            throw new RuntimeException("요청 실패", e);
+        }
+    }
+
+
     private UserInfoDto getUserInfoDto(String accessToken) {
         logger.info("Access token을 사용하여 사용자 정보 가져오기: {}", accessToken);
         String userInfoUrl = kakaoProperties.userInfoUrl();
