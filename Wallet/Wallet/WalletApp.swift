@@ -8,14 +8,14 @@
 import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
-//import OAuthSwift
+import Foundation
 
 @main
 struct WalletApp: App {
 //    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init() {
-        KakaoSDK.initSDK(appKey: "39d3dd59edaf61b248a1aedf5fcc15e3")
+        KakaoSDK.initSDK(appKey: "d04faa6dc8e7a737b9254f4c3dc47d9a")
     }
     
     var body: some Scene {

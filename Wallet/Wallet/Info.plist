@@ -2,16 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key></key>
+	<string></string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>knu.cool.Wallet</string>
+			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kakao39d3dd59edaf61b248a1aedf5fcc15e3</string>
+				<string>kakaod04faa6dc8e7a737b9254f4c3dc47d9a</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kakaod04faa6dc8e7a737b9254f4c3dc47d9a://oauth</string>
 			</array>
 		</dict>
 	</array>
@@ -22,6 +32,21 @@
 		<string>kakaoplus</string>
 		<string>kakaotalk</string>
 	</array>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>211.107.135.107</key> <!-- Replace with your server's IP or domain -->
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSExceptionRequiresForwardSecrecy</key>
+                <false/>
+            </dict>
+        </dict>
+    </dict>
 	<key>UIAppFonts</key>
 	<array>
 		<string>KnuTruth.otf</string>
