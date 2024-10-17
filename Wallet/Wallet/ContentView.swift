@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var isExpanded = true
     @State private var showHistory = false
+    @AppStorage("userNickname") var nickname: String = ""
     
     var body: some View {
         VStack {
@@ -19,8 +20,7 @@ struct ContentView: View {
                     .fontWeight(.light)
                     .padding(.leading, 12)
                 Spacer()
-                Button(action: {
-                }){
+                NavigationLink(destination: AddCertificationView().navigationBarBackButtonHidden(true)){
                     Image(systemName: "plus")
                         .font(.title)
                         .foregroundColor(.gray)
@@ -62,7 +62,7 @@ struct ContentView: View {
                             .padding(.top, 24)
                             .padding(.trailing, 24)
                     }
-                    Text("홍길동")
+                    Text(nickname)
                         .font(isExpanded ? .title : .title2)
                         .fontWeight(.medium)
                         .foregroundColor(.black)

@@ -20,6 +20,18 @@ struct OnboardingView: View {
     @State private var authCode: String?
     @State private var errorMessage: String?
     @State private var isLoggedIn = false
+    @State private var nickname: String = ""
+    
+    struct UserInfo: Decodable {
+        let id: Int
+        let nickname: String
+        let email: String
+        let accessToken: String
+        let jwtToken: String
+        let refreshToken: String
+        let serverUserId: Int
+        let serverUserEmail: String
+    }
     
     var body: some View {
         Group {
@@ -74,7 +86,7 @@ struct OnboardingView: View {
                 if let accessToken = self.accessToken {
                     sendAccessTokenToBackend(accessToken: accessToken)
                 }
-//                fetchUserInfo()
+
             }
         }
     }
@@ -94,30 +106,20 @@ struct OnboardingView: View {
                 return
             }
             
-            if let response = response as? HTTPURLResponse {
-                if response.statusCode == 200 {
-                    print("Access token sent successfully.")
-                } else {
-                    print("Failed to send access token. Status code: \(response.statusCode)")
+            if let data = data {
+                do {
+                    let userInfo = try JSONDecoder().decode(UserInfo.self, from: data)
+                    DispatchQueue.main.async {
+                        UserDefaults.standard.set(userInfo.nickname, forKey: "userNickname")
+                    }
+                } catch {
+                    print("Failed to decode JSON: \(error.localizedDescription)")
                 }
             }
         }
         
         task.resume()
     }
-
-
-    
-//    func fetchUserInfo() {
-//        UserApi.shared.me { user, error in
-//            if let error = error {
-//                print("사용자 정보 가져오기 실패: \(error.localizedDescription)")
-//            } else if let user = user {
-//                let nickname = user.kakaoAccount?.profile?.nickname ?? "닉네임 없음"
-//                print("사용자 닉네임: \(nickname)")
-//            }
-//        }
-//    }
 }
 
 #Preview {
