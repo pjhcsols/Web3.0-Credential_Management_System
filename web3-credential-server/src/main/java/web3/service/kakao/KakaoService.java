@@ -171,7 +171,6 @@ public class KakaoService {
         response.put("walletId", wallet.getId());
         response.put("privateKey", wallet.getPrivateKey());
         response.put("publicKey", wallet.getPublicKey());
-        response.put("address", wallet.getAddress());
 
         logger.info("지갑 정보 전송 완료: {}", response);
         return response;
@@ -200,8 +199,8 @@ public class KakaoService {
     private String createWalletTemplateObject(User user, Wallet wallet) {
         Map<String, Object> templateObject = new HashMap<>();
         templateObject.put("object_type", "text");
-        templateObject.put("text", String.format("지갑 정보\n이메일: %s\nPrivate Key: %s\nPublic Key: %s\nAddress: %s",
-                user.getEmail(), wallet.getPrivateKey(), wallet.getPublicKey(), wallet.getAddress()));
+        templateObject.put("text", String.format("지갑 정보\n이메일: %s\nPrivate Key: %s\nPublic Key: %s\n인증서: %s",
+                user.getEmail(), wallet.getPrivateKey(), wallet.getPublicKey(), wallet.getPdfUrl()));
         templateObject.put("link", Map.of("web_url", "http://your-web-url.com"));
 
         try {

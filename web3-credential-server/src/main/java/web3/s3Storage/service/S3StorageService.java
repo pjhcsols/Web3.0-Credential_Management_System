@@ -122,11 +122,11 @@ public class S3StorageService {
     }
 
     private static String getFileName(Wallet wallet) {
-        return wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + wallet.getAddress();
+        return wallet.getId() + "_" + System.currentTimeMillis() + "_" + wallet.getId();
     }
 
     private static String getEmptyFilename(Wallet wallet) {
-        return wallet.getAddress() + "_" + System.currentTimeMillis() + "_" + "empty.pdf";
+        return wallet.getId() + "_" + System.currentTimeMillis() + "_" + "empty.pdf";
     }
 
     public byte[] mergePdfs(byte[] pdf1, byte[] pdf2){

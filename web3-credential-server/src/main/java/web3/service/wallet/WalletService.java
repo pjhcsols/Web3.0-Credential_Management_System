@@ -24,12 +24,12 @@ public class WalletService {
     }
 
     //지갑 생성
-    public Wallet createWallet(User user, String privateKey, String publicKey, String address) throws WalletAlreadyExistsException {
+    public Wallet createWallet(User user, String privateKey, String publicKey) throws WalletAlreadyExistsException {
         Optional<Wallet> existingWallet = walletRepository.findByUser(user);
         if (existingWallet.isPresent()) {
             throw new WalletAlreadyExistsException("User already has a wallet");
         }
-        Wallet wallet = new Wallet(user, privateKey, publicKey, address);
+        Wallet wallet = new Wallet(user, privateKey, publicKey);
         return walletRepository.save(wallet);
     }
 
@@ -47,7 +47,7 @@ public class WalletService {
     public Wallet updateWallet(Long id, String privateKey, String publicKey, String address) {
         Wallet existingWallet = walletRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
-        existingWallet.updateWallet(privateKey, publicKey, address);
+        existingWallet.updateWallet(privateKey, publicKey);
         return walletRepository.save(existingWallet);
     }
 

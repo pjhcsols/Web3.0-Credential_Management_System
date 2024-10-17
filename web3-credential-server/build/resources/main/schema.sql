@@ -13,7 +13,6 @@ CREATE TABLE wallets (
                          pdfUrl VARCHAR(255),
                          privateKey VARCHAR(255) NOT NULL,
                          publicKey VARCHAR(255) NOT NULL,
-                         address VARCHAR(255) NOT NULL,
                          FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

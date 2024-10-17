@@ -24,32 +24,28 @@ public class Wallet {
     @Column(nullable = false)
     private String publicKey;
 
-    @Column(nullable = false)
-    private String address;
-
-    public void setPdfUrl(String pdfUrl) {
-        this.pdfUrl = pdfUrl;
-    }
 
     //JPA 기본 생성자
     protected Wallet() {}
 
     // 생성자: 필드 값을 모두 제공
-    public Wallet(User user, String privateKey, String publicKey, String address) {
+    public Wallet(User user, String privateKey, String publicKey) {
         this.user = user;
         this.privateKey = privateKey;
         this.publicKey = publicKey;
-        this.address = address;
     }
 
-    public void updateWallet(String privateKey, String publicKey, String address) {
+    public void updateWallet(String privateKey, String publicKey) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
-        this.address = address;
     }
 
     public void updatePdfUrl(String pdfUrl) {
         this.pdfUrl = pdfUrl;
+    }
+
+    public void updatePrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 
     // Getter 메서드
@@ -71,9 +67,6 @@ public class Wallet {
         return publicKey;
     }
 
-    public String getAddress() {
-        return address;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -97,7 +90,6 @@ public class Wallet {
                 ", user=" + user +
                 ", privateKey='" + privateKey + '\'' +
                 ", publicKey='" + publicKey + '\'' +
-                ", address='" + address + '\'' +
                 '}';
     }
 }
