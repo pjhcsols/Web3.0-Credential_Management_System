@@ -36,6 +36,7 @@ public class IdentityController {
         this.walletService = walletService;
     }
 
+    @Operation(summary = "재학증 pdf, 메타데이터 등록",description = "페이지에 pdf, 메타데이터 등록합니다.")
     @PostMapping("/register")
     public ResponseEntity<String> registerCertification(
             @RequestParam("file") MultipartFile file,
@@ -51,6 +52,20 @@ public class IdentityController {
         return ResponseEntity.ok("재학증이 성공적으로 등록되었습니다.");
     }
 
+    @Operation(summary = "pdf 대체하기",description = "원하는 페이지를 원하는 pdf로 대체합니다.")
+    @PostMapping("/replace-pdf")
+    public ResponseEntity<String> replacePdf(
+            @Parameter(description = "pdf 파일",required = true)
+            @RequestParam("file") MultipartFile file,
+            @Parameter(description = "페이지 번호",required = true)
+            @RequestParam("page") int page,
+            @Parameter(description = "사용자 지갑ID",required = true)
+            @RequestParam("walletId") Long walletId) throws IOException {
+        Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
+        String pdfUrl = identityService.replacePdfPage(wallet, page, file);
+        return ResponseEntity.ok(pdfUrl);
+    }
+
     @Operation(summary = "사용자의 등록된 인증서 key 목록 전체 얻기", description = "사용자의 등록된 인증서 이름 목록을 전체를 가져옵니다.")
     @GetMapping("/get-cert-names")
     public ResponseEntity<Set<String>> getCertNames(
@@ -61,6 +76,46 @@ public class IdentityController {
         Set<String> certNames = identityService.getCertNames(pdfUrl);
 
         return ResponseEntity.ok().body(certNames);
+    }
+
+    @Operation(summary = "인증서 리스트 얻기",description = "개인의 인증서{(key : value)..(key : value)}들을 모두 가져옵니다.")
+    @GetMapping("/certs")
+    public ResponseEntity<HashMap<String,String>> getCertList(
+            @Parameter(description = "pdf 파일 경로",required = true)
+            @RequestParam("pdfUrl") String pdfUrl) {
+        HashMap<String, String> certList = identityService.getCertList(pdfUrl);
+        HashMap<String, String> decodedMetadata = identityService.decodeMetadata(certList);
+
+        return ResponseEntity.ok().body(decodedMetadata);
+
+    }
+
+    @Operation(summary = "사용자의 해당되는 인증서의 특정 value 얻기",description = "사용자의 인증서 목록중 원하는 인증서의 내용들을 가져옵니다.")
+    @GetMapping("/get-content")
+    public ResponseEntity<List<Map.Entry<String, String>>> getPdfKey(
+            @Parameter(description = "pdf 파일 경로",required = true)
+            @RequestParam String pdfUrl,
+            @Parameter(description = "인증서 이름",required = true)
+            @RequestParam String certName,
+            @Parameter(description = "지갑 ID",required = true)
+            @RequestParam Long walletId) {
+
+        List<Map.Entry<String, String>> contentsForCertName = identityService.getContentsForCertName(pdfUrl, certName, walletId);
+        return ResponseEntity.ok().body(contentsForCertName);
+    }
+
+    @Operation(summary = "인증서 리스트 얻기 - pdf 형식",description = "개인의 인증서들을 pdf의 형식으로 모두 가져옵니다.")
+    @GetMapping("/get-pdf")
+    public ResponseEntity<byte[]> getPdf(
+            @Parameter(description = "pdf 파일 경로",required = true)
+            @RequestParam("pdfUrl") String pdfUrl) {
+        try {
+            byte[] pdfData = identityService.getPdf(pdfUrl).readAllBytes();
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdfData);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @Operation(summary = "특정 인증서 삭제",description = "지갑에서 특정 인증서를 삭제합니다. 즉,S3 스토리지에 pdf 파일에서 특정 페이지를 삭제합니다.")
@@ -84,60 +139,6 @@ public class IdentityController {
             @RequestParam("walletId") Long walletId) {
         identityService.deletePdf(pdfUrl, walletId);
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "인증서 리스트 얻기",description = "개인의 인증서{(key : value)..(key : value)}들을 모두 가져옵니다.")
-    @GetMapping("/certs")
-    public ResponseEntity<HashMap<String,String>> getCertList(
-            @Parameter(description = "pdf 파일 경로",required = true)
-            @RequestParam("pdfUrl") String pdfUrl) {
-        HashMap<String, String> certList = identityService.getCertList(pdfUrl);
-        HashMap<String, String> decodedMetadata = identityService.decodeMetadata(certList);
-
-        return ResponseEntity.ok().body(decodedMetadata);
-
-    }
-
-    @Operation(summary = "인증서 리스트 얻기 - pdf 형식",description = "개인의 인증서들을 pdf의 형식으로 모두 가져옵니다.")
-    @GetMapping("/get-pdf")
-    public ResponseEntity<byte[]> getPdf(
-            @Parameter(description = "pdf 파일 경로",required = true)
-            @RequestParam("pdfUrl") String pdfUrl) {
-        try {
-            byte[] pdfData = identityService.getPdf(pdfUrl).readAllBytes();
-            return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdfData);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @Operation(summary = "pdf 대체하기",description = "원하는 페이지를 원하는 pdf로 대체합니다.")
-    @PostMapping("/replace-pdf")
-    public ResponseEntity<String> replacePdf(
-            @Parameter(description = "pdf 파일",required = true)
-            @RequestParam("file") MultipartFile file,
-            @Parameter(description = "페이지 번호",required = true)
-            @RequestParam("page") int page,
-            @Parameter(description = "사용자 지갑ID",required = true)
-            @RequestParam("walletId") Long walletId) throws IOException {
-        Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
-        String pdfUrl = identityService.replacePdfPage(wallet, page, file);
-        return ResponseEntity.ok(pdfUrl);
-    }
-
-    @Operation(summary = "사용자의 해당되는 인증서의 특정 value 얻기",description = "사용자의 인증서 목록중 원하는 인증서의 내용들을 가져옵니다.")
-    @GetMapping("/get-content")
-    public ResponseEntity<List<Map.Entry<String, String>>> getPdfKey(
-            @Parameter(description = "pdf 파일 경로",required = true)
-            @RequestParam String pdfUrl,
-            @Parameter(description = "인증서 이름",required = true)
-            @RequestParam String certName,
-            @Parameter(description = "지갑 ID",required = true)
-            @RequestParam Long walletId) {
-
-        List<Map.Entry<String, String>> contentsForCertName = identityService.getContentsForCertName(pdfUrl, certName, walletId);
-        return ResponseEntity.ok().body(contentsForCertName);
     }
 
     @Operation(summary = "PDF 페이지 수 얻기", description = "특정 PDF의 총 페이지 수 반환")

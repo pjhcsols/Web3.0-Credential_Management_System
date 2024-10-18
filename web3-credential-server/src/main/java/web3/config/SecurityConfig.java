@@ -53,10 +53,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:8080")); // 패턴 사용
+        //configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:8080")); // 패턴 사용
         //configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:8080", "http://*.example.com"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        //configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        //configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
+        configuration.setAllowedOrigins(Arrays.asList("*")); // 모든 출처 허용
+        configuration.setAllowedMethods(Arrays.asList("*")); // 모든 HTTP 메서드 허용
+        configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 쿠키 및 인증 정보를 허용
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
 

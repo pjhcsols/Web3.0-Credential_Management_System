@@ -98,7 +98,8 @@ public class KakaoService {
 
             Long id = userInfoDto.getId();
             String email = userInfoDto.getEmail();
-            logger.info("사용자 정보 조회: id={}, email={}", id, email);
+            String nickname = userInfoDto.getNickname();
+            logger.info("사용자 정보 조회: id={}, email={}, nickname={}", id, email, nickname);
 
             User user = userService.findOrCreateUser(id, email);
             logger.info("사용자 조회 또는 생성: id={}, email={}", user.getId(), user.getEmail());
@@ -108,7 +109,7 @@ public class KakaoService {
             // Update userInfoDto with additional information
             userInfoDto = new UserInfoDto(
                     userInfoDto.getId(),
-                    userInfoDto.getNickname(),
+                    nickname,
                     userInfoDto.getEmail(),
                     accessToken,
                     tokens.get("jwt_token"),
@@ -116,6 +117,7 @@ public class KakaoService {
                     user.getId(),
                     user.getEmail()
             );
+            logger.info("userInfoDto: {}", userInfoDto);
 
             logger.info("kakaoLogin 성공 - 사용자: {}", user.getId());
             return userInfoDto;
@@ -140,6 +142,7 @@ public class KakaoService {
 
             JsonNode jsonNode = objectMapper.readTree(response);
             logger.debug("사용자 정보 응답: {}", response);
+            logger.info("사용자 정보 응답: {}",jsonNode);
 
             long id = jsonNode.path("id").asLong();
             JsonNode properties = jsonNode.path("properties");
