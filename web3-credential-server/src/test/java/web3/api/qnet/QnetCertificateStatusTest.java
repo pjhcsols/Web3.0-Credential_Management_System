@@ -56,13 +56,13 @@ public class QnetCertificateStatusTest {
         String requestBody = "{\n" +
             "    \"organization\": \"0001\",\n" +
             "    \"userName\": \"김건아\",\n" +
-            "    \"docNo\": \"2024082120452245739\"\n" +
+            "    \"docNo\": \"2024052022362795943\"\n" +
         "}";
 
         // HTTP 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set(HttpHeaders.ACCEPT_CHARSET, "UTF-8"); // UTF-8 인코딩 명시
+        //headers.set(HttpHeaders.ACCEPT_CHARSET, "UTF-8"); // UTF-8 인코딩 명시
         headers.setBearerAuth(accessToken);
 
         // HttpEntity 객체 생성 (요청 바디와 헤더 포함)
