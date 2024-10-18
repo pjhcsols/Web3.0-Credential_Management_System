@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Error Occurred</h1>
+<p class="error-message" th:utext="${errorMessage}">Unexpected error occurred.</p>
+<div id="errorDetails"></div>
+<a class="back-button" href="javascript:history.back()">Go Back</a>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var errorDetails = /*[[${details}]]*/ '';
+    var detailsContainer = document.getElementById('errorDetails');
+
+    if (errorDetails) {
+        var ul = document.createElement('ul');
+
+        try {
+            // JSON 문자열을 파싱하여 오류 상세 정보를 처리
+            var parsedDetails = JSON.parse(errorDetails);
+            for (var key in parsedDetails) {
+                if (parsedDetails.hasOwnProperty(key)) {
+                    var li = document.createElement('li');
+                    li.textContent = key + ': ' + parsedDetails[key];
+                    ul.appendChild(li);
+                }
+            }
+        } catch (e) {
+            // 오류가 있다면 콘솔에 로그를 출력
+            console.error('Error parsing error details:', e);
+            var li = document.createElement('li');
+            li.textContent = 'Error details could not be parsed.';
+            ul.appendChild(li);
+        }
+
+        detailsContainer.appendChild(ul);
+    }
+    /*]]>*/
+</script>
+</body>
+</html>
