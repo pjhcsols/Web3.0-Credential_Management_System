@@ -471,58 +471,6 @@ public class S3StorageService {
         return updatedMetadata; // 업데이트된 메타데이터 반환
     }
 
-    private HashMap<String, String> changeForNewMetadata(int pageNumberToRemove, HashMap<String, String> metadata) {
-        List<Integer> pageNumbers = new ArrayList<>();
-        for (String key : metadata.keySet()) {
-            // "page-" 뒤의 숫자 추출
-            if (key.startsWith("page-")) {
-                int pageNum = Integer.parseInt(key.substring(5));
-                pageNumbers.add(pageNum); //pageNumbers 리스트에 페이지 넘버 다 넣기
-            }
-        }
-        // 페이지 번호 정렬
-        pageNumbers.sort(Integer::compareTo);
-        int pageSize = getPageSize(pageNumberToRemove, pageNumbers);
-
-        pageNumbers.removeIf(pageNum -> pageNum == pageNumberToRemove);
-        List<Integer> newPageNumbers = new ArrayList<>();
-
-
-        for (Integer pageNumber : pageNumbers) {
-            if (pageNumber > pageNumberToRemove) {
-                newPageNumbers.add(pageNumber - pageSize);
-            } else {
-                newPageNumbers.add(pageNumber);
-            }
-        }
-
-        // 새로운 메타데이터 해시맵 생성
-        HashMap<String, String> newMetadata = new HashMap<>();
-
-        // 기존 메타데이터의 값을 유지하면서 새로운 키로 추가
-        for (int newPageNum : newPageNumbers) {
-            if(newPageNum + pageSize > pageNumberToRemove) {
-                newMetadata.put("page-" + newPageNum, metadata.get("page-" + (newPageNum+pageSize)));
-            }else{
-                newMetadata.put("page-" + newPageNum, metadata.get("page-" + newPageNum));
-            }
-        }
-        return newMetadata;
-    }
-
-    //삭제할 인증서의 페이지 수 구하기
-    private int getPageSize(int pageNumberToRemove, List<Integer> pageNumbers) {
-        //삭제할 인증서와 다음 인증서의 차 구하기 (삭제할 인증서의 페이지 수 구하기)
-        for (int i = 0; i< pageNumbers.size(); i++){
-            if (pageNumbers.get(i) == pageNumberToRemove){
-                if (i != pageNumbers.size()-1){
-                    return pageNumbers.get(i+1) - pageNumbers.get(i);
-                }
-            }
-        }
-        return 0;
-    }
-
     private void checkPageExist(boolean pageIndexToRemove, boolean pageIndexToRemove1, String pageNumberToRemove) {
         if (pageIndexToRemove || pageIndexToRemove1) {
             throw new IllegalArgumentException(pageNumberToRemove);

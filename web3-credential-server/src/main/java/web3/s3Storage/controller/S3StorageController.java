@@ -65,7 +65,7 @@ public class S3StorageController {
     @Operation(summary = "특정 인증서 삭제",description = "지갑에서 특정 인증서를 삭제합니다. 즉,S3 스토리지에 pdf 파일에서 특정 페이지를 삭제합니다.")
     @PatchMapping ("/delete-one")
     public ResponseEntity<Void> deleteCertForName(
-            @Parameter(description = "walletId와 삭제할 page가 담긴 Dto",required = true)
+            @Parameter(description = "walletId와 삭제할 인증서이름가 담긴 Dto",required = true)
             @RequestBody DeleteCertForNameRequest request
     ) throws IOException, S3UploadException {
         Long walletId = request.getWalletId();
@@ -148,7 +148,7 @@ public class S3StorageController {
     public ResponseEntity<List<Map.Entry<String, String>>> getPdfKey(
             @Parameter(description = "pdf 파일 경로",required = true)
             @RequestParam String pdfUrl,
-            @Parameter(description = "페이지 번호",required = true)
+            @Parameter(description = "인증서 이름",required = true)
             @RequestParam String certName) {
 
         List<Map.Entry<String, String>> contentsForCertName = s3StorageService.getContentsForCertName(pdfUrl, certName);
