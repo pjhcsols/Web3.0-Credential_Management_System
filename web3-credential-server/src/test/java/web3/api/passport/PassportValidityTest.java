@@ -20,6 +20,24 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+
+
+
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
 public class PassportValidityTest {
@@ -31,6 +49,9 @@ public class PassportValidityTest {
 
     private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
     private static final String CLIENT_SECRET = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
+
+    private String publicKeyStr = "   "; //public key 넣기
+    
 
     @Test
     void shouldCheckPassportValiditySuccessfully() throws Exception {
@@ -48,23 +69,25 @@ public class PassportValidityTest {
         String certFileEncoded = encodeFileToBase64(certFilePath);
         String keyFileEncoded = encodeFileToBase64(keyFilePath);
         
-        String certPassword = "geonah2410!";  // 사용자의 인증서 비밀번호
+        String certPassword = "    ";  // 사용자의 인증서 비밀번호
         String rsaEncryptedPassword = encryptRSAPassword(certPassword);
 
         // JSON Request Payload
         String requestBody = "{\n" +
                 "    \"organization\": \"0002\",\n" +
-                "    \"loginType\": \"0\",\n" +
+                "    \"loginType\": \"2\",\n" +
                 "    \"certType\": \"1\",\n" +
                 "    \"certFile\": \"" + certFileEncoded + "\",\n" +
                 "    \"keyFile\": \"" + keyFileEncoded + "\",\n" +
                 "    \"certPassword\": \"" + rsaEncryptedPassword + "\",\n" +
+                "    \"userName1\": \"김건아\",\n" +
+                "    \"identity\": \"\",\n" + //주민등록번호
 
                 "    \"userName\": \"김건아\",\n" +
-                "    \"passportNo\": \"M45554431\",\n" +
-                "    \"issueDate\": \"201900729\",\n" +
-                "    \"expirationDate\": \"20290729\",\n" +
-                "    \"birthDate\": \"20010416\"\n" +
+                "    \"passportNo\": \"  \",\n" + //여권번호
+                "    \"issueDate\": \"   \",\n" + //여권발급 날짜
+                "    \"expirationDate\": \"   \",\n" + //여권 만료 날짜
+                "    \"birthDate\": \"   \"\n" + //생일
                 "}";
 
         // HTTP 요청 헤더 설정
@@ -127,11 +150,22 @@ public class PassportValidityTest {
         return Base64.getEncoder().encodeToString(fileContent);
     }
 
-    // 비밀번호를 RSA로 암호화하는 메서드 (사용하는 인증서 제공기관의 암호화 방식에 맞게 수정 필요)
-    private String encryptRSAPassword(String password) {
-        // 실제 RSA 암호화는 사용자의 시스템 설정 및 제공된 공개키에 따라 다를 수 있습니다.
-        // 이 부분은 사용자 환경에 맞게 구현해야 합니다.
-        return password; // 여기서는 임시로 패스워드를 그대로 반환하지만, 실제로는 암호화된 값을 반환해야 합니다.
+    public String encryptRSAPassword(String password) throws Exception {
+        // 1. Base64로 인코딩된 공개키 문자열을 PublicKey 객체로 변환
+        byte[] keyBytes = Base64.getDecoder().decode(publicKeyStr);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = keyFactory.generatePublic(keySpec);
+
+        // 2. Cipher 객체를 사용하여 RSA 암호화 수행
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); // PKCS1Padding 사용
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+        // 3. 비밀번호를 암호화
+        byte[] encryptedBytes = cipher.doFinal(password.getBytes("UTF-8"));
+
+        // 4. 암호화된 바이트 배열을 Base64로 인코딩하여 반환
+        return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
     protected static HashMap<String, String> publishToken(String clientId, String clientSecret) {
