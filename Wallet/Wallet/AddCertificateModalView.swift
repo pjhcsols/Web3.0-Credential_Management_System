@@ -5,6 +5,7 @@
 //  Created by Seah Kim on 10/10/24.
 //
 
+import LocalAuthentication
 import SwiftUI
 
 struct AddCertificateModalView: View {
@@ -14,7 +15,9 @@ struct AddCertificateModalView: View {
     
     @State var allAgree = false
     @State var item1Checked = false
-    
+    @State var showPinEntry = false
+    @State var pdfIssued = false // PDF 발급 완료 여부
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -25,6 +28,7 @@ struct AddCertificateModalView: View {
                             .font(.title2)
                             .bold()
                             .foregroundColor(.black)
+                        
                         VStack(alignment: .leading, spacing: 10) {
                             Button(action: {
                                 allAgree.toggle()
@@ -56,25 +60,72 @@ struct AddCertificateModalView: View {
                                 }
                             }
                         }
+                        
                         Button(action: {
+                            authenticateUser()
                         }) {
                             Text("발급하기")
                                 .fontWeight(.medium)
                                 .foregroundColor(.white)
                                 .frame(width: 256, height: 45)
-                                .background(Color(red: 218/255, green: 33/255, blue: 39/255))
+                                .background(allAgree && item1Checked ? Color(red: 218/255, green: 33/255, blue: 39/255) : Color.gray) // 버튼 색상 설정
                                 .cornerRadius(6)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color(red: 218/255, green: 33/255, blue: 39/255), lineWidth: 1)
+                                        .stroke(allAgree && item1Checked ? Color(red: 218/255, green: 33/255, blue: 39/255) : Color.gray, lineWidth: 1)
                                 )
                         }
+                        .disabled(!(allAgree && item1Checked)) // 동의하지 않으면 버튼 비활성화
                         .padding()
                     }
                     .padding(.top, 48)
                 }
             }
+            .sheet(isPresented: $showPinEntry) {
+                CheckByCodeView { success in
+                    if success {
+//                        issuePdf() // PIN 인증 성공 시 PDF 발급
+                    }
+                }
+            }
+//            .alert(isPresented: $pdfIssued) {
+//                Alert(title: Text("PDF 발급 완료"), message: Text("PDF가 성공적으로 발급되었습니다."), dismissButton: .default(Text("확인")) {
+//                    dismiss()  // PDF 발급 완료 후 모달 닫기
+//                })
+//            }
         }
+    }
+    
+    private func authenticateUser() {
+        let context = LAContext()
+        var error: NSError?
+        
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            let reason = "Face ID를 사용하여 인증하세요."
+            
+            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, authenticationError in
+                DispatchQueue.main.async {
+                    if success {
+                        print("Face ID 인증 성공")
+                        issuePdf()  // Face ID 인증 성공 시 PDF 발급
+                    } else {
+                        print("Face ID 인증 실패, PIN 입력으로 전환")
+                        showPinEntry = true // PIN 입력 화면으로 전환
+                    }
+                }
+            }
+        } else {
+            DispatchQueue.main.async {
+                print("Face ID를 사용할 수 없음, PIN 입력으로 전환")
+                showPinEntry = true
+            }
+        }
+    }
+    
+    private func issuePdf() {
+        // PDF 발급
+        print("PDF 발급 시도")
+        pdfIssued = true  // 발급 완료되면 알림 띄우기
     }
 }
 

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AddCertificationView: View {
+    @Environment(\.presentationMode) var presentationMode
     @State private var showSheet = false
     @State private var selectedCertification: Certification?
     
@@ -21,6 +22,7 @@ struct AddCertificationView: View {
                     .fontWeight(.light)
                 HStack {
                     Button(action: {
+                        presentationMode.wrappedValue.dismiss()
                     }){
                         Image(systemName: "chevron.left")
                             .font(.title)
@@ -35,9 +37,6 @@ struct AddCertificationView: View {
             List(certificationArray) { item in
                 Button(action: {
                     selectedCertification = item
-                    DispatchQueue.main.async {
-                        showSheet = true
-                    }
                     print("\(item.name) 클릭됨")
                 }) {
                     HStack {
@@ -64,14 +63,10 @@ struct AddCertificationView: View {
             .scrollContentBackground(.hidden)
         }
         .padding(.top)
-        .sheet(isPresented: $showSheet, onDismiss: {
-            selectedCertification = nil
-        }) {
-            if let certification = selectedCertification {
-                AddCertificateModalView(certification: certification)
-                    .presentationDetents([.fraction(0.3)])
-                    .presentationDragIndicator(.visible)
-            }
+        .sheet(item: $selectedCertification) { certification in
+            AddCertificateModalView(certification: certification)
+                .presentationDetents([.fraction(0.3)])
+                .presentationDragIndicator(.visible)
         }
     }
 }
