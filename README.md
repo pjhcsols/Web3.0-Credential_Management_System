@@ -196,3 +196,25 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
 주민등록 진위 여부를 확인하기 위해 외부 API를 연동하여 사용자의 주민등록 진위를 검증하는 작업을 수행하였습니다.
 <br>
 이 API는 사용자가 제공한 주민등록번호가 실제로 존재하는지 검토하는 기능을 제공합니다.
+
+<br>
+<br>
+
+## 라이선스 정보
+
+이 프로젝트는 다음의 오픈 소스 라이브러리를 사용합니다. 각 라이브러리는 Apache License 2.0에 따라 라이센스가 부여됩니다.
+
+## 사용된 라이브러리
+
+1. **Hyperledger Fabric**
+   - 라이선스: Apache License 2.0
+   - [프로젝트 링크](https://www.hyperledger.org/use/fabric)
+
+2. **Apache PDFBox**
+   - 라이선스: Apache License 2.0
+   - [프로젝트 링크](https://pdfbox.apache.org)
+
+3. **UnivCert (학생 인증)**
+   - 라이선스: Apache License 2.0
+   - [프로젝트 링크](https://github.com/univcert)
+
