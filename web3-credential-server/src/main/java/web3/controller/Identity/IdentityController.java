@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web3.domain.wallet.Wallet;
 import web3.exception.S3.S3UploadException;
+import web3.s3Storage.dto.DeleteCertForNameRequest;
 import web3.s3Storage.dto.DeleteCertRequest;
 import web3.service.Identity.IdentityService;
 import web3.service.dto.Identity.StudentCertificationDto;

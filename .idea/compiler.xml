@@ -10,5 +10,10 @@
         <module name="web3-credential-server.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="web3-credential-server" target="21" />
+      <module name="web3-credential-server.main" target="21" />
+      <module name="web3-credential-server.test" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>

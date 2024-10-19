@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.springframework:spring-test:6.1.10" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.springframework" artifactId="spring-test" version="6.1.10" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-test/6.1.10/82d3c12836121e37843f21bf382a8c46c0448b59/spring-test-6.1.10.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.springframework/spring-test/6.1.10/99b29f83fb86c363eb949875d0172ea2794c419c/spring-test-6.1.10-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

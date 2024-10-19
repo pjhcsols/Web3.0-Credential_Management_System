@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: software.amazon.awssdk:regions:2.17.84" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="software.amazon.awssdk" artifactId="regions" version="2.17.84" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/regions/2.17.84/22d20a2357f823b4f4ec9dcb751655a4de8005e0/regions-2.17.84.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/regions/2.17.84/9fb71d87fea04053b7a3bab5f9f9f29c4bf0786b/regions-2.17.84-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

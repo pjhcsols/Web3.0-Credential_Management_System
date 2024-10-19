@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: software.amazon.awssdk:profiles:2.17.84" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="software.amazon.awssdk" artifactId="profiles" version="2.17.84" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/profiles/2.17.84/8f34a0881e3b06b4177ee4fac52f606d9a705346/profiles-2.17.84.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/software.amazon.awssdk/profiles/2.17.84/89ce2bcf8a4c36c9311081d89adc12ea14095497/profiles-2.17.84-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

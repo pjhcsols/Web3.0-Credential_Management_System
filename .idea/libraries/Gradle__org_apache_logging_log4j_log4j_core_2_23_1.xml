@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.apache.logging.log4j:log4j-core:2.23.1" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.apache.logging.log4j" artifactId="log4j-core" version="2.23.1" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.23.1/905802940e2c78042d75b837c136ac477d2b4e4d/log4j-core-2.23.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.logging.log4j/log4j-core/2.23.1/cd9f7e391254473ea47e0cce180f56c59dff5cce/log4j-core-2.23.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

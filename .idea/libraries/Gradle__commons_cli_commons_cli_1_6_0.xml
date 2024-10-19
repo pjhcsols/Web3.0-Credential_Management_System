@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: commons-cli:commons-cli:1.6.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="commons-cli" artifactId="commons-cli" version="1.6.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-cli/commons-cli/1.6.0/38166a23afb5bd5520f739b87b3be87f7f0fb96d/commons-cli-1.6.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/commons-cli/commons-cli/1.6.0/1aff83a90fe36191684d5384f115b338c84f8ec6/commons-cli-1.6.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

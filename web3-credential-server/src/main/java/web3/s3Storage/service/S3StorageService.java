@@ -347,8 +347,6 @@ public class S3StorageService {
         GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
         String value = null;
         List<Map.Entry<String, String>> tuples = new ArrayList<>();
-        System.out.println("certName = " + certName);
-        System.out.println("pdfUrl = " + pdfUrl);
         Map<String, String> metadata = decodeMetadata(getObjectResponse.metadata());
         for (String key : metadata.keySet()) {
 
@@ -409,7 +407,7 @@ public class S3StorageService {
     }
 
     @Transactional
-    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException,S3UploadException {
+    public void deletePdfForCertName(Wallet wallet, String certName) throws IOException, S3UploadException {
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
         String fileName = extractKeyFromUrl(pdfUrl);
@@ -417,22 +415,36 @@ public class S3StorageService {
         // 기존 PDF 로드와 리소스 관리
         try (PDDocument originalDocument = PDDocument.load(new ByteArrayInputStream(originalPdfBytes))) {
             int totalPages = originalDocument.getNumberOfPages();
+            LinkedHashMap<String, String> metadata = decodeMetadata(getPdfMetadata(wallet.getPdfUrl()));
 
-            // 페이지 번호는 0부터 시작하므로 1을 빼줌
-            int pageIndexToRemove = pageNumberToRemove - 1;
+            int firstPageIndexToRemove = -1;
+            int lastPageIndexToRemove = -1;
+
+            for (int i = 0; i < metadata.size(); i++) {
+                String key = (String) metadata.keySet().toArray()[i];
+                String[] parts = key.split("_");
+
+                if (parts.length > 0 && parts[0].equals(certName)) {
+                    if (firstPageIndexToRemove == -1) {
+                        firstPageIndexToRemove = i;
+                    }
+                    lastPageIndexToRemove = i;
+                }
+            }
+            System.out.println("firstPageIndexToRemove = " + firstPageIndexToRemove);
+            System.out.println("lastPageIndexToRemove = " + lastPageIndexToRemove);
 
             // 페이지가 존재하는지 확인
-            checkPageExist(pageIndexToRemove < 0, pageIndexToRemove >= totalPages, "Page number out of range: " + pageNumberToRemove);
+            checkPageExist(firstPageIndexToRemove < 0, lastPageIndexToRemove >= totalPages, "Page number out of range: " + lastPageIndexToRemove);
 
-            byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
-            byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
+            byte[] frontPart = createPdfBytesPart(originalDocument, 0, firstPageIndexToRemove);
+            byte[] backPart = createPdfBytesPart(originalDocument, lastPageIndexToRemove + 1, originalDocument.getNumberOfPages());
 
             // PDF 합치기
             byte[] finalPdfBytes = mergePdfs(frontPart, backPart);
-            HashMap<String, String> metadata = getPdfMetadata(fileName);
 
             // 기존 키들을 리스트로 변환 후 정렬
-            HashMap<String, String> newMetadata = changeForNewMetadata(pageNumberToRemove, metadata);
+            HashMap<String, String> newMetadata = deleteMetadataForName(certName, metadata);
 
             // 최종 PDF를 S3에 업로드
             try {
@@ -443,6 +455,21 @@ public class S3StorageService {
         }
     }
 
+    public LinkedHashMap<String, String> deleteMetadataForName(String certName, LinkedHashMap<String, String> metadata) {
+        LinkedHashMap<String, String> updatedMetadata = new LinkedHashMap<>();
+
+        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+            String key = entry.getKey();
+            String[] parts = key.split("_"); // '_'로 분리
+
+            // 앞부분이 certName과 일치하지 않으면 그대로 추가
+            if (parts.length == 0 || !parts[0].equals(certName)) {
+                updatedMetadata.put(key, entry.getValue());
+            }
+        }
+
+        return updatedMetadata; // 업데이트된 메타데이터 반환
+    }
 
     private HashMap<String, String> changeForNewMetadata(int pageNumberToRemove, HashMap<String, String> metadata) {
         List<Integer> pageNumbers = new ArrayList<>();
@@ -526,23 +553,20 @@ public class S3StorageService {
         GetObjectRequest getObjectRequest = getGetObjectRequest(key); // getGetObjectRequest 메서드 사용
         HashMap<String, String> metadata = decodeMetadata(getPdfMetadata(pdfUrl));
 
-        // certName과 일치하는 key의 순서를 기억할 변수
         int targetPageIndex = -1;
         int currentIndex = 0;
 
-        // metadata의 key를 순회
         for (String k : metadata.keySet()) {
-            // key에서 '_' 이전의 값과 certName을 비교
+
             String[] parts = k.split("_");
             if (parts[0].equals(certName)) {
-                targetPageIndex = currentIndex; // 순서 기억
-                break; // 일치하는 값을 찾았으면 루프 종료
+                targetPageIndex = currentIndex;
+                break;
             }
             currentIndex++;
         }
 
-
-        return getPageFromPdf(key, targetPageIndex); // PDF 페이지 가져오는 메서드 호출
+        return getPageFromPdf(key, targetPageIndex);
 
     }
 
@@ -554,9 +578,6 @@ public class S3StorageService {
         try (PDDocument document = PDDocument.load(s3Object)) {
             PDPageTree pages = document.getPages();
 
-            if (pageNumber < 1 || pageNumber > pages.getCount()) {
-                throw new IllegalArgumentException("페이지 번호는 1과 " + pages.getCount() + " 사이여야 합니다.");
-            }
 
             // 특정 페이지 추출
             PDDocument singlePageDocument = new PDDocument();

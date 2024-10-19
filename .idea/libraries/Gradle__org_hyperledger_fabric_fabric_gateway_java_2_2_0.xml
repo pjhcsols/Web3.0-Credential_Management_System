@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.hyperledger.fabric:fabric-gateway-java:2.2.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.hyperledger.fabric" artifactId="fabric-gateway-java" version="2.2.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hyperledger.fabric/fabric-gateway-java/2.2.0/627ecd17582ae149b8e69084781446b0d7dea2d5/fabric-gateway-java-2.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.hyperledger.fabric/fabric-gateway-java/2.2.0/c779ee5b54e2e9c98b7b6e8e87518a17203d0a0d/fabric-gateway-java-2.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

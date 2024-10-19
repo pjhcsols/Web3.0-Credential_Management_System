@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.opentelemetry:opentelemetry-exporter-otlp-common:1.37.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.opentelemetry" artifactId="opentelemetry-exporter-otlp-common" version="1.37.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-exporter-otlp-common/1.37.0/444d869b5773695c6fb0192d77b1304361e6a765/opentelemetry-exporter-otlp-common-1.37.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-exporter-otlp-common/1.37.0/b3e33d0516d8571c8a9138261a69a3aedb9f6df1/opentelemetry-exporter-otlp-common-1.37.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

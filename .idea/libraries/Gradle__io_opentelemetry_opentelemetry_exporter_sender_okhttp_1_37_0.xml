@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: io.opentelemetry:opentelemetry-exporter-sender-okhttp:1.37.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.opentelemetry" artifactId="opentelemetry-exporter-sender-okhttp" version="1.37.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-exporter-sender-okhttp/1.37.0/821912a6b2641ce1b07220067d874c8bcfe4c45b/opentelemetry-exporter-sender-okhttp-1.37.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.opentelemetry/opentelemetry-exporter-sender-okhttp/1.37.0/9a501eaf309272a3edd7a40da3c1f729ce37f98e/opentelemetry-exporter-sender-okhttp-1.37.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
