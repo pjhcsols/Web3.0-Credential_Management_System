@@ -101,6 +101,21 @@ public class S3StorageController {
         }
     }
 
+    @Operation(summary = "특정 인증서 얻기 - pdf 형식",description = "특정 인증서를 certName을 통해 찾아와 pdf의 형식으로 가져옵니다.")
+    @GetMapping("/get-onepdf")
+    public ResponseEntity<byte[]> getOnePdf(
+            @Parameter(description = "pdf 파일 경로",required = true)
+            @RequestParam("pdfUrl") String pdfUrl,
+            @Parameter(description = "인증서 이름",required = true)
+            @RequestParam("certName") String certName){
+        try {
+            byte[] pdfData = s3StorageService.getPdfByCertName(pdfUrl,certName);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(pdfData);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Operation(summary = "pdf 대체하기",description = "원하는 페이지를 원하는 pdf로 대체합니다.")
     @PostMapping("/replace-pdf")
     public ResponseEntity<String> replacePdf(
@@ -115,7 +130,7 @@ public class S3StorageController {
         return ResponseEntity.ok(pdfUrl);
     }
 
-    @Operation(summary = "메타데이터 얻기",description = "사용자의 모든 메타데이터의 정보들을 가져옵니다.")
+    /*@Operation(summary = "메타데이터 얻기",description = "사용자의 모든 메타데이터의 정보들을 가져옵니다.")
     @GetMapping("/get-metadata")
     public ResponseEntity<String> getMetadata(
             @Parameter(description = "pdf 파일 경로",required = true)
@@ -125,7 +140,7 @@ public class S3StorageController {
         String metadata = s3StorageService.getMetadataForPage(pdfUrl, page);
 
         return ResponseEntity.ok().body(metadata);
-    }
+    }*/
 
     @Operation(summary = "메타데이터 내용부분 얻기",description = "사용자의 인증서 목록중 원하는 인증서의 내용들을 가져옵니다.")
     @GetMapping("/get-content")

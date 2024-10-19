@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.rendering.ImageType;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,11 +16,12 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import web3.domain.wallet.Wallet;
-import web3.exception.S3.GetFileException;
 import web3.exception.S3.S3UploadException;
 import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -172,7 +176,7 @@ public class S3StorageService {
 
         int totalPages = originalDocument.getNumberOfPages();
 
-        // 페이지 번호는 0부터 시작하므로 1을 빼줌
+        // 페이지 번호는 0부터 시작 하므로 1을 빼줌
         int pageIndexToRemove = pageNumberToRemove - 1;
 
         // 페이지가 존재하는지 확인
@@ -183,7 +187,7 @@ public class S3StorageService {
         // 새로운 PDF 파일 로드
         byte[] newPdfBytes = getFileBytes(newPdfFile);
 
-        // 앞부분과 뒷부분 PDF 바이트 배열 생성
+        // 앞 부분과 뒷부분 PDF 바이트 배열 생성
         byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
         byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
 
@@ -314,7 +318,7 @@ public class S3StorageService {
         return metadata;
     }
 
-    @Transactional
+   /* @Transactional
     public String getMetadataForPage(String pdfUrl, int pageNumber) {
         String fileName = extractKeyFromUrl(pdfUrl);
 
@@ -336,7 +340,7 @@ public class S3StorageService {
 
         return null; // 결과가 없거나 ':'가 없는 경우 null 반환
     }
-
+*/
     public List<Map.Entry<String, String>> getContentsForCertName(String pdfUrl, String certName) {
         String fileName = extractKeyFromUrl(pdfUrl);
         GetObjectRequest getRequest = getGetObjectRequest(fileName);
@@ -372,11 +376,10 @@ public class S3StorageService {
     }
 
     private GetObjectRequest getGetObjectRequest(String fileName) {
-        GetObjectRequest getRequest = GetObjectRequest.builder()
+        return GetObjectRequest.builder()
                 .bucket(s3Properties.getS3BucketName())
                 .key(fileName)
                 .build();
-        return getRequest;
     }
 
     public int getPdfPageCount(byte[] pdfBytes){
@@ -516,6 +519,62 @@ public class S3StorageService {
         GetObjectRequest getObjectRequest = getGetObjectRequest(key);
         return s3Client.getObject(getObjectRequest);
     }
+
+    @Transactional
+    public byte[] getPdfByCertName(String pdfUrl, String certName) throws IOException {
+        String key = extractKeyFromUrl(pdfUrl);
+        GetObjectRequest getObjectRequest = getGetObjectRequest(key); // getGetObjectRequest 메서드 사용
+        HashMap<String, String> metadata = decodeMetadata(getPdfMetadata(pdfUrl));
+
+        // certName과 일치하는 key의 순서를 기억할 변수
+        int targetPageIndex = -1;
+        int currentIndex = 0;
+
+        // metadata의 key를 순회
+        for (String k : metadata.keySet()) {
+            // key에서 '_' 이전의 값과 certName을 비교
+            String[] parts = k.split("_");
+            if (parts[0].equals(certName)) {
+                targetPageIndex = currentIndex; // 순서 기억
+                break; // 일치하는 값을 찾았으면 루프 종료
+            }
+            currentIndex++;
+        }
+
+
+        return getPageFromPdf(key, targetPageIndex); // PDF 페이지 가져오는 메서드 호출
+
+    }
+
+    public byte[] getPageFromPdf(String key, int pageNumber) throws IOException {
+        // S3에서 PDF 파일 가져오기
+        GetObjectRequest request = getGetObjectRequest(key);
+        ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(request);
+
+        try (PDDocument document = PDDocument.load(s3Object)) {
+            PDPageTree pages = document.getPages();
+
+            if (pageNumber < 1 || pageNumber > pages.getCount()) {
+                throw new IllegalArgumentException("페이지 번호는 1과 " + pages.getCount() + " 사이여야 합니다.");
+            }
+
+            // 특정 페이지 추출
+            PDDocument singlePageDocument = new PDDocument();
+            singlePageDocument.addPage(pages.get(pageNumber - 1)); // 페이지 번호는 0부터 시작하므로 -1
+
+            // ByteArrayOutputStream에 저장
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            singlePageDocument.save(outputStream);
+            singlePageDocument.close();
+
+            // byte[] 형태로 반환
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            // 예외 처리: 필요에 따라 로깅이나 추가적인 처리
+            throw new IOException("PDF 문서를 처리하는 중 오류가 발생했습니다.", e);
+        }
+    }
+
 
     private String extractKeyFromUrl(String url) {
         //예상 포맷: https://s3.ap-northeast-2.amazonaws.com/bucketName/fileName
