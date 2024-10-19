@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -19,8 +20,8 @@ import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//@SpringBootTest
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class AccessTokenTest {
 
     @Autowired

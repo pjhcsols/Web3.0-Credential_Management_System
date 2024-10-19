@@ -50,7 +50,9 @@ public class PassportValidityTest {
     private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
     private static final String CLIENT_SECRET = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
 
-    private String publicKeyStr = "   "; //public key 넣기
+
+    //codef api 계정의 public Key 입력하기
+    private String publicKeyStr = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvGXundpJlAHNhwDiVDSKWy4iJ+jzkawCMy3d1IZ0o5qHaOk8X2bVn9rL8lepioNNGcswWxhjs4UEqPGsu6+XPHbbYrUPNimlaa0dRsQcNdjD7flaSMIbDMeD5v04AZiquWcLZl1CqdzntLeYXVat7uqcQ68Sb5mGn0HYWN8XlQHpBMdmEESr0mJCEhLI2MD6+uqU8oMnrUnPJZSkKD83udCXjt1b0N8SksWBtWz3NQqsmx8a9NgYJlRSG1jkI8zgBzwtvnNxD4NaM/NqtDiuVXhNfupltzmA+xt4hy+DD00GKUcg05iRQih1go3WG8UKtA5KOqcfHS9e8S9z77lkkQIDAQAB"; //public key 넣기
     
 
     @Test
@@ -66,28 +68,49 @@ public class PassportValidityTest {
         String certFilePath = "D:/NPKI/yessign/USER/cn=김건아()003104620200131131003160,ou=DGB,ou=personal4IB,o=yessign,c=kr/signCert.der";
         String keyFilePath = "D:/NPKI/yessign/USER/cn=김건아()003104620200131131003160,ou=DGB,ou=personal4IB,o=yessign,c=kr/signPri.key";
         
-        String certFileEncoded = encodeFileToBase64(certFilePath);
-        String keyFileEncoded = encodeFileToBase64(keyFilePath);
+        //String certFileEncoded = encodeFileToBase64(certFilePath);
+        //String keyFileEncoded = encodeFileToBase64(keyFilePath);
+
+/////////////////////////////////////////////////여기부터///////////////////////////////
+
         
-        String certPassword = "    ";  // 사용자의 인증서 비밀번호
+        // String certFileEncoded = 
+        // String keyFileEncoded = 
+
+        // // 사용자의 공동 인증서 비밀번호
+        // String certPassword = 
+
+
+        // //사용자 실제값
+        // String userName = 
+        // String identity= 
+        // String passportNo= 
+        // String issueDate = 
+        // String expirationDate =
+        // String brithDate= 
+
+//////////////////////////////////////////////여기까지는 개인정보 유출 주의!!!/////////////////////
+
         String rsaEncryptedPassword = encryptRSAPassword(certPassword);
 
         // JSON Request Payload
         String requestBody = "{\n" +
+                    //아래 3값(organization, loginType, certType)은 고정값
                 "    \"organization\": \"0002\",\n" +
                 "    \"loginType\": \"2\",\n" +
                 "    \"certType\": \"1\",\n" +
+                    //아래 10개 값은 사용자의 실제 데이터값 필요
                 "    \"certFile\": \"" + certFileEncoded + "\",\n" +
                 "    \"keyFile\": \"" + keyFileEncoded + "\",\n" +
                 "    \"certPassword\": \"" + rsaEncryptedPassword + "\",\n" +
-                "    \"userName1\": \"김건아\",\n" +
-                "    \"identity\": \"\",\n" + //주민등록번호
+                "    \"userName1\": \""+userName+"\",\n" +
+                "    \"identity\": \""+identity+"\",\n" + //주민등록번호
 
-                "    \"userName\": \"김건아\",\n" +
-                "    \"passportNo\": \"  \",\n" + //여권번호
-                "    \"issueDate\": \"   \",\n" + //여권발급 날짜
-                "    \"expirationDate\": \"   \",\n" + //여권 만료 날짜
-                "    \"birthDate\": \"   \"\n" + //생일
+                "    \"userName\": \""+userName+"\",\n" +
+                "    \"passportNo\": \""+passportNo+"\",\n" + //여권번호
+                "    \"issueDate\": \""+issueDate+"\",\n" + //여권발급 날짜
+                "    \"expirationDate\": \""+expirationDate+"\",\n" + //여권 만료 날짜
+                "    \"birthDate\": \""+brithDate+"\"\n" + //생일
                 "}";
 
         // HTTP 요청 헤더 설정
