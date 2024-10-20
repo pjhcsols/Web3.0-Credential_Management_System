@@ -27,7 +27,7 @@ struct CheckByCodeView: View {
                 Spacer()
                     .frame(height: 128)
 
-                Text(showError ? "비밀번호가 일치하지 않습니다.\n다시 입력해주세요." : "4자리 비밀번호를 입력해주세요.")
+                Text(showError ? "비밀번호가 일치하지 않습니다.\n다시 입력해주세요." : "4자리 비밀번호를 입력해주세요.\n")
                     .font(.title3)
                     .fontWeight(.semibold)
                     .multilineTextAlignment(.center)
