@@ -13,8 +13,13 @@ struct CreateWalletView: View {
     @State private var isWalletCreated = false
     @State private var isWalletExists = false
     
-    let privateKey = "test1"
-    let publicKey = "test2"
+//    let keys = generateKeyPair()
+//    
+//    let self.privateKey = keys.privateKey
+//    let self.publicKey = keys.publicKey
+    
+    @State private var privateKey: String? = nil
+    @State private var publicKey: String? = nil
     
     struct WalletResponse: Codable {
         let id: Int
@@ -27,7 +32,7 @@ struct CreateWalletView: View {
     
     struct User: Codable {
         let id: Int
-        let email: String
+        let email: String?
         let password: String
     }
     
@@ -41,6 +46,7 @@ struct CreateWalletView: View {
                 Spacer()
                 
                 Button(action: {
+                    generateKeys()
                     getWallet()
                 }) {
                     Text("다음")
@@ -56,10 +62,23 @@ struct CreateWalletView: View {
                 .padding()
                 
                 // 지갑 O
-                NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true), isActive: $isWalletExists) {
+                NavigationLink(destination: University().navigationBarBackButtonHidden(true), isActive: $isWalletExists) {
                     EmptyView()
                 }
             }
+        }
+    }
+    
+    private func generateKeys() {
+        let keys = generateKeyPair()
+        self.privateKey = keys.privateKey
+        self.publicKey = keys.publicKey
+        
+        if let privateKey = self.privateKey, let publicKey = self.publicKey {
+            print("Generated Private Key: \(privateKey)")
+            print("Generated Public Key: \(publicKey)")
+        } else {
+            print("Failed to generate keys")
         }
     }
     
@@ -69,7 +88,7 @@ struct CreateWalletView: View {
             return
         }
         
-        guard let url = URL(string: "http://192.168.1.99:8080/api/wallets/me") else {
+        guard let url = URL(string: "http://192.168.1.188:8080/api/wallets/me") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -101,6 +120,10 @@ struct CreateWalletView: View {
                     }
                 } else if httpResponse.statusCode == 404 {
                     DispatchQueue.main.async {
+                        guard let privateKey = self.privateKey, let publicKey = self.publicKey else {
+                                                print("Keys are not available.")
+                                                return
+                                            }
                         self.createWallet(privateKey: privateKey, publicKey: publicKey)
                     }
                 } else {
@@ -122,7 +145,7 @@ struct CreateWalletView: View {
         print("프라이빗키: \(privateKey)")
         print("퍼블릭키: \(publicKey)")
         
-        guard let url = URL(string: "http://192.168.1.99:8080/api/wallets?privateKey=\(privateKey)&publicKey=\(publicKey)") else {
+        guard let url = URL(string: "http://192.168.1.188:8080/api/wallets?privateKey=\(privateKey)&publicKey=\(publicKey)") else {
             print("유효하지 않은 URL입니다.")
             return
         }
