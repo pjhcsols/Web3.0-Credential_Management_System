@@ -74,20 +74,20 @@ public class PassportValidityTest {
 /////////////////////////////////////////////////여기부터///////////////////////////////
 
         
-        // String certFileEncoded = 
-        // String keyFileEncoded = 
+        String certFileEncoded = "";
+        String keyFileEncoded = "";
 
-        // // 사용자의 공동 인증서 비밀번호
-        // String certPassword = 
+        // 사용자의 공동 인증서 비밀번호
+        String certPassword = "";
 
 
-        // //사용자 실제값
-        // String userName = 
-        // String identity= 
-        // String passportNo= 
-        // String issueDate = 
-        // String expirationDate =
-        // String brithDate= 
+        //사용자 실제값
+        String userName = "";
+        String identity= "";
+        String passportNo= "";
+        String issueDate = "";
+        String expirationDate ="";
+        String brithDate= "";
 
 //////////////////////////////////////////////여기까지는 개인정보 유출 주의!!!/////////////////////
 
