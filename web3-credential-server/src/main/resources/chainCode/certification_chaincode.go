@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	//"io/ioutil" // 개인 키 파일 읽기에 사용
+	// "io/ioutil" // 개인 키 파일 읽기에 사용
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"os"
 )
@@ -27,7 +27,6 @@ func readPrivateKey(path string) (string, error) {
 	}
 	return string(data), nil
 }
-
 
 // 인증 정보를 저장하는 함수
 func (c *CertificationContract) RegisterCertification(ctx contractapi.TransactionContextInterface, key string, email string, univName string, univCheck bool) error {

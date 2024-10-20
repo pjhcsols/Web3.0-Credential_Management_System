@@ -5,6 +5,9 @@ CORE_PEER_ADDRESS=$(docker exec peer0.org1.example.com printenv CORE_PEER_ADDRES
 CORE_PEER_LOCALMSPID=$(docker exec peer0.org1.example.com printenv CORE_PEER_LOCALMSPID)
 ORDERER_ADDRESS=$(docker exec orderer.example.com printenv ORDERER_ADDRESS)
 
+# 파일 삭제 및 초기화
+#docker exec -it peer0.org1.example.com /bin/bash -c "rm -rf /opt/gopath/src/chaincode"
+
 echo "1"
 # 개인 키 파일 존재 여부 확인 (도커 내부에서 확인)
 if ! docker exec peer0.org1.example.com [ -f /etc/hyperledger/fabric/msp/keystore/priv_sk ]; then
@@ -22,7 +25,7 @@ fi
 echo "3"
 # 체인코드 파일 도커 컨테이너로 복사
 echo "Copying chaincode file to the container..."
-docker cp /Users/hansol/Desktop/공개SW/2차/BE/Web3.0-Credential_Management_System/web3-credential-server/src/main/resources/chaincode/certification_chaincode.go peer0.org1.example.com:/opt/gopath/src/chaincode
+docker cp /Users/hansol/Desktop/공개SW/final/Web3.0-Credential_Management_System/web3-credential-server/src/main/resources/chainCode/certification_chaincode.go peer0.org1.example.com:/opt/gopath/src/chaincode
 
 echo "4"
 # 체인코드가 정상적으로 복사되었는지 확인
@@ -70,9 +73,47 @@ echo "7"
 # 체인코드 ID 설정
 export CORE_CHAINCODE_ID_NAME=certification_chaincode:1.0
 
+#docker exec -it peer0.org1.example.com /bin/bash
+# cd /opt/gopath/src/chaincode
+# go mod init certification_chaincode
+# go get github.com/hyperledger/fabric-contract-api-go/contractapi
+# go mod tidy
+docker exec -it peer0.org1.example.com /bin/bash -c "cd /opt/gopath/src/chaincode && go mod init certification_chaincode"
+docker exec -it peer0.org1.example.com /bin/bash -c "cd /opt/gopath/src/chaincode && go get github.com/hyperledger/fabric-contract-api-go/contractapi"
+docker exec -it peer0.org1.example.com /bin/bash -c "cd /opt/gopath/src/chaincode && go mod tidy"
+
+#chmod 666 /etc/hyperledger/fabric/msp/keystore/priv_sk
+#ls -l /etc/hyperledger/fabric/msp/keystore/
+docker exec peer0.org1.example.com find / -name "ca.crt"
+
+# 채널 생성
+docker exec -it peer0.org1.example.com peer channel create -o orderer.example.com:7050 -c IdentityBlock -f ./channel-artifacts/channel.tx --outputBlock ./channel-artifacts/IdentityBlock.block --tls --cafile /etc/hyperledger/fabric/tls/ca.crt
+
+# 피어를 채널에 가입
+docker exec -it peer0.org1.example.com peer channel join -b ./channel-artifacts/IdentityBlock.block
+
+# 체인 코드 복사 후 설치
+docker exec -it peer0.org1.example.com peer lifecycle chaincode package certification_chaincode.tar.gz --path /opt/gopath/src/chaincode --lang golang --label certification_chaincode
+docker exec -it peer0.org1.example.com peer lifecycle chaincode install certification_chaincode.tar.gz
+
+# 체인 코드 승인
+docker exec -it peer0.org1.example.com peer lifecycle chaincode approveformyorg --channelID IdentityBlock --name certification_chaincode --version 1.0 --sequence 1 --signature-policy "AND ('Org1MSP.peer')" --output json --init-required
+
+# 체인 코드 커밋
+docker exec -it peer0.org1.example.com peer lifecycle chaincode commit -o orderer.example.com:7050 --channelID IdentityBlock --name certification_chaincode --version 1.0 --sequence 1 --peerAddresses peer0.org1.example.com:7051 --peerAddresses peer0.org2.example.com:9051
+
+# 체인 코드 초기화 (옵션)
+#docker exec -it peer0.org1.example.com peer chaincode invoke -o orderer.example.com:7050 --channelID IdentityBlock --name certification_chaincode --isInit --peerAddresses peer0.org1.example.com:7051 -c '{"function":"initLedger","Args":[]}'
+
+# 체인코드를 쿼리하여 결과를 확인합니다.
+docker exec -it peer0.org1.example.com peer chaincode query -C IdentityBlock -n certification_chaincode -c '{"Args":["queryFunction","arg1"]}'
+
+
+
 echo "8"
 # 체인코드 실행 환경 설정 및 실행
 echo "컨테이너 내에서 CORE_CHAINCODE_ID_NAME 설정 및 체인코드 실행 중..."
-docker exec -it peer0.org1.example.com /bin/bash -c "export CORE_CHAINCODE_ID_NAME=certification_chaincode:1.0 && export PATH=\$PATH:/usr/local/go/bin && cd /opt/gopath/src/chaincode && go run certification_chaincode.go --peer.address='peer0.org1.example.com:7051'"
+docker exec -it peer0.org1.example.com /bin/bash -c "cat /etc/hyperledger/fabric/msp/keystore/priv_sk"
+docker exec -it peer0.org1.example.com /bin/bash -c "export CORE_CHAINCODE_ID_NAME=certification_chaincode:1.0 && export PATH=\$PATH:/usr/local/go/bin && export CORE_CHAINCODE_PATH=/opt/gopath/src/chaincode && cd /opt/gopath/src/chaincode && go run certification_chaincode.go --peer.address='peer0.org1.example.com:7051'"
 
 echo "체인코드 실행 완료"
