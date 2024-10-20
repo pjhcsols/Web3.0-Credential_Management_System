@@ -16,7 +16,7 @@ struct AddCertificateModalView: View {
     @State var allAgree = false
     @State var item1Checked = false
     @State var showPinEntry = false
-    @State var pdfIssued = false // PDF 발급 완료 여부
+    @State var pdfIssued = false
 
     var body: some View {
         NavigationStack {
@@ -68,14 +68,14 @@ struct AddCertificateModalView: View {
                                 .fontWeight(.medium)
                                 .foregroundColor(.white)
                                 .frame(width: 256, height: 45)
-                                .background(allAgree && item1Checked ? Color(red: 218/255, green: 33/255, blue: 39/255) : Color.gray) // 버튼 색상 설정
+                                .background(allAgree && item1Checked ? Color(red: 218/255, green: 33/255, blue: 39/255) : Color.gray)
                                 .cornerRadius(6)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 6)
                                         .stroke(allAgree && item1Checked ? Color(red: 218/255, green: 33/255, blue: 39/255) : Color.gray, lineWidth: 1)
                                 )
                         }
-                        .disabled(!(allAgree && item1Checked)) // 동의하지 않으면 버튼 비활성화
+                        .disabled(!(allAgree && item1Checked))
                         .padding()
                     }
                     .padding(.top, 48)
@@ -130,5 +130,5 @@ struct AddCertificateModalView: View {
 }
 
 #Preview {
-    AddCertificateModalView(certification: Certification(name: "Sample", organ: "Sample Organ"))
+    AddCertificateModalView(certification: Certification(name: "Sample"))
 }

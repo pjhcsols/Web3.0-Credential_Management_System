@@ -9,10 +9,13 @@ import SwiftUI
 
 struct AddCertificationView: View {
     @Environment(\.presentationMode) var presentationMode
+    @AppStorage("pdfUrl") var pdfUrl: String = ""
     @State private var showSheet = false
+    @State private var errorMessage: String?
     @State private var selectedCertification: Certification?
     
-    let certificationArray = certifications
+    @State private var certifications: [Certification] = [
+    ]
     
     var body: some View {
         VStack {
@@ -23,7 +26,7 @@ struct AddCertificationView: View {
                 HStack {
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
-                    }){
+                    }) {
                         Image(systemName: "chevron.left")
                             .font(.title)
                             .foregroundColor(.gray)
@@ -34,20 +37,15 @@ struct AddCertificationView: View {
             .padding(.top, 12)
             .padding(.horizontal)
             
-            List(certificationArray) { item in
+            List(certifications) { item in
                 Button(action: {
                     selectedCertification = item
                     print("\(item.name) 클릭됨")
                 }) {
                     HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.body)
-                                .fontWeight(.medium)
-                            Text(item.organ)
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
+                        Text(item.name)
+                            .font(.body)
+                            .fontWeight(.medium)
                         Spacer()
                         Image(systemName: "plus")
                             .foregroundColor(Color(red: 218/255, green: 33/255, blue: 39/255))
@@ -61,6 +59,9 @@ struct AddCertificationView: View {
             .listStyle(PlainListStyle())
             .padding(.horizontal, 16.0)
             .scrollContentBackground(.hidden)
+            .onAppear {
+                fetchCertifications()
+            }
         }
         .padding(.top)
         .sheet(item: $selectedCertification) { certification in
@@ -69,20 +70,41 @@ struct AddCertificationView: View {
                 .presentationDragIndicator(.visible)
         }
     }
-}
+    
+    private func fetchCertifications() {
+        guard !pdfUrl.isEmpty, let url = URL(string: "http://192.168.1.188:8080/api/certifications/get-cert-names?pdfUrl=\(pdfUrl)")
+        else {
+            print("유효하지 않은 URL입니다.")
+            return
+        }
 
-let certifications: [Certification] = [
-    Certification(name: "학생증", organ: "써트피아"),
-    Certification(name: "자격증", organ: "정부 24"),
-    Certification(name: "주민등록증", organ: "정부 24"),
-    Certification(name: "운전면허증", organ: "정부 24"),
-    Certification(name: "여권", organ: "정부 24"),
-]
-
-struct Certification: Identifiable {
-    let id = UUID()
-    let name: String
-    let organ: String
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("요청 실패: \(error.localizedDescription)")
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200, let data = data {
+                    do {
+                        if let certificationNames = try JSONSerialization.jsonObject(with: data, options: []) as? [String] {
+                            DispatchQueue.main.async {
+                                self.certifications.append(contentsOf: certificationNames.map { Certification(name: $0) })
+                            }
+                        }
+                    } catch {
+                        print("JSON 디코딩 실패: \(error.localizedDescription)")
+                    }
+                } else {
+                    print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
+                }
+            }
+        }
+        task.resume()
+    }
 }
 
 #Preview {
