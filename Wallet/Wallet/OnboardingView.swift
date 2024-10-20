@@ -25,7 +25,7 @@ struct OnboardingView: View {
     struct UserInfo: Decodable {
         let id: Int
         let nickname: String
-        let email: String
+        let email: String?
         let accessToken: String
         let jwtToken: String
         let refreshToken: String
@@ -92,14 +92,14 @@ struct OnboardingView: View {
     }
     
     func sendAccessTokenToBackend(accessToken: String) {
-        guard let url = URL(string: "http://211.107.135.107:8080/api/kakao/login/access?accessToken=\(accessToken)") else {
+        guard let url = URL(string: "http://192.168.1.188:8080/api/kakao/login/access?accessToken=\(accessToken)") else {
             print("Invalid URL")
             return
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("HTTP request failed: \(error.localizedDescription)")
@@ -107,11 +107,13 @@ struct OnboardingView: View {
             }
             
             if let data = data {
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("서버 응답 JSON: \(jsonString)")
+                }
+                
                 do {
                     let userInfo = try JSONDecoder().decode(UserInfo.self, from: data)
                     DispatchQueue.main.async {
-                        
-                        /*
                         print("ID: \(userInfo.id)")
                         print("닉네임: \(userInfo.nickname)")
                         print("이메일: \(userInfo.email)")
@@ -120,17 +122,17 @@ struct OnboardingView: View {
                         print("리프레시 토큰: \(userInfo.refreshToken)")
                         print("서버 유저 ID: \(userInfo.serverUserId)")
                         print("서버 유저 이메일: \(userInfo.serverUserEmail)")
-                        */
                         
                         UserDefaults.standard.set(userInfo.nickname, forKey: "userNickname")
                         UserDefaults.standard.set(userInfo.jwtToken, forKey: "jwtToken")
+                        UserDefaults.standard.set(userInfo.email, forKey: "email")
                     }
                 } catch {
                     print("Failed to decode JSON: \(error.localizedDescription)")
                 }
             }
         }
-        
+
         task.resume()
     }
 }

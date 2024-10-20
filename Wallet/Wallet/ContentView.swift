@@ -12,7 +12,7 @@ struct ContentView: View {
     @State private var showHistory = false
     @AppStorage("userNickname") var nickname: String = ""
     @AppStorage("walletId") var walletId: String = ""
-    @AppStorage("userEmail") var email: String = ""
+    @AppStorage("email") var email: String = ""
     @AppStorage("univName") var univName: String = ""
     @AppStorage("univCheck") var univCheck: Bool = false
     @AppStorage("pdfUrl") var pdfUrl: String = ""
@@ -104,7 +104,7 @@ struct ContentView: View {
             }
         }
     }
-
+    
     private func registerPdf() {
         guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             print("대학교 이름 인코딩 실패")
@@ -116,7 +116,12 @@ struct ContentView: View {
         print("encoded univName: \(encodedUnivName)")
         print("univCheck: \(univCheck)")
 
-        guard let url = URL(string: "http://220.81.24.60:8080/api/certifications/register?walletId=\(walletId)&email=\(email)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+//        guard let url = URL(string: "http://192.168.1.188:8080/api/certifications/register?walletId=\(walletId)&email=\(email)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+//            print("유효하지 않은 URL입니다.")
+//            return
+//        }
+        
+        guard let url = URL(string: "http://192.168.1.188:8080/api/certifications/register?walletId=\(walletId)&email=seakim@knu.ac.kr&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -162,7 +167,6 @@ struct ContentView: View {
         }
         task.resume()
     }
-
 }
 
 #Preview {
