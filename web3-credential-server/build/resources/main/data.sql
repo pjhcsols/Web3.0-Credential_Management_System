@@ -10,5 +10,3 @@ VALUES
     (1,'https://basilium-product-bucket.s3.ap-northeast-2.amazonaws.com/1_certifications.pdf','privateKeyForUser1', 'publicKeyForUser1'),
     (2,null,'privateKeyForUser2', 'publicKeyForUser2'),
     (3,null,'privateKeyForUser2', 'publicKeyForUser2');
-
-

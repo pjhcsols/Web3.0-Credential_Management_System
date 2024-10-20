@@ -8,10 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import web3.properties.PassportProperties;
 import web3.service.dto.cert.PassportRequestDto;
 
 import javax.crypto.Cipher;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -25,6 +25,7 @@ import java.util.Map;
 @Slf4j
 public class PassportService {
 
+    private final PassportProperties passportProperties;
     private final WebClient webClient;
     private final WebClient webClientToken; // 액세스 토큰 요청을 위한 WebClient
     private static final String BASE_URL = "https://development.codef.io";
@@ -33,16 +34,17 @@ public class PassportService {
     private static final String ACCESS_TOKEN_URL = "/oauth/token";
     private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
 
-    public PassportService(WebClient.Builder webClientBuilder) {
+    public PassportService(WebClient.Builder webClientBuilder, PassportProperties passportProperties) {
         this.webClient = webClientBuilder.baseUrl(BASE_URL).build();
-        this.webClientToken = webClientBuilder.baseUrl(BASE_TOKEN_URL).build(); // 수정된 부분
+        this.webClientToken = webClientBuilder.baseUrl(BASE_TOKEN_URL).build();
+        this.passportProperties = passportProperties;
     }
 
     // 액세스 토큰을 가져오는 메서드
     private Mono<String> fetchAccessToken() {
         return webClientToken.post()
-                .uri(ACCESS_TOKEN_URL) // 추가된 경로
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((CLIENT_ID + ":" + CLIENT_SECRET).getBytes()))
+                .uri(ACCESS_TOKEN_URL)
+                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((CLIENT_ID + ":" + passportProperties.clientSecret()).getBytes()))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .bodyValue("grant_type=client_credentials&scope=read")
                 .retrieve()
@@ -53,20 +55,18 @@ public class PassportService {
 
     // RSA 암호화 메서드
     private String encryptRSAPassword(String password) throws Exception {
-        byte[] keyBytes = Base64.getDecoder().decode(PUBLIC_KEY_STR);
+        byte[] keyBytes = Base64.getDecoder().decode(passportProperties.publicKeyStr());
         PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(keyBytes));
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         return Base64.getEncoder().encodeToString(cipher.doFinal(password.getBytes(StandardCharsets.UTF_8)));
     }
 
-    // 패스포트 유효성 검사 메서드
     public Mono<Map<String, Object>> checkPassportValidity(PassportRequestDto passportRequestDto) {
         return fetchAccessToken()
                 .flatMap(accessToken -> {
                     try {
                         Map<String, String> requestBody = createRequestBody(passportRequestDto);
-                        log.info("requestBody: {}", requestBody);
                         return webClient.post()
                                 .uri(API_URL)
                                 .header("Authorization", "Bearer " + accessToken)
@@ -75,25 +75,21 @@ public class PassportService {
                                 .bodyValue(requestBody)
                                 .retrieve()
                                 .bodyToMono(String.class)
-                                .flatMap(responseBody -> {
-                                    log.info("Response: {}", responseBody);
-                                    ObjectMapper objectMapper = new ObjectMapper();
-                                    try {
-                                        String decodedResponseBody = URLDecoder.decode(responseBody, StandardCharsets.UTF_8.name());
-                                        Map<String, Object> jsonResponse = objectMapper.readValue(decodedResponseBody, new TypeReference<Map<String, Object>>() {});
-                                        return Mono.just(jsonResponse);
-                                    } catch (JsonProcessingException e) {
-                                        log.error("Error processing JSON: {}", e.getMessage());
-                                        return Mono.error(e); // 예외를 반환
-                                    } catch (UnsupportedEncodingException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
-                                .doOnError(e -> log.error("Error checking passport validity: {}", e.getMessage()));
+                                .flatMap(this::parseResponse);
                     } catch (Exception e) {
                         return Mono.error(e);
                     }
                 });
+    }
+
+    private Mono<Map<String, Object>> parseResponse(String responseBody) {
+        try {
+            String decodedResponseBody = URLDecoder.decode(responseBody, StandardCharsets.UTF_8);
+            ObjectMapper objectMapper = new ObjectMapper();
+            return Mono.just(objectMapper.readValue(decodedResponseBody, new TypeReference<Map<String, Object>>() {}));
+        } catch (JsonProcessingException e) {
+            return Mono.error(e);
+        }
     }
 
     private Map<String, String> createRequestBody(PassportRequestDto passportRequestDto) throws Exception {
