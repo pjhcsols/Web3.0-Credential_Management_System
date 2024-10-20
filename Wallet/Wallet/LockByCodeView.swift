@@ -129,6 +129,8 @@ struct LockByCodeView: View {
 
     private func validateCodes() {
         if code == confirmCode {
+            UserDefaults.standard.set(code, forKey: "userPinCode")
+            print("pin code: ",code)
             navigateToBio = true
         } else {
             confirmCode = ""
