@@ -160,7 +160,7 @@
 <br>
 <br>
 
-## 외부 API를 이용한 인증 (대학 재학 인증, 자격증, 주민등록증)
+## 외부 API를 이용한 인증 (대학 재학 인증, 자격증, 주민등록증, 여권)
 
 사용자 및 인증서의 신뢰성을 위해 외부 API를 연동하여 대학 재학을 인증하고,  
 Qnet 자격증 확인서 및 주민등록 진위 여부 인증을 테스트하는 작업을 수행하였습니다.
@@ -199,6 +199,75 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
 
 <br>
 <br>
+
+### 4. 여권 유효성 및 인증 테스트
+
+여권 유효성 및 인증 테스트는 사용자의 여권 정보가 유효한지를 확인하는 과정입니다. 이 과정은 외부 API를 통해 이루어지며, 사용자가 제공한 여권 정보가 실제로 유효한지 검증합니다.
+
+#### API 개요
+
+- **API 제공처**: Codef
+- **API Endpoint**: [https://development.codef.io/v1/kr/public/mw/passport-data/status](https://development.codef.io/v1/kr/public/mw/passport-data/status)
+- **인증 방식**: OAuth 2.0 (클라이언트 자격 증명 방식)
+- **요청 데이터**: 여권 정보와 인증서 데이터
+
+#### 테스트 절차
+
+1. **액세스 토큰 요청**: Codef API를 사용하기 위해 액세스 토큰을 요청합니다.
+   - **요청 URL**: [https://oauth.codef.io/oauth/token](https://oauth.codef.io/oauth/token)
+   - **요청 헤더**: Basic 인증 방식으로 클라이언트 ID와 클라이언트 시크릿을 포함합니다.
+   - **요청 본문**: `grant_type=client_credentials&scope=read`
+
+2. **여권 정보 요청**: 획득한 액세스 토큰을 사용하여 여권의 유효성을 확인합니다.
+   - **요청 URL**: [https://development.codef.io/v1/kr/public/mw/passport-data/status](https://development.codef.io/v1/kr/public/mw/passport-data/status)
+   - **요청 헤더**:
+     - `Authorization`: `Bearer {access_token}`
+     - `Content-Type`: `application/json`
+   - **요청 본문**: 사용자의 여권 정보 및 인증서 정보를 포함합니다.
+
+#### 요청 본문 예시
+
+```json
+{
+    "organization": "0002",
+    "loginType": "2",
+    "certType": "1",
+    "certFile": "{cert_file_encoded}",
+    "keyFile": "{key_file_encoded}",
+    "certPassword": "{encrypted_cert_password}",
+    "userName": "{user_name}",
+    "identity": "{identity_number}",
+    "passportNo": "{passport_number}",
+    "issueDate": "{issue_date}",
+    "expirationDate": "{expiration_date}",
+    "birthDate": "{birth_date}"
+}
+```
+"certFile": "{cert_file_encoded}", "keyFile": "{key_file_encoded}" 실제 공동인증서를 사용
+
+<img width="425" alt="image" src="https://github.com/user-attachments/assets/6d4ffcfc-0af4-4a04-84d1-2c6f844ad814">
+
+서버에서 인코딩 및 디코딩을 수행하여 해당 값을 추출하여 Codef에게 전달
+<img width="748" alt="image" src="https://github.com/user-attachments/assets/ea870999-75c8-4b54-8eef-8996b2ee8335">
+
+
+#### 여권 유효성 검사 성공 예시
+```
+{
+    "result": {
+        "code": "CF-00000", // 해당 코드의 성공 유무 가이드 https://developer.codef.io/common-guide/error-code
+        "extraMessage": "",
+        "message": "성공",
+        "transactionId": "6715130b28e65e51c0d13262"
+    },
+    "data": {
+        "resAuthenticity": 1,
+        "resAuthenticityDesc": ""
+    }
+}
+```
+<img width="676" alt="image" src="https://github.com/user-attachments/assets/0497ad78-ea32-4e7d-9f3a-1e6ee4268bb8">
+
 
 ## 라이선스 정보
 
