@@ -123,25 +123,13 @@ public class S3StorageController {
             @Parameter(description = "pdf 파일",required = true)
             @RequestParam("file") MultipartFile file,
             @Parameter(description = "페이지 번호",required = true)
-            @RequestParam("page") int page,
+            @RequestParam("certName") String certName,
             @Parameter(description = "사용자 지갑ID",required = true)
             @RequestParam("walletId") Long walletId) throws IOException {
         Wallet wallet = walletService.getWalletById(walletId).orElseThrow(()-> new EntityNotFoundException("Wallet does not exist"));
-        String pdfUrl = s3StorageService.replacePdfPage(wallet, page, file);
+        String pdfUrl = s3StorageService.replacePdfPage(wallet, certName, file);
         return ResponseEntity.ok(pdfUrl);
     }
-
-    /*@Operation(summary = "메타데이터 얻기",description = "사용자의 모든 메타데이터의 정보들을 가져옵니다.")
-    @GetMapping("/get-metadata")
-    public ResponseEntity<String> getMetadata(
-            @Parameter(description = "pdf 파일 경로",required = true)
-            @RequestParam String pdfUrl,
-            @Parameter(description = "페이지 번호",required = true)
-            @RequestParam int page) {
-        String metadata = s3StorageService.getMetadataForPage(pdfUrl, page);
-
-        return ResponseEntity.ok().body(metadata);
-    }*/
 
     @Operation(summary = "메타데이터 내용부분 얻기",description = "사용자의 인증서 목록중 원하는 인증서의 내용들을 가져옵니다.")
     @GetMapping("/get-content")

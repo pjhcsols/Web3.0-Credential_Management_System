@@ -2,6 +2,7 @@ package web3.s3Storage.service;
 
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.util.ParameterMap;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -165,7 +166,7 @@ public class S3StorageService {
     }
 
     @Transactional
-    public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException{
+    public String replacePdfPage(Wallet wallet, String certName, MultipartFile newPdfFile) throws IOException{
         // 원래 PDF 가져오기
         String pdfUrl = wallet.getPdfUrl();
         byte[] originalPdfBytes = getOriginalPdfBytes(pdfUrl);
@@ -175,28 +176,63 @@ public class S3StorageService {
         PDDocument originalDocument = loadOriginalDocument(originalPdfBytes);
 
         int totalPages = originalDocument.getNumberOfPages();
+        int pdfPageCount = getPdfPageCount(newPdfFile.getBytes());
+
+        LinkedHashMap<String, String> metadata = decodeMetadata(getPdfMetadata(wallet.getPdfUrl()));
+
+        int firstPageIndexToRemove = -1;
+        int lastPageIndexToRemove = -1;
+
+        for (int i = 0; i < metadata.size(); i++) {
+            String key = (String) metadata.keySet().toArray()[i];
+            String[] parts = key.split("_");
+
+            if (parts.length > 0 && parts[0].equals(certName)) {
+                if (firstPageIndexToRemove == -1) {
+                    firstPageIndexToRemove = i;
+                }
+                lastPageIndexToRemove = i;
+            }
+        }
 
         // 페이지 번호는 0부터 시작 하므로 1을 빼줌
-        int pageIndexToRemove = pageNumberToRemove - 1;
 
         // 페이지가 존재하는지 확인
-        if (pageIndexToRemove < 0 || pageIndexToRemove >= totalPages) {
-            throw new IllegalArgumentException("Page number out of range: " + pageNumberToRemove);
+        if (firstPageIndexToRemove < 0 || lastPageIndexToRemove >= totalPages) {
+            throw new IllegalArgumentException("Page number out of range");
         }
 
         // 새로운 PDF 파일 로드
         byte[] newPdfBytes = getFileBytes(newPdfFile);
 
         // 앞 부분과 뒷부분 PDF 바이트 배열 생성
-        byte[] frontPart = createPdfBytesPart(originalDocument, 0, pageIndexToRemove);
-        byte[] backPart = createPdfBytesPart(originalDocument, pageIndexToRemove + 1, originalDocument.getNumberOfPages());
+        byte[] frontPart = createPdfBytesPart(originalDocument, 0, firstPageIndexToRemove);
+        byte[] backPart = createPdfBytesPart(originalDocument, lastPageIndexToRemove + 1, originalDocument.getNumberOfPages());
 
         // PDF 합치기
         byte[] finalPdfBytes = mergeThreePdfs(frontPart, newPdfBytes, backPart);
-        HashMap<String, String> metadata = decodeMetadata(getPdfMetadata(fileName));
+        LinkedHashMap<String, String> newMetadata = decodeMetadata(getPdfMetadata(fileName));
+
+        for (Map.Entry<String, String> entry : metadata.entrySet()) {
+            String key = entry.getKey();
+            String[] parts = key.split("_"); // '_'로 분리
+
+            // 메타데이터 추가
+            newMetadata.put(key, entry.getValue());
+
+            // 앞부분이 certName과 같을 경우
+            if (parts.length > 0 && parts[0].equals(certName)) {
+                // 새로운 키를 추가
+                for (int i = 1; i < pdfPageCount; i++) {
+                    String newKey = certName + "_" + wallet.getId() + "_" + i;
+                    newMetadata.put(newKey, entry.getValue()); // 같은 값을 사용하여 추가
+                }
+
+            }
+        }
 
         // 최종 PDF를 S3에 업로드
-        uploadToS3(fileName, metadata, finalPdfBytes);
+        uploadToS3(fileName, newMetadata, finalPdfBytes);
 
         try {
             originalDocument.close(); // 리소스 닫기
