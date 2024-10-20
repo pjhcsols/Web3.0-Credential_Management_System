@@ -32,7 +32,7 @@ struct University: View {
                     .background(Color(UIColor.systemGray6))
                     .cornerRadius(6)
                     .padding(.vertical, 10)
-                    .frame(width: 270)
+                    .frame(width: 300)
                 Spacer()
                 Spacer()
                 Button(action: {
@@ -40,7 +40,7 @@ struct University: View {
                 }) {
                     Text("다음")
                         .foregroundColor(.white)
-                        .frame(width: 256, height: 45)
+                        .frame(width: 300, height: 45)
                         .background(Color(red: 218/255, green: 33/255, blue: 39/255))
                         .cornerRadius(6)
                         .overlay(
@@ -59,7 +59,7 @@ struct University: View {
     }
 
     private func checkUniversity(univName: String) {
-        let baseURL = "http://220.81.24.60:8080/api/univcert/check-univ"
+        let baseURL = "http://192.168.1.188:8080/api/univcert/check-univ"
         guard let url = URL(string: "\(baseURL)?univName=\(univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")") else {
             print("유효하지 않은 URL입니다.")
             return
