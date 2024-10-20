@@ -18,6 +18,7 @@ import web3.service.dto.Identity.StudentCertificationDto;
 import web3.service.wallet.WalletService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +46,8 @@ public class IdentityController {
             @RequestParam("univName") String univName,
             @RequestParam("univCheck") Boolean univCheck) {
 
-        StudentCertificationDto certificationDto = new StudentCertificationDto(email, univName, univCheck);
-
+        LocalDateTime certifiedDate = LocalDateTime.now(); // 현재 시간
+        StudentCertificationDto certificationDto = new StudentCertificationDto(email, univName, univCheck, certifiedDate);
         identityService.registerStudentCertification(walletId, certificationDto, file);
 
         return ResponseEntity.ok("재학증이 성공적으로 등록되었습니다.");

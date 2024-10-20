@@ -53,10 +53,11 @@ public class IdentityService {
         // 메타데이터 키 및 문자열 생성
         // 등록 및 인증시간 포함하기
         String metadataKey = "재학증_" + walletId;
-        String metadataString = String.format("{\"email\":\"%s\",\"univName\":\"%s\",\"univ_check\":%b}",
+        String metadataString = String.format("{\"email\":\"%s\",\"univName\":\"%s\",\"univ_check\":%b,\"certified_date\":\"%s\"}",
                 certificationDto.getEmail(),
                 certificationDto.getUnivName(),
-                certificationDto.isUnivCheck());
+                certificationDto.isUnivCheck(),
+                certificationDto.getCertifiedDate());
 
         String fileName = generatePdfFileName(walletId);
         byte[] result;
