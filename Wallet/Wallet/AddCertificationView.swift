@@ -72,7 +72,7 @@ struct AddCertificationView: View {
     }
     
     private func fetchCertifications() {
-        guard !pdfUrl.isEmpty, let url = URL(string: "http://192.168.1.188:8080/api/certifications/get-cert-names?pdfUrl=\(pdfUrl)")
+        guard !pdfUrl.isEmpty, let url = URL(string: "http://220.81.24.60:8080/api/certifications/get-cert-names?pdfUrl=\(pdfUrl)")
         else {
             print("유효하지 않은 URL입니다.")
             return

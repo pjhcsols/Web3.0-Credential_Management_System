@@ -70,6 +70,7 @@ struct LockByBioView: View {
             
         }
         .padding()
+
         Spacer()
     }
     

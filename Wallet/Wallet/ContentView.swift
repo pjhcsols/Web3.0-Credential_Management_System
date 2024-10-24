@@ -12,10 +12,10 @@ struct ContentView: View {
     @State private var showHistory = false
     @AppStorage("userNickname") var nickname: String = ""
     @AppStorage("walletId") var walletId: String = ""
-    @AppStorage("email") var email: String = ""
-    @AppStorage("univName") var univName: String = ""
-    @AppStorage("univCheck") var univCheck: Bool = false
-    @AppStorage("pdfUrl") var pdfUrl: String = ""
+    @AppStorage("userEmail") var email: String = ""
+    @AppStorage("userUniversity") var univName: String = ""
+    @AppStorage("checkUniversity") var univCheck: Bool = false
+    @AppStorage("userPdfUrl") var pdfUrl: String = ""
 
     var body: some View {
         VStack {
@@ -101,28 +101,36 @@ struct ContentView: View {
                 registerPdf()
             } else{
                 print("pdfURL: \(pdfUrl)")
+                print("\nContentView.swift")
+                print("* * * * * * * * * * * * * * * * * *\n\n")
             }
         }
     }
     
     private func registerPdf() {
+        print("* * * * * * * * * * * * * * * * * *\n\n")
+        print("ContentView.swift\n")
         guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             print("대학교 이름 인코딩 실패")
+            print("\nContentView.swift")
+            print("* * * * * * * * * * * * * * * * * *\n\n")
             return
         }
 
         print("walletId: \(walletId)")
-        print("email: \(email)")
-        print("encoded univName: \(encodedUnivName)")
-        print("univCheck: \(univCheck)")
+        print("user mail: \(email)")
+        print("encoded userUniversity: \(encodedUnivName)")
+        print("uniVerified: \(univCheck)")
 
-//        guard let url = URL(string: "http://192.168.1.188:8080/api/certifications/register?walletId=\(walletId)&email=\(email)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+//        guard let url = URL(string: "http://192.168.1.188:8080/api/certifications/register?walletId=\(walletId)&kakaoEmail=\(kakaoEmail)&userUniversity=\(encodedUnivName)&uniVerified=\(uniVerified)") else {
 //            print("유효하지 않은 URL입니다.")
 //            return
 //        }
         
-        guard let url = URL(string: "http://192.168.1.188:8080/api/certifications/register?walletId=\(walletId)&email=seakim@knu.ac.kr&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+        guard let url = URL(string: "http://121.151.45.73/:8080/api/certifications/register?walletId=\(walletId)&email=\(email)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
             print("유효하지 않은 URL입니다.")
+            print("\nContentView.swift")
+            print("* * * * * * * * * * * * * * * * * *\n\n")
             return
         }
 
@@ -147,6 +155,8 @@ struct ContentView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("요청 실패: \(error.localizedDescription)")
+                print("\nContentView.swift")
+                print("* * * * * * * * * * * * * * * * * *\n\n")
                 return
             }
 
@@ -156,11 +166,15 @@ struct ContentView: View {
                         print("서버 응답 성공: PDF 등록 완료")
                         print("서버 응답 데이터: \(responseString)")
                         print("pdfURL: \(pdfUrl)")
+                        print("\nContentView.swift")
+                        print("* * * * * * * * * * * * * * * * * *\n\n")
                     }
                 } else {
                     if let data = data, let errorResponse = String(data: data, encoding: .utf8) {
                         print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
                         print("서버 오류 응답: \(errorResponse)")
+                        print("\nContentView.swift")
+                        print("* * * * * * * * * * * * * * * * * *\n\n")
                     }
                 }
             }

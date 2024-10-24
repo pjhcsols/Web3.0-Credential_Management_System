@@ -32,8 +32,19 @@
 		<string>kakaoplus</string>
 		<string>kakaotalk</string>
 	</array>
-	<key>NSAppTransportSecurity</key>
-	<dict/>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>121.151.45.73</key>
+            <dict>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+                <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+            </dict>
+        </dict>
+    </dict>
 	<key>UIAppFonts</key>
 	<array>
 		<string>KnuTruth.otf</string>

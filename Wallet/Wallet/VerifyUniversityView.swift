@@ -8,31 +8,25 @@
 import SwiftUI
 
 struct VerifyUniversityView: View {
-    
-    @AppStorage("userNickname") var nickname: String = ""
-    @AppStorage("univName") var univName: String = ""
-    @AppStorage("univCheck") var univCheck: Bool = false
-    @AppStorage("walletId") var walletId: String = ""
-    @AppStorage("email") var email: String = ""
-    @AppStorage("pdfUrl") var pdfUrl: String = ""
-    @AppStorage("code") var code: Int = 0
-    
-    
-    @State private var navigateToContentView: Bool = false
-    @State private var isCodeSent: Bool = false
+    @AppStorage("userUniversity") var univName: String = ""
+    @AppStorage("userEmail") var email: String = ""
+    @AppStorage("userVerified") var userVerify: Bool = false
     @State private var codeInput: String = ""
+    @State private var isCodeSent: Bool = false
+    @State private var navigateToContentView: Bool = false
+    private var userName = UserDefaults.standard.string(forKey: "userNickname")
     
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
                 Spacer()
-                Text("\(nickname)님의")
+                Text("\(userName ?? "사용자")님의")
                     .font(.title2)
                     .fontWeight(.semibold)
                 Text("이메일을 입력해주세요")
                     .font(.title2)
                     .fontWeight(.semibold)
-                TextField("exaple@knu.ac.kr", text: $email)
+                TextField("이메일주소", text: $email)
                     .padding()
                     .background(Color(UIColor.systemGray6))
                     .cornerRadius(6)
@@ -90,17 +84,24 @@ struct VerifyUniversityView: View {
     }
     
     private func sendCode() {
+        print("* * * * * * * * * * * * * * * * * *")
+        print("VerifyUniversityView.swift\n")
         guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             print("대학교 이름 인코딩 실패")
+            print("\nVerifyUniversityView.swift")
+            print("* * * * * * * * * * * * * * * * * *\n\n")
             return
         }
-        
-        print("email: \(email)")
+        let userEmail = email
+        print("user email: \(email)")
         print("4자리 코드: \(codeInput)")
-        print("encoded univName: \(encodedUnivName)")
+        print("encoded userUniversity: \(encodedUnivName)")
         
-        guard let url = URL(string: "http://192.168.1.188:8080/api/univcert/send-code?email=\(email)&univName=\(encodedUnivName)") else {
+        guard let url = URL(string: "http://121.151.45.73:8080/api/univcert/send-code?email=\(userEmail)&univName=\(encodedUnivName)") else {
             print("유효하지 않은 URL입니다.")
+            print("\nVerifyUniversityView.swift")
+            print("* * * * * * * * * * * * * * * * * *\n\n")
+
             return
         }
         
@@ -110,6 +111,9 @@ struct VerifyUniversityView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("요청 실패: \(error.localizedDescription)")
+                print("\nVerifyUniversityView.swift")
+                print("* * * * * * * * * * * * * * * * * *\n\n")
+
             }
             
             if let httpResponse = response as? HTTPURLResponse {
@@ -125,6 +129,9 @@ struct VerifyUniversityView: View {
                     if let data = data, let errorResponse = String(data: data, encoding: .utf8) {
                         print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
                         print("서버 오류 응답: \(errorResponse)")
+                        print("\nVerifyUniversityView.swift")
+                        print("* * * * * * * * * * * * * * * * * *\n\n")
+
                     }
                 }
             }
@@ -135,11 +142,18 @@ struct VerifyUniversityView: View {
     private func verifyCode() {
         guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             print("대학교 이름 인코딩 실패")
+            print("\nVerifyUniversityView.swift")
+            print("* * * * * * * * * * * * * * * * * *\n\n")
+
             return
         }
         
-        guard let url = URL(string: "http://192.168.1.188:8080/api/univcert/verify-code?email=\(email)&univName=\(encodedUnivName)&code=\(codeInput)") else {
+        let userEmail = email
+        
+        guard let url = URL(string: "http://121.151.45.73:8080/api/univcert/verify-code?email=\(userEmail)&univName=\(encodedUnivName)&code=\(codeInput)") else {
             print("유효하지 않은 URL입니다.")
+            print("\nVerifyUniversityView.swift")
+            print("* * * * * * * * * * * * * * * * * *\n\n")
             return
         }
         
@@ -149,6 +163,9 @@ struct VerifyUniversityView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("요청 실패: \(error.localizedDescription)")
+                print("\nVerifyUniversityView.swift")
+                print("* * * * * * * * * * * * * * * * * *\n\n")
+
             }
             
             if let httpResponse = response as? HTTPURLResponse {
@@ -159,19 +176,58 @@ struct VerifyUniversityView: View {
                             
                             if let jsonData = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                                let success = jsonData["success"] as? Bool, success {
-
+                                self.userVerify = true
                                 self.navigateToContentView = true
+                                
+                                clearCertifiedUserList()
+                                
+                                print("\nVerifyUniversityView.swift")
+                                print("* * * * * * * * * * * * * * * * * *\n\n")
+
                             }
+                            print("\nVerifyUniversityView.swift")
+                            print("* * * * * * * * * * * * * * * * * *\n\n")
+
                         }
                     }
                 } else {
                     if let data = data, let errorResponse = String(data: data, encoding: .utf8) {
                         print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
                         print("서버 오류 응답: \(errorResponse)")
+                        print("\nVerifyUniversityView.swift")
+                        print("* * * * * * * * * * * * * * * * * *\n\n")
+
                     }
                 }
             }
         }
+        task.resume()
+    }
+    
+    private func clearCertifiedUserList() {
+        guard let url = URL(string: "http://121.151.45.73:8080/api/univcert/clear-list") else {
+            print("Invalid URL for clearing user list")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Failed to clear user list: \(error.localizedDescription)")
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                DispatchQueue.main.async {
+                    print("User list cleared successfully")
+                }
+            } else {
+                print("Unexpected response from server")
+            }
+        }
+        
         task.resume()
     }
 }
