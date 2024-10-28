@@ -35,13 +35,13 @@ public class DriverLicenseTest {
     private static final String ACCESS_TOKEN_URL = "https://oauth.codef.io/oauth/token";
     private static final String API_URL = "https://development.codef.io/v1/kr/public/ef/driver-license/status";
 
-    private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
-    private static final String CLIENT_SECRET = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
+    private static final String CLIENT_ID = "464ae47d-b662-4f60-b2a9-c80fc9d98c8c";
+    private static final String CLIENT_SECRET = "3bfb3fbc-d939-4968-bdc8-1b155c8c06f2";
 
 
     //codef api 계정의 public Key 입력하기
-    private String publicKeyStr = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvGXundpJlAHNhwDiVDSKWy4iJ+jzkawCMy3d1IZ0o5qHaOk8X2bVn9rL8lepioNNGcswWxhjs4UEqPGsu6+XPHbbYrUPNimlaa0dRsQcNdjD7flaSMIbDMeD5v04AZiquWcLZl1CqdzntLeYXVat7uqcQ68Sb5mGn0HYWN8XlQHpBMdmEESr0mJCEhLI2MD6+uqU8oMnrUnPJZSkKD83udCXjt1b0N8SksWBtWz3NQqsmx8a9NgYJlRSG1jkI8zgBzwtvnNxD4NaM/NqtDiuVXhNfupltzmA+xt4hy+DD00GKUcg05iRQih1go3WG8UKtA5KOqcfHS9e8S9z77lkkQIDAQAB"; //public key 넣기
-    
+    private String publicKeyStr = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAorz9VEkZFaJXFcpNUqXMoIM1GI8JuXbeFp2wCNdY5razRLiMK6iQurB9FjwK5IquRDV2DkVfYLRAfA24rNPz64/VuXpA93ibZS5SuEfgAihB19RwYtEi1EPO/2TRtWlzba/x7mavcimteaGi9Zz67IstlLcExgS6D8IhiYe/RzMhAzso6bZIaLQYorbpMYLhNKwfmWKuGJQGu910HEUAleLym8GvqKmeGC5V3P62e3rAgw3X7Mduv+KVke+Tlng48OfMpo99iH10HEdxtvLQCYJ0iMmcfXhrrG3VrtZfSomKMMkzzd1gpfLUY8pJvmuY5MdIoL0oDI+eMgcCKuETQwIDAQAB"; //public key 넣기
+  
 
     @Test
     void shouldCheckPassportValiditySuccessfully() throws Exception {

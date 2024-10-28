@@ -40,8 +40,8 @@ public class QnetCertificateStatusTest {
     private static final String ACCESS_TOKEN_URL = "https://oauth.codef.io/oauth/token";
     private static final String API_URL = "https://development.codef.io/v1/kr/etc/hr/qnet-certificate/status";  // 수정된 도메인
 
-    private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
-    private static final String CLIENT_SECRET = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
+    private static final String CLIENT_ID = "464ae47d-b662-4f60-b2a9-c80fc9d98c8c";
+    private static final String CLIENT_SECRET = "3bfb3fbc-d939-4968-bdc8-1b155c8c06f2";
 
     @Test
     void shouldCheckQnetCertificateStatusSuccessfully() throws Exception {

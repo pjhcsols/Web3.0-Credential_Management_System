@@ -19,11 +19,12 @@ public class GetToken {
     private static final String GET_TOKEN = "/oauth/token";
 
     public static void main(String[] args) {
-        String clientId = "86640213-3b83-461a-97ab-2491d68a2052";
-        String clientSecret = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
-
+        String CLIENT_ID = "464ae47d-b662-4f60-b2a9-c80fc9d98c8c";
+        String CLIENT_SECRET = "3bfb3fbc-d939-4968-bdc8-1b155c8c06f2";
+    
+    
         // 토큰 발급
-        HashMap<String, String> tokenMap = publishToken(clientId, clientSecret);
+        HashMap<String, String> tokenMap = publishToken(CLIENT_ID, CLIENT_SECRET);
 
         if (tokenMap != null && tokenMap.containsKey("access_token")) {
             // 발급된 액세스 토큰
