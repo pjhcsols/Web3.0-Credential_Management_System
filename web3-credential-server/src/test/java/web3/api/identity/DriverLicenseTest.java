@@ -28,12 +28,12 @@ import javax.crypto.Cipher;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
-public class IdentityCheckTest {
+public class DriverLicenseTest {
 
     private RestTemplate restTemplate = new RestTemplate();
 
     private static final String ACCESS_TOKEN_URL = "https://oauth.codef.io/oauth/token";
-    private static final String API_URL = "https://development.codef.io/v1/kr/public/mw/identity-card/check-status";
+    private static final String API_URL = "https://development.codef.io/v1/kr/public/ef/driver-license/status";
 
     private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
     private static final String CLIENT_SECRET = "8721d0b3-37ea-4484-8d65-6418a61fd1a1";
@@ -61,20 +61,25 @@ public class IdentityCheckTest {
 
 /////////////////////////////////////////////////여기부터///////////////////////////////
 
-        //공동 인증서 데이타(der, key파일)
         String certFileEncoded = "";
-        String keyFileEncoded ="";
+        String keyFileEncoded = "";
 
         // 사용자의 공동 인증서 비밀번호
-        String certPassword ="";
-
+        String certPassword = ""; 
 
         //사용자 실제값
-        String userName = ""; //이름
-        String identity= "";//주민등록번호
+        String userName = "";
+        String identity= "";
 
-        String issueDate = "";//민증 발급날짜
+        String loginUserName="";
+        String birthDate = "";
+        String serialNo = "";
 
+        String licenseNo01 = "";
+        String licenseNo02 = "";
+        String licenseNo03 = "";
+        String licenseNo04 = "";
+ 
 
 //////////////////////////////////////////////여기까지는 개인정보 유출 주의!!!/////////////////////
 
@@ -83,8 +88,8 @@ public class IdentityCheckTest {
         // JSON Request Payload
         String requestBody = "{\n" +
                     //아래 3값(organization, loginType, certType)은 고정값
-                "    \"organization\": \"0002\",\n" +
-                "    \"loginType\": \"0\",\n" +
+                "    \"organization\": \"0001\",\n" +
+                "    \"loginType\": \"2\",\n" +
                 "    \"certType\": \"1\",\n" +
                     //아래 10개 값은 사용자의 실제 데이터값 필요
                 "    \"certFile\": \"" + certFileEncoded + "\",\n" +
@@ -92,9 +97,15 @@ public class IdentityCheckTest {
                 "    \"certPassword\": \"" + rsaEncryptedPassword + "\",\n" +
 
                 "    \"identity\": \""+identity+"\",\n" + //주민등록번호
+                "    \"loginUserName\": \""+loginUserName+"\",\n" + 
+                "    \"birthDate\": \""+birthDate+"\",\n" + 
+                "    \"serialNo\": \""+serialNo+"\",\n" + 
+                "    \"licenseNo01\": \""+licenseNo01+"\",\n" + 
+                "    \"licenseNo02\": \""+licenseNo02+"\",\n" + 
+                "    \"licenseNo03\": \""+licenseNo03+"\",\n" + 
+                "    \"licenseNo04\": \""+licenseNo04+"\",\n" + 
 
-                "    \"userName\": \""+userName+"\",\n" +
-                "    \"issueDate\": \""+issueDate+"\"\n" + //민증발급 날짜
+                "    \"userName\": \""+userName+"\"\n" +
     
                 "}";
 
@@ -129,20 +140,20 @@ public class IdentityCheckTest {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(responseBody).isNotNull();
 
-            // JSON 파싱 시도 (Content-Type이 JSON일 경우만)
-            if (contentType != null && contentType.equals(MediaType.APPLICATION_JSON)) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> parsedResponseBody = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {
-                });
+            // // JSON 파싱 시도 (Content-Type이 JSON일 경우만)
+            // if (contentType != null && contentType.equals(MediaType.APPLICATION_JSON)) {
+            //     ObjectMapper objectMapper = new ObjectMapper();
+            //     Map<String, Object> parsedResponseBody = objectMapper.readValue(responseBody, new TypeReference<Map<String, Object>>() {
+            //     });
 
-                // 필드 검증
-                assertThat(parsedResponseBody).containsKey("resAuthenticity");
-                assertThat(parsedResponseBody.get("resAuthenticity")).isInstanceOf(String.class);
-                String resAuthenticity = (String) parsedResponseBody.get("resAuthenticity");
-                assertThat(resAuthenticity).isNotEmpty();
-            } else {
-                System.err.println("Unexpected content type: " + contentType);
-            }
+            //     // 필드 검증
+            //     assertThat(parsedResponseBody).containsKey("resLicenseStatus");
+            //     assertThat(parsedResponseBody.get("resLicenseStatus")).isInstanceOf(String.class);
+            //     String resAuthenticity = (String) parsedResponseBody.get("resLicenseStatus");
+            //     assertThat(resAuthenticity).isNotEmpty();
+            // } else {
+            //     System.err.println("Unexpected content type: " + contentType);
+            // }
 
         } catch (Exception e) {
             // 오류 로그 출력

@@ -8,6 +8,10 @@ import org.springframework.http.*;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -23,7 +27,7 @@ public class UnivCertApiTest {
         // JSON Request Payload
         String jsonRequest = "{\n" +
                 "  \"key\": \"43086994-92b9-4caa-8b3e-be2510051c8e\",\n" +
-                "  \"email\": \"solhappy2000@knu.ac.kr\",\n" +
+                "  \"email\": \"kga0416@knu.ac.kr\",\n" +
                 "  \"univName\": \"경북대학교\",\n" +
                 "  \"univ_check\": true\n" +
                 "}";
@@ -57,9 +61,9 @@ public class UnivCertApiTest {
         // JSON Request Payload
         String jsonRequest = "{\n" +
                 "  \"key\": \"43086994-92b9-4caa-8b3e-be2510051c8e\",\n" +
-                "  \"email\": \"solhappy2000@knu.ac.kr\",\n" +
+                "  \"email\": \"kga0416@knu.ac.kr\",\n" +
                 "  \"univName\": \"경북대학교\",\n" +
-                "  \"code\": 1032\n" +
+                "  \"code\": 8368\n" +
                 "}";
 
         // Set Headers
@@ -84,6 +88,52 @@ public class UnivCertApiTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("\"success\":true");
     }
+
+
+    @Test
+    @DisplayName("이메일 인증 상태를 성공적으로 조회해야 합니다.")
+    void shouldGetEmailCertificationStatusSuccessfully() {
+        // JSON Request Payload (성공 케이스)
+        String jsonRequest = "{\n" +
+                "  \"key\": \"43086994-92b9-4caa-8b3e-be2510051c8e\",\n" +  
+                "  \"email\": \"kga0416@knu.ac.kr\"\n" +
+                "}";
+    
+        // Set Headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+    
+        // Create HttpEntity
+        HttpEntity<String> request = new HttpEntity<>(jsonRequest, headers);
+    
+        // Send POST request
+        ResponseEntity<String> response = restTemplate.exchange(
+                "https://univcert.com/api/v1/status",
+                HttpMethod.POST,
+                request,
+                String.class
+        );
+    
+        // 로그에 응답 본문 출력
+        System.out.println("Response Body: " + response.getBody());
+    
+        // Validate Response
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).contains("\"success\":true");
+    
+        try {
+            // Extract the 'certified_date' field if 'success' is true
+            String certifiedDate = JsonPath.read(response.getBody(), "$.certified_date");
+    
+            // Validate that certified_date is not null
+            assertThat(certifiedDate).isNotNull();  // certified_date가 존재하는지 확인
+        } catch (PathNotFoundException e) {
+            System.out.println("PathNotFoundException: " + e.getMessage());
+            System.out.println("응답 본문에서 'certified_date' 필드를 찾지 못했습니다.");
+        }
+    }
+    
+
 
     @Test
     @DisplayName("인증된 사용자 목록 조회에 성공해야 합니다.") // Test retrieving the list of certified users successfully
