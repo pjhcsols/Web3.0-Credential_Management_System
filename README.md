@@ -160,7 +160,7 @@
 <br>
 <br>
 
-## 외부 API를 이용한 인증 (대학 재학 인증, 자격증, 주민등록증, 여권)
+## 외부 API를 이용한 인증 (대학 재학 인증, 자격증, 주민등록증, 여권, 운전면허)
 
 사용자 및 인증서의 신뢰성을 위해 외부 API를 연동하여 대학 재학을 인증하고,  
 Qnet 자격증 확인서 및 주민등록 진위 여부 인증을 테스트하는 작업을 수행하였습니다.
@@ -168,37 +168,216 @@ Qnet 자격증 확인서 및 주민등록 진위 여부 인증을 테스트하�
 
 ### 1. 재학 인증 테스트
 
-![image](https://github.com/user-attachments/assets/1f153339-efc8-4fe4-9361-17b761c3e9bd)
-
 사용자가 특정 대학에 재학 중인지를 확인하기 위해 외부 API를 통해 사용자의 학적 정보를 확인할 수 있는 기능을 통합하였습니다. API 요청을 통해 사용자의 재학 상태를 검증하고, 인증기관 서버는 이 정보를 바탕으로 사용자가 제공한 정보의 진위를 확인합니다. 성공적인 재학 인증 요청에 대해, 시스템은 사용자가 제공한 정보와 외부 API의 응답이 일치하는지를 확인하고, 재학 상태가 검증된 사용자로 표시합니다.
 
-![image](https://github.com/user-attachments/assets/90e2ea2a-582c-4c90-bbbe-f9dc51e952b0)
+### API 개요
 
-<br>
+- **API 제공처**: UnivCert https://univcert.com/
+- **요청 헤더**:
+    - `Content-Type`: `application/json`
+- **필요 데이터**: API키, 사용자 이름, 대학교 이메일, 대학교명, 인증번호
 
-### 2. Qnet 자격증 확인서 인증 테스트
+### 테스트 절차
 
-Qnet 자격증 확인서는 특정 자격증 소지 여부를 검증하는 데 사용됩니다.  
-프로젝트에서는 Codef API를 통해 자격증 정보와 확인서를 검증하는 절차를 테스트하였습니다.
-<br>
-![image](https://github.com/user-attachments/assets/4ac278be-1d8a-4bce-af94-c8c0f88aa80b)
-<br>
-API 요청을 통해 사용자가 소지한 자격증의 유효성을 확인하고, Qnet에서 반환한 응답 데이터를 바탕으로 사용자가 주장하는 자격증 소지가 올바른지를 검증하였습니다.  
+1. **이용자 메일 인증 시작 (인증코드 발송)**
+    - **요청 URL**: https://univcert.com/api/v1/certify
+
+### Request 예시
+
+```json
+{
+  “key” : “{부여받은 API KEY}”,
+  "email” : “{대학교 이메일}”,
+  “univName” : “{대학교명}”,
+  “univ_check” : true
+}
+```
+
+("univ_check"가 true라면 해당 대학 재학 여부, false라면 메일 소유자 여부를 판단해 줍니다.)
+
+### Response 예시
+
+```json
+//메일로 인증번호 전송이 성공한 경우
+{
+  “success” : true
+}
+//실패한 경우
+{
+  "status" : 400,
+  "success" : false,
+  "message" : "{에러 메시지}"
+}
+```
+
+1. **이용자 메일에 발송된 인증코드를 전달받아 요청하기**
+    - **요청 URL**: https://univcert.com/api/v1/certifycode
+
+### Request 예시
+
+```json
+{
+  “key” : “{부여받은 API KEY}”
+  “univName” : “{대학교명}”,
+  “email” : "{대학교 이메일}”,
+  “code” : {대학 이메일로 받은 인증코드}
+}
+```
+
+### Response 예시
+
+```json
+//정확한 인증번호를 입력했을 때
+{
+  “success” : true
+  “univName” : “OO대학교”,
+  “certified_email” : “abc@knu.ac.kr”,
+  “certified_date” : “2023-01-03T09:30:22”
+}
+//실패한 경우
+{
+  “status” : 400,
+  "success" : false,
+  "message" : "{에러 메시지}"
+}
+```
+
+1. **인증된 이메일인지 확인**
+    - **요청 URL**: https://univcert.com/api/v1/status
+
+### Request 예시
+
+```json
+{
+  “key” : “{부여받은 API KEY}”,
+  "email” : “{인증하고자 하는 이메일}”
+}
+```
+
+### Response 예시
+
+```json
+//성공한 경우
+{
+  “success” : true,
+  “certified_date” : “2023-01-03T09:30:22(인증받은 시간)”
+}
+//실패한 경우
+{
+  “success” : false,
+  “message” : "{에러 메시지}"
+}
+```
+
+### 2. Qnet 자격증 확인서 진위확인 테스트
+
+Codef API를 통해 자격증 확인서를 검증하는 절차를 테스트하였습니다.
+
+### API 개요
+
+- **API 제공처**: Codef
+- **API Endpoint**: https://development.codef.io/v1/kr/etc/hr/qnet-certificate/status
+- **인증 방식**: OAuth 2.0 (클라이언트 자격 증명 방식)
+- **요청 데이터**: 사용자 정보와 자격증 확인서 데이터
+
+API 요청을 통해 사용자가 소지한 자격증 확인서의 유효성을 확인하고, Qnet에서 반환한 응답 데이터를 바탕으로 사용자가 주장하는 자격증 소지가 올바른지를 검증하였습니다.
+
 API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증되었을 경우, 인증기관 서버는 해당 사용자를 신뢰할 수 있는 자격증 소지자로 식별합니다.
 
-<br>
+### 테스트 절차
+
+1. **액세스 토큰 요청**: Codef API를 사용하기 위해 액세스 토큰을 요청합니다.
+    - **요청 URL**: https://oauth.codef.io/oauth/token
+    - **요청 헤더**: Basic 인증 방식으로 클라이언트 ID와 클라이언트 시크릿을 포함합니다.
+    - **요청 본문**: `grant_type=client_credentials&scope=read`
+2. **확인서 정보 요청**: 획득한 액세스 토큰을 사용하여 확인서의 유효성을 확인합니다.
+    - **요청 URL**: https://development.codef.io/v1/kr/etc/hr/qnet-certificate/status
+    - **요청 헤더**:
+        - `Authorization`: `Bearer {access_token}`
+        - `Content-Type`: `application/json`
+    - **요청 본문**: 사용자의 정보 및 자격증 문서 정보를 포함합니다.
+
+### Request 예시
+
+```json
+{
+    "organization": "0001",
+    "userName": "{성명}",
+    "docNo": "{문서확인번호}"
+}
+```
+
+### Response 예시
+
+```json
+{
+    "resIssueYN": "{발행여부}", (0이면 실패, 1이면 성공)
+    "resResultDesc": "{결과메시지}",
+    "resDocNo": "{문서확인번호}",
+    "resPublishNo": "{발행번호}",
+    "resDocType": "{확인서종류}",
+    "resType": "{시험구분}",
+    "resUserNm": "{성명}",
+    "commBirthDate": "{생년월일}",
+    "resItemName": "{종목}",
+    "resExaminationNo": "{수험번호}",
+    "resAcquisitionDate": "{시행일}",
+    "resInquiryDate": "{조회일자}"
+}
+```
 
 ### 3. 주민등록 진위 여부 테스트
 
-
-![image](https://github.com/user-attachments/assets/394a2f99-55e1-408e-b5df-685dd9631c2f)
-<br>
 주민등록 진위 여부를 확인하기 위해 외부 API를 연동하여 사용자의 주민등록 진위를 검증하는 작업을 수행하였습니다.
-<br>
+
+- **API 제공처**: Codef
+- **API Endpoint**: https://development.codef.io/v1/kr/public/mw/identity-card/check-status
+- **인증 방식**: OAuth 2.0 (클라이언트 자격 증명 방식)
+- **요청 데이터**: 사용자 데이터와 공동인증서
+
 이 API는 사용자가 제공한 주민등록번호가 실제로 존재하는지 검토하는 기능을 제공합니다.
 
-<br>
-<br>
+### 테스트 절차
+
+1. **액세스 토큰 요청**: Codef API를 사용하기 위해 액세스 토큰을 요청합니다.
+    - **요청 URL**: https://oauth.codef.io/oauth/token
+    - **요청 헤더**: Basic 인증 방식으로 클라이언트 ID와 클라이언트 시크릿을 포함합니다.
+    - **요청 본문**: `grant_type=client_credentials&scope=read`
+2. **주민등록 정보 요청**: 획득한 액세스 토큰을 사용하여 사용자 사용자 정보의 유효성을 확인합니다.
+    - **요청 URL**: https://development.codef.io/v1/kr/public/mw/identity-card/check-status
+    - **요청 헤더**:
+        - `Authorization`: `Bearer {access_token}`
+        - `Content-Type`: `application/json`
+    - **요청 본문**: 사용자의 정보 및 공동 인증서 정보를 포함합니다.
+
+### Request 예시
+
+```json
+{
+    "organization": "0002",
+    "loginType": "0",
+    "certType": "1",
+    "certFile": "{BASE64로 Encoding된 인증서 der파일 문자열}",
+    "keyFile": "{BASE64로 Encoding된 인증서 key파일 문자열}",
+    "certPassword": "{RSA암호화된 인증서 비밀번호}",
+    "birthDate": "{생년월일}",
+    "identity": "{사용자 주민번호}",
+    "userName": "{사용자 이름}",
+    "issueDate": "{발급일자}", (YYYYMMDD 형식)
+}
+```
+
+### Response 예시
+
+```json
+{
+    "resUserNm": "{성명}",
+    "resUserIdentiyNo": "{주민등록번호}", (뒤 7자리는 * 로 표시됨)
+    "resAuthenticity": "{진위확인}", ("0": false, "1": true)
+    "resAuthenticityDesc": "{진위확인 내용}"
+}
+```
+
 
 ### 4. 여권 유효성 및 인증 테스트
 
@@ -268,6 +447,65 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
 ```
 <img width="676" alt="image" src="https://github.com/user-attachments/assets/0497ad78-ea32-4e7d-9f3a-1e6ee4268bb8">
 
+
+### 5. 운전면허 진위확인 테스트
+
+외부 API를 연동하여 사용자의 운전면허증 진위를 검증하는 작업을 수행하였습니다.
+
+### API 개요
+
+- **API 제공처**: Codef
+- **API Endpoint**: https://development.codef.io/v1/kr/public/ef/driver-license/status
+- **인증 방식**: OAuth 2.0 (클라이언트 자격 증명 방식)
+- **요청 데이터**: 사용자, 운전면허증 정보와 공동 인증서 데이터
+
+### 테스트 절차
+
+1. **액세스 토큰 요청**: Codef API를 사용하기 위해 액세스 토큰을 요청합니다.
+    - **요청 URL**: https://oauth.codef.io/oauth/token
+    - **요청 헤더**: Basic 인증 방식으로 클라이언트 ID와 클라이언트 시크릿을 포함합니다.
+    - **요청 본문**: `grant_type=client_credentials&scope=read`
+2. **운전면허 정보 요청**: 획득한 액세스 토큰을 사용하여 운전면허증의 유효성을 확인합니다.
+    - **요청 URL**: https://development.codef.io/v1/kr/public/ef/driver-license/status
+    - **요청 헤더**:
+        - `Authorization`: `Bearer {access_token}`
+        - `Content-Type`: `application/json`
+    - **요청 본문**: 사용자의 운전면허증 정보 및 인증서 정보를 포함합니다.
+
+### Request 예시
+
+```json
+{
+    "organization": "0001",
+    "loginType": "2",
+    "certType": "1",
+    "certFile": "{BASE64로 Encoding된 인증서 der파일 문자열}",
+    "keyFile": "{BASE64로 Encoding된 인증서 key파일 문자열}",
+    "certPassword": "{RSA암호화된 공동인증서 비밀번호}",
+    "loginUserName": "{사용자이름}",
+    "identity": "{사용자 주민등록번호}",
+    "birthDate": "{생년월일YYYYMMDD}",
+    "licenseNo01": "{운전 면허번호01 (지역)}",
+    "licenseNo02": "{운전 면허번호02 (년도)}",
+    "licenseNo03": "{운전 면허번호03}",
+    "licenseNo04": "{운전 면허번호04}",
+    "serialNo": "{암호일련번호}",
+    "userName": "{사용자이름}",
+}
+```
+
+### Response 예시
+
+```json
+{
+    "resUserNm": "{성명}",
+    "commBirthDate": "{생년월일}",
+    "resAuthenticity": "{진위확인}", ("0": false, "1": true, "2": 전산정보만 일치)
+    "resLicenseNumber": "{운전면허 번호}",
+    "resAuthenticityDesc1": "{전산자료와일치합니다.}",
+    "resAuthenticityDesc2": "{식별번호가일치합니다.}"
+}
+```
 
 ## 라이선스 정보
 
