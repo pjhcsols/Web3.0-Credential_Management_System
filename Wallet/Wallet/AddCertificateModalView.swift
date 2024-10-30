@@ -24,9 +24,7 @@ struct AddCertificateModalView: View {
     @State var allAgree = false
     @State var item1Checked = false
     @State var pdfIssued = false
-    
-    
-//    @State private var tempPdfFilePath: String = ""
+
     @State private var showPinEntry = false
     @State private var selectedPdfData: Data? = nil
     @State private var showDocumentPicker = false
@@ -97,7 +95,6 @@ struct AddCertificateModalView: View {
             .sheet(isPresented: $showPinEntry) {
                 CheckByCodeView { success in
                     if success {
-//                        issuePdf()
                         showDocumentPicker = true
                     }
                 }

@@ -9,14 +9,14 @@ import SwiftUI
 
 struct AddCertificationView: View {
     @Environment(\.presentationMode) var presentationMode
+    
     @AppStorage("userPdfUrls") var pdfUrls: String = ""
     @AppStorage("userWalletId") var walletId: String = ""
+    @AppStorage("certificationList") private var certificationListData: Data?
     
     @State private var showSheet = false
     @State private var errorMessage: String?
     @State private var selectedCertification: Certification?
-    
-    @AppStorage("certificationList") private var certificationListData: Data?
     @State private var certifications: [Certification] = []
     
     var body: some View {

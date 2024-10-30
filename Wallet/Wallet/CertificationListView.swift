@@ -11,6 +11,7 @@ import PDFKit
 struct CertificationListView: View {
     @AppStorage("userPdfUrls") var pdfUrls: String = ""
     @AppStorage("certificationList") private var certificationListData: Data?
+    
     @State private var selectedCertification: Certification?
     @State private var certificationList: [Certification] = []
     @State private var isShowingPDF = false
@@ -105,19 +106,18 @@ struct PDFKitView: UIViewRepresentable {
     func makeUIView(context: Context) -> PDFView {
         let pdfView = PDFView()
         pdfView.autoScales = true
-        pdfView.displayMode = .singlePage // Set to single-page mode
+        pdfView.displayMode = .singlePage
         pdfView.displaysAsBook = false
-        pdfView.isUserInteractionEnabled = false // Disable interaction to prevent scrolling
+        pdfView.isUserInteractionEnabled = false
         
         print("Attempting to load PDF from URL: \(url)")
         
-        // Load the PDF document on a background thread
         DispatchQueue.global(qos: .userInitiated).async {
             if let document = PDFDocument(url: url) {
                 DispatchQueue.main.async {
                     pdfView.document = document
                     if let firstPage = document.page(at: 0) {
-                        pdfView.go(to: firstPage) // Go to the first page
+                        pdfView.go(to: firstPage)
                     }
                     print("PDF document successfully loaded, showing first page only.")
                 }
@@ -133,7 +133,6 @@ struct PDFKitView: UIViewRepresentable {
 
     func updateUIView(_ pdfView: PDFView, context: Context) {}
 }
-
 
 #Preview {
     CertificationListView()
