@@ -3,7 +3,8 @@
 ## 주제
 **개인이 데이터를 직접 소유하고 관리하는 Web3 전자지갑 시스템 : “Web 3.0 신원/자격증명 관리 시스템"**
 <br>
-![image](https://github.com/user-attachments/assets/0a312fe1-5f85-4f05-b948-eff5e3ccf505)
+<img width="880" alt="설계" src="https://github.com/user-attachments/assets/dd0f8d41-04cc-4073-8aa6-fa07873fc42b">
+
 
 이 시스템은 Web3 구조와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
 전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있습니다.
@@ -210,7 +211,7 @@ Qnet 자격증 확인서 및 주민등록 진위 여부 인증을 테스트하�
 }
 ```
 
-1. **이용자 메일에 발송된 인증코드를 전달받아 요청하기**
+2. **이용자 메일에 발송된 인증코드를 전달받아 요청하기**
     - **요청 URL**: https://univcert.com/api/v1/certifycode
 
 ### Request 예시
@@ -242,7 +243,7 @@ Qnet 자격증 확인서 및 주민등록 진위 여부 인증을 테스트하�
 }
 ```
 
-1. **인증된 이메일인지 확인**
+3. **인증된 이메일인지 확인**
     - **요청 URL**: https://univcert.com/api/v1/status
 
 ### Request 예시
