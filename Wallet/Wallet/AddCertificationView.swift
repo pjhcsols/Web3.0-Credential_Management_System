@@ -9,13 +9,15 @@ import SwiftUI
 
 struct AddCertificationView: View {
     @Environment(\.presentationMode) var presentationMode
-    @AppStorage("pdfUrl") var pdfUrl: String = ""
+    @AppStorage("userPdfUrls") var pdfUrls: String = ""
+    @AppStorage("userWalletId") var walletId: String = ""
+    
     @State private var showSheet = false
     @State private var errorMessage: String?
     @State private var selectedCertification: Certification?
     
-    @State private var certifications: [Certification] = [
-    ]
+    @AppStorage("certificationList") private var certificationListData: Data?
+    @State private var certifications: [Certification] = []
     
     var body: some View {
         VStack {
@@ -72,7 +74,7 @@ struct AddCertificationView: View {
     }
     
     private func fetchCertifications() {
-        guard !pdfUrl.isEmpty, let url = URL(string: "http://220.81.24.60:8080/api/certifications/get-cert-names?pdfUrl=\(pdfUrl)")
+        guard !pdfUrls.isEmpty, let url = URL(string: "http://220.89.75.210:8080/api/certifications/cert-names?walletId=\(walletId)")
         else {
             print("유효하지 않은 URL입니다.")
             return
@@ -92,7 +94,13 @@ struct AddCertificationView: View {
                     do {
                         if let certificationNames = try JSONSerialization.jsonObject(with: data, options: []) as? [String] {
                             DispatchQueue.main.async {
-                                self.certifications.append(contentsOf: certificationNames.map { Certification(name: $0) })
+                                let newCertifications = certificationNames.map { Certification(name: $0) }
+                                                            
+                                loadCertifications()
+                                let combinedCertifications = Set(certifications + newCertifications)
+                                                    
+                                certifications = Array(combinedCertifications)
+                                saveCertifications()
                             }
                         }
                     } catch {
@@ -104,6 +112,24 @@ struct AddCertificationView: View {
             }
         }
         task.resume()
+    }
+    
+    private func saveCertifications() {
+        do {
+            let data = try JSONEncoder().encode(certifications)
+            certificationListData = data
+        } catch {
+            print("Certification 저장 실패: \(error)")
+        }
+    }
+    
+    private func loadCertifications() {
+        guard let data = certificationListData else { return }
+        do {
+            certifications = try JSONDecoder().decode([Certification].self, from: data)
+        } catch {
+            print("Certification 로드 실패: \(error)")
+        }
     }
 }
 

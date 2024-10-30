@@ -129,21 +129,13 @@ struct LockByCodeView: View {
 
     private func validateCodes() {
         if code == confirmCode {
-            print("* * * * * * * * * * * * * * * * * *")
-            print("LockByCodeView.swift\n")
             UserDefaults.standard.set(code, forKey: "userPinCode")
-            print("pin code: ",code)
-            print("\nLockByCodeView.swift")
-            print("* * * * * * * * * * * * * * * * * *\n\n")
+            print("(LockByCodeView) pin code: ",code)
             
             navigateToBio = true
         } else {
-            print("* * * * * * * * * * * * * * * * * *")
-            print("LockByCodeView.swift\n")
             confirmCode = ""
             showError = true
-            print("\nLockByCodeView.swift")
-            print("* * * * * * * * * * * * * * * * * *\n\n")
         }
     }
 }

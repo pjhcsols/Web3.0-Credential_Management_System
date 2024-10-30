@@ -58,19 +58,13 @@ struct GetUniversityView: View {
     }
 
     private func checkUniversity(univName: String) {
-        print("* * * * * * * * * * * * * * * * * *")
-        print("GetUniversityView.swift\n")
         guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             print("대학교 이름 인코딩 실패")
-            print("\nGetUniversityView.swift")
-            print("* * * * * * * * * * * * * * * * * *\n\n")
             return
         }
         
-        guard let url = URL(string: "http://121.151.45.73:8080/api/univcert/check-univ?univName=\(encodedUnivName)") else {
+        guard let url = URL(string: "http://220.89.75.210:8080/api/univcert/check-univ?univName=\(encodedUnivName)") else {
             print("유효하지 않은 URL입니다.")
-            print("\nGetUniversityView.swift")
-            print("* * * * * * * * * * * * * * * * * *\n\n")
             return
         }
         
@@ -80,8 +74,6 @@ struct GetUniversityView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("요청 실패: \(error.localizedDescription)")
-                print("\nGetUniversityView.swift")
-                print("* * * * * * * * * * * * * * * * * *\n\n")
                 return
             }
             
@@ -95,24 +87,16 @@ struct GetUniversityView: View {
                                 print("서버 응답 성공: success == 1")
                                 DispatchQueue.main.async {
                                     self.isUnivChecked = true
-                                    print("\nGetUniversityView.swift")
-                                    print("* * * * * * * * * * * * * * * * * *\n\n")
                                 }
                             } else {
                                 print("서버 응답 실패 또는 다른 상태")
-                                print("\nGetUniversityView.swift")
-                                print("* * * * * * * * * * * * * * * * * *\n\n")
                             }
                         }
                     } catch {
                         print("JSON 디코딩 실패: \(error.localizedDescription)")
-                        print("\nGetUniversityView.swift")
-                        print("* * * * * * * * * * * * * * * * * *\n\n")
                     }
                 } else {
                     print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
-                    print("\nGetUniversityView.swift")
-                    print("* * * * * * * * * * * * * * * * * *\n\n")
                 }
             }
         }

@@ -63,14 +63,8 @@ struct OnboardingView: View {
     func loginWithKakaoAccount() {
         UserApi.shared.loginWithKakaoAccount { (oauthToken, error) in
             if let error = error {
-                print("* * * * * * * * * * * * * * * * * *")
-                print("OnboardingView.swift\n")
                 print("로그인 실패: \(error.localizedDescription)")
-                print("\nOnboardingView.swift")
-                print("* * * * * * * * * * * * * * * * * *\n\n")
             } else {
-                print("* * * * * * * * * * * * * * * * * *")
-                print("OnboardingView.swift\n")
                 print("로그인 성공")
                 
                 self.accessToken = oauthToken?.accessToken
@@ -90,10 +84,8 @@ struct OnboardingView: View {
     }
     
     func sendAccessTokenToBackend(accessToken: String) {
-        guard let url = URL(string: "http://121.151.45.73:8080/api/kakao/login/access?accessToken=\(accessToken)") else {
+        guard let url = URL(string: "http://220.89.75.210:8080/api/kakao/login/access?accessToken=\(accessToken)") else {
             print("Invalid URL")
-            print("\nOnboardingView.swift")
-            print("* * * * * * * * * * * * * * * * * *\n\n")
             return
         }
         
@@ -103,8 +95,6 @@ struct OnboardingView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("HTTP request failed: \(error.localizedDescription)")
-                print("\nOnboardingView.swift")
-                print("* * * * * * * * * * * * * * * * * *\n\n")
                 return
             }
             
@@ -116,6 +106,7 @@ struct OnboardingView: View {
                 do {
                     let userInfo = try JSONDecoder().decode(User.self, from: data)
                     DispatchQueue.main.async {
+                        print("Onboarding view")
                         print("ID: \(userInfo.id)")
                         print("닉네임: \(userInfo.nickname)")
                         print("이메일: \(userInfo.email ?? "temp")")
@@ -130,25 +121,19 @@ struct OnboardingView: View {
                         UserDefaults.standard.removeObject(forKey: "userWalletId")
                         UserDefaults.standard.removeObject(forKey: "userPassword")
                         UserDefaults.standard.removeObject(forKey: "userUniversity")
-                        UserDefaults.standard.removeObject(forKey: "userUniversityCheck")
+                        UserDefaults.standard.removeObject(forKey: "checkUniversity")
                         UserDefaults.standard.removeObject(forKey: "userEmail")
                         UserDefaults.standard.removeObject(forKey: "userUniversityCheck")
                         UserDefaults.standard.set(userInfo.nickname, forKey: "userNickname")
                         UserDefaults.standard.set(userInfo.jwtToken, forKey: "jwtToken")
                         UserDefaults.standard.set(userInfo.serverUserId, forKey: "userId")
-                        
-                        
+                                
                         for (key, value) in UserDefaults.standard.dictionaryRepresentation() {
                           print("\(key) = \(value) \n")
                         }
-                        
-                        print("\nOnboardingView.swift")
-                        print("* * * * * * * * * * * * * * * * * *\n\n")
                     }
                 } catch {
                     print("Failed to decode JSON: \(error.localizedDescription)")
-                    print("\nOnboardingView.swift")
-                    print("* * * * * * * * * * * * * * * * * *\n\n")
                 }
             }
         }
@@ -157,7 +142,7 @@ struct OnboardingView: View {
     }
     
     func clearAuthenticatedUserList() {
-        guard let url = URL(string: "http://121.151.45.73:8080/api/univcert/clear-list") else {
+        guard let url = URL(string: "http://220.89.75.210:8080/api/univcert/clear-list") else {
             print("Invalid URL for clearing user list")
             return
         }
