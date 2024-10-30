@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var isExpanded = true
-    @State private var showCertification = false
+    @StateObject private var walletViewModel = WalletViewModel()
+    
     @AppStorage("userNickname") var nickname: String = ""
     @AppStorage("userWalletId") var walletId: String = ""
     @AppStorage("userEmail") var email: String = ""
     @AppStorage("userUniversity") var univName: String = ""
     @AppStorage("checkUniversity") var univCheck: Bool = false
     @AppStorage("userPdfUrls") var pdfUrls: String = ""
-
-    @StateObject private var walletViewModel = WalletViewModel()
     
+    @State private var isExpanded = true
+    @State private var showCertification = false
+
     var body: some View {
         VStack {
             HStack {

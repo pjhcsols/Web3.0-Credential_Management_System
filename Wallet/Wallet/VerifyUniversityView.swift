@@ -11,13 +11,16 @@ struct VerifyUniversityView: View {
     @ObservedObject private var walletViewModel = WalletViewModel()
     
     @AppStorage("userUniversity") var univName: String = ""
-    @AppStorage("userEmail") private var storedEmail: String = ""
+    @AppStorage("userEmail") private var email: String = ""
     @AppStorage("userVerified") var userVerify: Bool = false
     @AppStorage("userWalletId") var walletId: String = ""
     @AppStorage("checkUniversity") var univCheck: Bool = false
     @AppStorage("userPdfUrls") var pdfUrls: String = ""
     
-    @State private var email: String = ""
+
+    
+    @State private var selectedPdfData: Data? = nil
+    @State private var showDocumentPicker = false
     @State private var codeInput: String = ""
     @State private var isCodeSent: Bool = false
     @State private var navigateToContentView: Bool = false
@@ -41,7 +44,6 @@ struct VerifyUniversityView: View {
                     .cornerRadius(6)
                     .padding(.bottom, 10)
                     .frame(width: 300)
-                    .onChange(of: email) { newValue in storedEmail = newValue }
                 Button(action: {
                     sendCode()
                 }) {
@@ -55,7 +57,7 @@ struct VerifyUniversityView: View {
                                 .stroke(Color(red: 218/255, green: 33/255, blue: 39/255), lineWidth: 1)
                         )
                 }
-                .padding(.bottom, 48)
+                .padding(.bottom, 32)
                 
                 Text("이메일로 전송된\n인증 코드를 입력해주세요")
                     .font(.title3)
@@ -65,8 +67,26 @@ struct VerifyUniversityView: View {
                     .background(Color(UIColor.systemGray6))
                     .cornerRadius(6)
                     .frame(width: 300)
+                    .padding(.bottom, 32)
+                
+                Text("(선택)재학증 업로드")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                Button(action: { showDocumentPicker = true }) {
+                    Text("내 파일에서 찾기")
+                        .foregroundColor(Color.blue)
+                        .frame(width:300, height: 50)
+                        .background(Color.clear)
+                        .cornerRadius(10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color.blue)
+                        )
+                }
+                
                 Spacer()
                 Spacer()
+                
                 Button(action: {
                     verifyCode()
                     print("인증 코드: \(codeInput)")
@@ -88,8 +108,13 @@ struct VerifyUniversityView: View {
             }
             .padding()
             .ignoresSafeArea(.keyboard)
-            .onAppear {
-                email = storedEmail
+            .sheet(isPresented: $showDocumentPicker) {
+                DocumentPicker(selectedPdfData: $selectedPdfData)
+            }
+            .onChange(of: selectedPdfData) { newData in
+                if let pdfData = newData {
+                    registerUnivPdf(pdfData: pdfData)
+                }
             }
         }
     }
@@ -189,19 +214,19 @@ struct VerifyUniversityView: View {
            let storedPdfUrlsData = storedPdfUrlsString.data(using: .utf8) {
             do {
                 let storedPdfUrls = try JSONDecoder().decode([String: String].self, from: storedPdfUrlsData)
-                print("저장된 PDF URLs (디코딩 후) VerifyContentView: \(storedPdfUrls)")
+                print("이미 저장되어 있지롱 VerifyContentView: \(storedPdfUrls)")
                 
                 if !storedPdfUrls.isEmpty {
                     self.navigateToContentView = true
                 } else {
-                    registerUnivPdf()
+                    registerEmptyPdf()
                 }
             } catch {
                 print("저장된 PDF URLs 디코딩 실패: \(error)")
-                registerUnivPdf()
+                registerEmptyPdf()
             }
         } else {
-            registerUnivPdf()
+            registerEmptyPdf()
         }
     }
 
@@ -235,7 +260,7 @@ struct VerifyUniversityView: View {
         task.resume()
     }
     
-    private func registerUnivPdf() {
+    private func registerEmptyPdf() {
         print("\nregisterPdf()")
         guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
             print("대학교 이름 인코딩 실패")
@@ -244,7 +269,7 @@ struct VerifyUniversityView: View {
         
         let userEmail = email
 
-        print("(registerUnivPdf)walletId: \(walletId)")
+        print("(registerEmptyPdf)walletId: \(walletId)")
         print("user mail: \(userEmail)")
         print("encoded userUniversity: \(encodedUnivName)")
         print("uniVerified: \(univCheck)")
@@ -300,10 +325,59 @@ struct VerifyUniversityView: View {
         }
         task.resume()
     }
-}
+    
+    private func registerUnivPdf(pdfData: Data) {
+           guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
+               print("대학교 이름 인코딩 실패")
+               return
+           }
+           
+           let userEmail = email
+           guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/register?walletId=\(walletId)&email=\(userEmail)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+               print("유효하지 않은 URL입니다.")
+               return
+           }
+           
+           var request = URLRequest(url: url)
+           request.httpMethod = "POST"
+           
+           let boundary = UUID().uuidString
+           request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+           
+           var body = Data()
+           body.append("--\(boundary)\r\n".data(using: .utf8)!)
+           body.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.pdf\"\r\n".data(using: .utf8)!)
+           body.append("Content-Type: application/pdf\r\n\r\n".data(using: .utf8)!)
+           body.append(pdfData)
+           body.append("\r\n".data(using: .utf8)!)
+           body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+           
+           request.httpBody = body
+           print("HTTP Body Set: \(body.count) bytes of data")
 
-#Preview {
-    VerifyUniversityView()
+           let task = URLSession.shared.dataTask(with: request) { data, response, error in
+               if let error = error {
+                   print("요청 실패: \(error.localizedDescription)")
+                   return
+               }
+               
+               if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 {
+                   if let data = data, let responseString = String(data: data, encoding: .utf8) {
+                       print("서버 응답 데이터: \(responseString)")
+                       
+                       DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                           walletViewModel.getWallet()
+                       }
+                   }
+               } else {
+                   print("서버 오류: 상태 코드 \((response as? HTTPURLResponse)?.statusCode ?? -1)")
+                   if let data = data, let errorResponse = String(data: data, encoding: .utf8) {
+                       print("서버 오류 응답: \(errorResponse)")
+                   }
+               }
+           }
+           task.resume()
+       }
 }
 
 #Preview {

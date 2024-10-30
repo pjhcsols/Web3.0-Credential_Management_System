@@ -15,7 +15,7 @@ struct CertificationListView: View {
     @State private var selectedCertification: Certification?
     @State private var certificationList: [Certification] = []
     @State private var isShowingPDF = false
-    @State private var selectedPDFURL = URL(string: "https://s3.ap-northeast-2.amazonaws.com/basilium-product-bucket/10_student_certifications.pdf")
+    @State private var selectedPDFURL = URL(string: "https://s3.ap-northeast-2.amazonaws.com/basilium-product-bucket/3_student_certifications.pdf")
     
     var body: some View {
         VStack(alignment: .leading){

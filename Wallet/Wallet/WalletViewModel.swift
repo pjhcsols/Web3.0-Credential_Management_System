@@ -10,7 +10,6 @@ import Foundation
 class WalletViewModel: ObservableObject {
     @Published var isWalletExists = false
     @Published var walletResponse: Wallet?
-    @Published var navigateToContentView = false
     
     private var jwtToken = UserDefaults.standard.string(forKey: "jwtToken")
 
@@ -70,7 +69,6 @@ class WalletViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self?.walletResponse = walletResponse
                     self?.isWalletExists = true
-                    self?.navigateToContentView = true
                 }
                 
                 print("지갑 정보(get): \(walletResponse)")

@@ -29,6 +29,7 @@
 		A26B8D542CCE81DB005EC6CF /* KakaoSDKUser in Frameworks */ = {isa = PBXBuildFile; productRef = A26B8D532CCE81DB005EC6CF /* KakaoSDKUser */; };
 		A26B8D562CCE81EC005EC6CF /* KakaoSDKFriendResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = A26B8D552CCE81EC005EC6CF /* KakaoSDKFriendResources.bundle */; };
 		A26B8D582CD0C334005EC6CF /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26B8D572CD0C334005EC6CF /* WalletViewModel.swift */; };
+		A26B8D5A2CD269DB005EC6CF /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A26B8D592CD269DB005EC6CF /* DocumentPicker.swift */; };
 		A27AE2A12CB3B8ED005F9A31 /* LockByCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27AE2A02CB3B8ED005F9A31 /* LockByCodeView.swift */; };
 		A27AE2A32CB4F9B0005F9A31 /* LockByBioView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27AE2A22CB4F9B0005F9A31 /* LockByBioView.swift */; };
 		A27B12C12CA94BDB004AAF23 /* WalletApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A27B12C02CA94BDB004AAF23 /* WalletApp.swift */; };
@@ -75,6 +76,7 @@
 		A25F24D52CC514F900908411 /* VerifyUniversityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyUniversityView.swift; sourceTree = "<group>"; };
 		A26B8D552CCE81EC005EC6CF /* KakaoSDKFriendResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = KakaoSDKFriendResources.bundle; path = "../../../../Library/Developer/Xcode/DerivedData/Wallet-fvsvhaaqqzrubtbjvgzidkaovghx/SourcePackages/checkouts/kakao-ios-sdk/Sources/KakaoSDKFriendCore/KakaoSDKFriendResources.bundle"; sourceTree = "<group>"; };
 		A26B8D572CD0C334005EC6CF /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
+		A26B8D592CD269DB005EC6CF /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		A27AE2A02CB3B8ED005F9A31 /* LockByCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockByCodeView.swift; sourceTree = "<group>"; };
 		A27AE2A22CB4F9B0005F9A31 /* LockByBioView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockByBioView.swift; sourceTree = "<group>"; };
 		A27B12BD2CA94BDB004AAF23 /* Wallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -164,6 +166,7 @@
 				A25F24D12CC4BB8300908411 /* GetUniversityView.swift */,
 				A25F24D52CC514F900908411 /* VerifyUniversityView.swift */,
 				A26B8D572CD0C334005EC6CF /* WalletViewModel.swift */,
+				A26B8D592CD269DB005EC6CF /* DocumentPicker.swift */,
 				A27B12C22CA94BDB004AAF23 /* ContentView.swift */,
 				A27B13082CB0E721004AAF23 /* CertificationListView.swift */,
 				A25C92FB2CB7E2E80015C068 /* AddCertificationView.swift */,
@@ -381,6 +384,7 @@
 				A25F24D62CC514F900908411 /* VerifyUniversityView.swift in Sources */,
 				A25F24C92CC162E000908411 /* GenerateKeyPair.swift in Sources */,
 				A25C92FC2CB7E2E80015C068 /* AddCertificationView.swift in Sources */,
+				A26B8D5A2CD269DB005EC6CF /* DocumentPicker.swift in Sources */,
 				A26B8D582CD0C334005EC6CF /* WalletViewModel.swift in Sources */,
 				A27AE2A32CB4F9B0005F9A31 /* LockByBioView.swift in Sources */,
 				A27AE2A12CB3B8ED005F9A31 /* LockByCodeView.swift in Sources */,
