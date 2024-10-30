@@ -34,8 +34,7 @@ struct ContentView: View {
                             .font(.title)
                             .foregroundColor(.gray)
                     }
-                    Button(action: {
-                    }) {
+                    NavigationLink(destination: SettingView().navigationBarBackButtonHidden(true)) {
                         Image(systemName: "gearshape")
                             .font(.title)
                             .foregroundColor(.gray)
@@ -66,11 +65,11 @@ struct ContentView: View {
                             .padding(.top, 24)
                             .padding(.leading, 24)
                         Spacer()
-                        Text("2024.01.01.")
-                            .font(.subheadline)
-                            .foregroundColor(.black)
-                            .padding(.top, 24)
-                            .padding(.trailing, 24)
+//                        Text("2024.01.01.")
+//                            .font(.subheadline)
+//                            .foregroundColor(.black)
+//                            .padding(.top, 24)
+//                            .padding(.trailing, 24)
                     }
                     Text(nickname)
                         .font(isExpanded ? .title : .title2)
