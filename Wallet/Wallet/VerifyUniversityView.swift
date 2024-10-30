@@ -117,6 +117,7 @@ struct VerifyUniversityView: View {
                 }
             }
         }
+        .ignoresSafeArea(.keyboard)
     }
     
     private func sendCode() {

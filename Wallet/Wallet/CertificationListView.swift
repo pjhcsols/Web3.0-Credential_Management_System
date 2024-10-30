@@ -1,5 +1,5 @@
 //
-//  HistoryListView.swift
+//  CertificationListView.swift
 //  Wallet
 //
 //  Created by Seah Kim on 10/5/24.
@@ -11,6 +11,7 @@ import PDFKit
 struct CertificationListView: View {
     @AppStorage("userPdfUrls") var pdfUrls: String = ""
     @AppStorage("certificationList") private var certificationListData: Data?
+    @AppStorage("userWalletId") var walletId: String = ""
     
     @State private var selectedCertification: Certification?
     @State private var certificationList: [Certification] = []
@@ -18,32 +19,41 @@ struct CertificationListView: View {
     @State private var selectedPDFURL = URL(string: "https://s3.ap-northeast-2.amazonaws.com/basilium-product-bucket/3_student_certifications.pdf")
     
     var body: some View {
-        VStack(alignment: .leading){
+        VStack(alignment: .leading) {
             Spacer()
             Text("내 인증서")
                 .font(.title)
                 .fontWeight(.bold)
                 .padding()
-            List(certificationList) { item in
-                VStack(alignment: .leading) {
-                    Button(action: {
-                        selectedCertification = item
-                        fetchPDFURL(for: item.name)
-                        print("\(item.name) clicked")
-                    }) {
-                        HStack {
-                            Text(item.name)
-                                .font(.body)
-                                .fontWeight(.medium)
-                            Spacer()
-                            Text("보기")
-                                .font(.body)
-                                .foregroundColor(Color(red: 218/255, green: 33/255, blue: 39/255))
+            List {
+                ForEach(certificationList) { item in
+                    VStack(alignment: .leading) {
+                        Button(action: {
+                            selectedCertification = item
+                            fetchPDFURL(for: item.name)
+                            print("\(item.name) clicked")
+                        }) {
+                            HStack {
+                                Text(item.name)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                Spacer()
+                                Text("보기")
+                                    .font(.body)
+                                    .foregroundColor(Color(red: 218/255, green: 33/255, blue: 39/255))
+                            }
+                            .background(Color.white)
                         }
-                        .background(Color.white)
+                        .buttonStyle(PlainButtonStyle())
+                        .listRowInsets(EdgeInsets())
                     }
-                    .buttonStyle(PlainButtonStyle())
-                    .listRowInsets(EdgeInsets())
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            deleteCertification(item)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
                 }
             }
             .listStyle(PlainListStyle())
@@ -79,7 +89,6 @@ struct CertificationListView: View {
             return
         }
         
-        // Find the first matching key that starts with baseCertificationName
         if let pdfURLString = pdfDict.first(where: { $0.key.starts(with: baseCertificationName) })?.value,
            let pdfURL = URL(string: pdfURLString) {
             selectedPDFURL = pdfURL
@@ -89,6 +98,81 @@ struct CertificationListView: View {
             print("PDF URL lookup failed: no matching key found")
         }
     }
+    
+    private func deleteCertification(_ certification: Certification) {
+        guard let pdfDict = try? JSONDecoder().decode([String: String].self, from: pdfUrls.data(using: .utf8) ?? Data()) else {
+            print("Failed to decode PDF URLs from userPdfUrls")
+            return
+        }
+
+        print("PDF URLs Dictionary: \(pdfDict)")
+        
+        let baseCertificationName = certification.name.split(separator: "_").first.map(String.init) ?? certification.name
+        guard let pdfUrl = pdfDict.first(where: { $0.key.starts(with: baseCertificationName) })?.value else {
+            print("No URL found for certification \(certification.name)")
+            return
+        }
+        
+        guard let userWalletId = Int(walletId) else {
+            print("Failed to convert walletId to Int")
+            return
+        }
+        
+        deletePDFFile(pdfUrl: pdfUrl, walletId: userWalletId, certificateName: certification.name) { success in
+            if success {
+                // Remove from local list and save updated list to AppStorage
+                if let index = certificationList.firstIndex(where: { $0.id == certification.id }) {
+                    certificationList.remove(at: index)
+                    saveCertifications()
+                    print("Certification \(certification.name) deleted successfully.")
+                }
+            }
+        }
+    }
+
+
+    
+    private func saveCertifications() {
+        if let encoded = try? JSONEncoder().encode(certificationList) {
+            certificationListData = encoded
+        }
+    }
+    
+    private func deletePDFFile(pdfUrl: String, walletId: Int, certificateName: String, completion: @escaping (Bool) -> Void) {
+        // Encode pdfUrl for safe transmission
+        guard let encodedPdfUrl = pdfUrl.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+              let url = URL(string: "http://220.89.75.210:8080/api/certifications/delete-pdf?pdfUrl=\(encodedPdfUrl)&walletId=\(walletId)&certificateName=\(certificateName)") else {
+            print("Invalid URL for deletion request")
+            completion(false)
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error deleting certification: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                if httpResponse.statusCode == 200 {
+                    print("Certification deleted successfully from server.")
+                    completion(true)
+                } else {
+                    print("Failed to delete certification from server with status code: \(httpResponse.statusCode)")
+                    completion(false)
+                }
+            } else {
+                print("Failed to cast response as HTTPURLResponse")
+                completion(false)
+            }
+        }
+        task.resume()
+    }
+
 }
 
 struct PDFViewer: View {
@@ -132,8 +216,4 @@ struct PDFKitView: UIViewRepresentable {
     }
 
     func updateUIView(_ pdfView: PDFView, context: Context) {}
-}
-
-#Preview {
-    CertificationListView()
 }

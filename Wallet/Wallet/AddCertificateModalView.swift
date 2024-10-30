@@ -156,14 +156,16 @@ struct AddCertificateModalView: View {
             return
         }
                 
-        guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/replace-pdf?page=1&walletId=\(walletId)&certificateName=\(encodeCertName)") else {
-            print("유효하지 않은 URL입니다.")
-            return
-        }
-//        guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/register?walletId=\(walletId)&email=\(userEmail)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+//        guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/replace-pdf?page=1&walletId=\(walletId)&certificateName=\(encodeCertName)") else {
 //            print("유효하지 않은 URL입니다.")
 //            return
 //        }
+        guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/register?walletId=\(walletId)&email=\(userEmail)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+            print("유효하지 않은 URL입니다.")
+            return
+        }
+        
+        
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
