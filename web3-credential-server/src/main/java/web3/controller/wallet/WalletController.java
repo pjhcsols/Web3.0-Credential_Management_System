@@ -13,6 +13,7 @@ import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
 import web3.service.wallet.WalletService;
 import web3.validation.LoginMember;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,10 +52,11 @@ public class WalletController {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청")
             }
     )
-    public ResponseEntity<Wallet> createWallet(@LoginMember User loginUser) throws WalletAlreadyExistsException {
+    public ResponseEntity<Wallet> createWallet(@LoginMember User loginUser) throws WalletAlreadyExistsException, NoSuchAlgorithmException {
         Wallet wallet = walletService.createWallet(loginUser);
         return new ResponseEntity<>(wallet, HttpStatus.CREATED);
     }
+
 
     @PutMapping("/{id}")
     @Operation(
@@ -68,9 +70,8 @@ public class WalletController {
     public ResponseEntity<Wallet> updateWallet(
             @PathVariable Long id,
             @RequestParam String privateKey,
-            @RequestParam String publicKey,
-            @RequestParam String address) {
-        Wallet updatedWallet = walletService.updateWallet(id, privateKey, publicKey, address);
+            @RequestParam String publicKey) {
+        Wallet updatedWallet = walletService.updateWallet(id, privateKey, publicKey);
         return ResponseEntity.ok(updatedWallet);
     }
 

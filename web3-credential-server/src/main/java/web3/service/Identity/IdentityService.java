@@ -16,6 +16,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 import web3.domain.wallet.Wallet;
 import web3.exception.S3.S3UploadException;
+import web3.properties.RsaProperties;
 import web3.properties.S3Properties;
 import web3.repository.wallet.WalletRepository;
 
@@ -27,26 +28,50 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 
 
 import web3.service.dto.Identity.PassportCertificationDto;
 import web3.service.dto.Identity.StudentCertificationDto;
 
+import javax.crypto.Cipher;
+
 @Service
 @Slf4j
 public class IdentityService {
     private final S3Properties s3Properties;
+    private final RsaProperties rsaProperties;
     private final S3Client s3Client;
     private final WalletRepository walletRepository;
 
     @Autowired
-    public IdentityService(S3Properties s3Properties, WalletRepository walletRepository) {
+    public IdentityService(S3Properties s3Properties, WalletRepository walletRepository, RsaProperties rsaProperties) {
         this.s3Properties = s3Properties;
         this.s3Client = s3Properties.getS3Client();
         this.walletRepository = walletRepository;
+        this.rsaProperties = rsaProperties;
+    }
+
+    // RSA 암호화 로직 메서드
+    private String encryptMetadata(String metadata, PublicKey publicKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        byte[] encryptedBytes = cipher.doFinal(metadata.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(encryptedBytes);
+    }
+
+    // RSA 복호화 로직 메서드
+    private String decryptMetadata(String encryptedMetadata, PrivateKey privateKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedMetadata));
+        return new String(decryptedBytes, StandardCharsets.UTF_8);
     }
 
     @Transactional
@@ -71,8 +96,20 @@ public class IdentityService {
             throw new RuntimeException("파일 처리 중 오류 발생", e);
         }
 
+        // RSA 암호화 및 복호화 키 설정
+        PublicKey publicKey = wallet.getPublicKeyDecoder();  // 공개키 객체로 변환
+
+        String encryptedMetadata;
+        // 공개키로 암호화
+        try {
+            encryptedMetadata = encryptMetadata(metadataString, publicKey);
+        } catch (Exception e) {
+            throw new RuntimeException("메타데이터 암호화 중 오류 발생", e);
+        }
+
         HashMap<String, String> metadata = new HashMap<>();
-        metadata.put(metadataKey, metadataString);
+
+        metadata.put(metadataKey, encryptedMetadata);
 
         log.info("metadata = {}", metadata);
         uploadToS3(fileName, metadata, result);
@@ -80,8 +117,7 @@ public class IdentityService {
         // PDF 파일 해시값 생성
         String pdfHash = generatePdfHash(result);
         // 지갑에 해시값 추가
-        wallet.addToPublicKey(pdfHash); // addToPublicKey 메서드는 Wallet 엔티티 내에서 정의
-
+        wallet.updatePdfHash(metadataKey, pdfHash);
         wallet.updatePdfUrl(metadataKey, getPdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
     }
@@ -119,9 +155,20 @@ public class IdentityService {
             throw new RuntimeException("파일 처리 중 오류 발생", e);
         }
 
-        // 메타데이터를 HashMap에 저장합니다.
+        // RSA 암호화 및 복호화 키 설정
+        PublicKey publicKey = wallet.getPublicKeyDecoder();  // 공개키 객체로 변환
+
+        String encryptedMetadata;
+        // 공개키로 암호화
+        try {
+            encryptedMetadata = encryptMetadata(metadataString, publicKey);
+        } catch (Exception e) {
+            throw new RuntimeException("메타데이터 암호화 중 오류 발생", e);
+        }
+
         HashMap<String, String> metadata = new HashMap<>();
-        metadata.put(metadataKey, metadataString);
+
+        metadata.put(metadataKey, encryptedMetadata);
 
         log.info("metadata = {}", metadata);
         uploadToS3(fileName, metadata, result);
@@ -129,7 +176,7 @@ public class IdentityService {
         // PDF 파일 해시값 생성
         String pdfHash = generatePdfHash(result);
         // 지갑에 해시값 추가
-        wallet.addToPublicKey(pdfHash); // addToPublicKey 메서드는 Wallet 엔티티 내에서 정의
+        wallet.updatePdfHash(metadataKey, pdfHash);
         wallet.updatePdfUrl(metadataKey, getPdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
     }
@@ -151,6 +198,44 @@ public class IdentityService {
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("해시 알고리즘을 찾을 수 없습니다.", e);
+        }
+    }
+
+    public List<Map.Entry<String, String>> getContentsForCertName(String pdfUrl, String certName, Long walletId) {
+        try {
+            // 파일 이름 추출 및 S3에서 메타데이터 가져오기
+            String fileName = extractKeyFromUrl(pdfUrl);
+            GetObjectResponse getObjectResponse = s3Client.getObject(getGetObjectRequest(fileName)).response();
+
+            // 주어진 certName과 walletId에 해당하는 메타데이터 찾기
+            String value = Optional.ofNullable(
+                    decodeMetadata(getObjectResponse.metadata()).entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(certName + "_") && entry.getKey().endsWith(walletId.toString()))
+                            .map(Map.Entry::getValue)
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("조건에 맞는 메타데이터가 없습니다."))
+            ).orElseThrow();
+
+            log.info("[RSA 디코딩 및 JSON 파싱 진행중]");
+            log.info("암호화된 메타데이터: {}", value);
+
+            // 월렛에서 개인키 가져오기
+            PrivateKey privateKey = walletRepository.findById(walletId)
+                    .map(Wallet::getPrivateKeyDecoder)
+                    .orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+            String decryptedValue = decryptMetadata(value, privateKey);
+            log.info("복호화된 메타데이터: {}", decryptedValue);
+            log.info("[메타데이터 전송 완료]");
+            // JSON 파싱 후 (key, value) 형태로 변환하여 리스트로 반환
+            return new ObjectMapper().readValue(decryptedValue, new TypeReference<Map<String, Object>>() {})
+                    .entrySet().stream()
+                    .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().toString()))
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("오류 발생: {}", e.getMessage(), e);
+            return Collections.emptyList();  // 예외 발생 시 빈 리스트 반환
         }
     }
 
@@ -395,7 +480,7 @@ public class IdentityService {
     }
 
     @Transactional
-    public HashMap<String, String> getPdfMetadata( String pdfUrl) {
+    public HashMap<String, String> getPdfMetadata(String pdfUrl) {
         HashMap<String, String> metadata;
         String fileName = extractKeyFromUrl(pdfUrl);
 
@@ -461,51 +546,6 @@ public class IdentityService {
         }
 
         return certNames; // Set 형태로 반환
-    }
-
-
-    public List<Map.Entry<String, String>> getContentsForCertName(String pdfUrl, String certName, Long walletId) {
-        String fileName = extractKeyFromUrl(pdfUrl);
-        GetObjectRequest getRequest = getGetObjectRequest(fileName);
-        GetObjectResponse getObjectResponse = s3Client.getObject(getRequest).response();
-        String value = null;
-        List<Map.Entry<String, String>> tuples = new ArrayList<>();
-
-        // 메타데이터 디코딩
-        Map<String, String> metadata = decodeMetadata(getObjectResponse.metadata());
-
-        // 주어진 certName과 walletId에 해당하는 메타데이터 찾기
-        for (String key : metadata.keySet()) {
-            if (key.startsWith(certName + "_") && key.endsWith(walletId.toString())) {
-                value = metadata.get(key);
-                break;
-            }
-        }
-
-        // value 값이 없는 경우 null 처리
-        if (value == null) {
-            return tuples; // 빈 리스트 반환
-        }
-
-        // JSON 파싱을 위해 ObjectMapper 사용
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            // JSON 형식으로 저장된 value를 Map으로 변환
-            Map<String, Object> parsedJson = objectMapper.readValue(value, new TypeReference<Map<String, Object>>() {});
-
-            // Map의 각 항목을 (key, value) 형태로 변환하여 리스트에 추가
-            for (Map.Entry<String, Object> entry : parsedJson.entrySet()) {
-                tuples.add(new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().toString()));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            // 오류 발생 시 빈 리스트 반환
-            return tuples;
-        }
-
-        System.out.println("tuples = " + tuples);
-        return tuples;
     }
 
     private GetObjectRequest getGetObjectRequest(String fileName) {

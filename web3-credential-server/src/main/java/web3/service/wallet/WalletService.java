@@ -9,6 +9,8 @@ import web3.exception.wallet.WalletAlreadyExistsException;
 import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
 import web3.repository.wallet.WalletRepository;
 
+import java.security.*;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,15 +26,22 @@ public class WalletService {
         this.walletRepository = walletRepository;
     }
 
-    //지갑 생성
-    public Wallet createWallet(User user) throws WalletAlreadyExistsException {
+    public Wallet createWallet(User user) throws WalletAlreadyExistsException, NoSuchAlgorithmException {
         Optional<Wallet> existingWallet = walletRepository.findByUser(user);
         if (existingWallet.isPresent()) {
             throw new WalletAlreadyExistsException("User already has a wallet");
         }
-        //pk에 uuid
-        String privateKey = UUID.randomUUID().toString();
-        Wallet wallet = new Wallet(user, privateKey);
+
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048, new SecureRandom());
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+
+        // 공개키와 개인키를 PEM 형식의 문자열로 변환
+        String publicKeyString = Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded());
+        String privateKeyString = Base64.getEncoder().encodeToString(keyPair.getPrivate().getEncoded());
+
+        // 지갑 생성
+        Wallet wallet = new Wallet(user, privateKeyString, publicKeyString);
         return walletRepository.save(wallet);
     }
 
@@ -47,7 +56,7 @@ public class WalletService {
     }
 
     // 지갑 업데이트,더티체킹 update 사용안함
-    public Wallet updateWallet(Long id, String privateKey, String publicKey, String address) {
+    public Wallet updateWallet(Long id, String privateKey, String publicKey) {
         Wallet existingWallet = walletRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
         existingWallet.updateWallet(privateKey, publicKey);
@@ -76,8 +85,5 @@ public class WalletService {
         return wallet;
     }
 
-    private boolean matchPrivateKey(String privateKey, Wallet wallet) {
-        return wallet.getPrivateKey().equals(privateKey);
-    }
 
 }

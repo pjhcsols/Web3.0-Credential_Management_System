@@ -1,14 +1,12 @@
 INSERT INTO users (email, password)
 VALUES
     ('pjhcsols@naver.com', '$2a$10$ENYqGvZ3p6LvtsBnRWINSOJHKlMt1Ykgb3.jCnoKkrhMihviXhkDu'),
-    ('exampleuser@example.com', '$2a$10$EXAMPLEHASHFORUSERPASSWORD'),
-    ('3751271433', '$2a$10$ENYqGvZ3p6LvtsBnRWINSOJHKlMt1Ykgb3.jCnoKkrhMihviXhkDu');
+    ('exampleuser@example.com', '$2a$10$EXAMPLEHASHFORUSERPASSWORD');
 
 INSERT INTO wallets (user_id, private_key, public_key)
 VALUES
-    (1, 'privateKeyForUser1', 'publicKeyForUser1'),
-    (2, 'privateKeyForUser2', 'publicKeyForUser2'),
-    (3, 'privateKeyForUser3', 'publicKeyForUser3');
+    (1, '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'),
+    (2, 'privateKeyForUser2', 'publicKeyForUser2');
 
 INSERT INTO wallet_pdf_urls (wallet_id, certificate_type, pdf_url)
 VALUES
@@ -16,3 +14,7 @@ VALUES
     (1, '여권_1', 'https://s3.ap-northeast-2.amazonaws.com/basilium-product-bucket/1_passport_certification.pdf'),
     (2, '재학증_2', null);
 
+INSERT INTO wallet_pdf_hash (wallet_id, certificate_type, pdf_hash)
+VALUES
+    (1, '재학증_1', '82a9ba18e4f8c3bbf64b9500ecd8b7701371db05f32887fc2835447d66cfa8e8'),
+    (1, '여권_1', 'd2c70bf0b298e152e95649cfeb21c4d9a698b052ee62c0c70d9aa9b4ac6f6325');
