@@ -1,5 +1,5 @@
 package web3.s3Storage.controller;
-
+/*
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 @RestController
 @RequestMapping("/api/wallets")
 public class S3StorageController {
@@ -140,3 +139,5 @@ public class S3StorageController {
     }
 
 }
+
+ */

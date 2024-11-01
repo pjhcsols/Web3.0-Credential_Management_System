@@ -25,10 +25,12 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 
+import web3.service.dto.Identity.PassportCertificationDto;
 import web3.service.dto.Identity.StudentCertificationDto;
 
 @Service
@@ -47,11 +49,9 @@ public class IdentityService {
 
     @Transactional
     public void registerStudentCertification(Long walletId, StudentCertificationDto certificationDto, MultipartFile file) {
-        // 지갑 조회
         Wallet wallet = walletRepository.findById(walletId)
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
-        // 메타데이터 키 및 문자열 생성
-        // 등록 및 인증시간 포함하기
+
         String metadataKey = "재학증_" + walletId;
         String metadataString = String.format("{\"email\":\"%s\",\"univName\":\"%s\",\"univ_check\":%b,\"certified_date\":\"%s\"}",
                 certificationDto.getEmail(),
@@ -59,41 +59,93 @@ public class IdentityService {
                 certificationDto.isUnivCheck(),
                 certificationDto.getCertifiedDate());
 
-        String fileName = generatePdfFileName(walletId);
+        String fileName = generateStudentPdfFileName(walletId);
         byte[] result;
 
         try {
-            // PDF 처리
-            if (wallet.getPdfUrl() == null) {
-                // 첫 등록일 때 => PDF 생성
-                result = (file.getSize() > 0) ? getFileBytes(file) : createEmptyPdf();
-            } else {
-                // 이미 있을 시 -> PDF 병합
-                String destination = wallet.getPdfUrl();
-                byte[] first = getBytes(destination); // 원래 파일
-                byte[] second = (file.getSize() > 0) ? getFileBytes(file) : createEmptyPdf(); // 새로 추가될 파일
-                result = mergePdfs(first, second); // PDF 병합
-            }
+            String destination = wallet.getPdfUrls().get(metadataKey);
+            result = handlePdfProcessing(destination, file);
         } catch (IOException e) {
-            throw new RuntimeException("Error processing file", e);
+            throw new RuntimeException("파일 처리 중 오류 발생", e);
         }
 
-        // 메타데이터 생성
         HashMap<String, String> metadata = new HashMap<>();
-        metadata.put(metadataKey, metadataString); // 메타데이터 추가
+        metadata.put(metadataKey, metadataString);
 
         log.info("metadata = {}", metadata);
 
-        // S3에 업로드 및 지갑 업데이트
         uploadToS3(fileName, metadata, result);
-        wallet.updatePdfUrl(getPdfUrl(fileName));
+        wallet.updatePdfUrl(metadataKey, getPdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
     }
 
     // PDF 파일 이름 생성하는 메소드
-    private String generatePdfFileName(Long walletId) {
-        return walletId + "_certifications.pdf";
+    private String generateStudentPdfFileName(Long walletId) {
+        return walletId + "_student_certifications.pdf";
     }
+
+    @Transactional
+    public void registerPassportCertification(Long walletId, PassportCertificationDto certificationDto, MultipartFile file) {
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+        String metadataKey = "여권_" + walletId;
+
+        String metadataString = String.format("{\"certPassword\":\"%s\",\"userName\":\"%s\",\"identity\":\"%s\",\"passportNo\":\"%s\",\"issueDate\":\"%s\",\"expirationDate\":\"%s\",\"birthDate\":\"%s\",\"certified_date\":\"%s\"}",
+                certificationDto.getCertPassword(),
+                certificationDto.getUserName(),
+                certificationDto.getIdentity(),
+                certificationDto.getPassportNo(),
+                certificationDto.getIssueDate(),
+                certificationDto.getExpirationDate(),
+                certificationDto.getBirthDate(),
+                certificationDto.getCertifiedDate()
+        );
+
+        String fileName = generatePassportPdfFileName(walletId);
+        byte[] result;
+
+        try {
+            String destination = wallet.getPdfUrls().get(metadataKey);
+            result = handlePdfProcessing(destination, file);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 처리 중 오류 발생", e);
+        }
+
+        // 메타데이터를 HashMap에 저장합니다.
+        HashMap<String, String> metadata = new HashMap<>();
+        metadata.put(metadataKey, metadataString);
+
+        log.info("metadata = {}", metadata);
+
+        // S3에 업로드
+        uploadToS3(fileName, metadata, result);
+        wallet.updatePdfUrl(metadataKey, getPdfUrl(fileName));
+        walletRepository.saveAndFlush(wallet);
+    }
+
+    private String generatePassportPdfFileName(Long walletId) {
+        return walletId + "_passport_certification.pdf";
+    }
+
+    //pdf 병합 로직
+    private byte[] handlePdfProcessing(String destination, MultipartFile file) throws IOException {
+        byte[] first = (destination != null) ? getBytes(destination) : null;
+
+        if (file.getSize() > 0) {
+            byte[] second = getFileBytes(file);
+            return (first != null) ? mergePdfs(first, second) : second; // 기존 PDF와 병합하거나 새 PDF 반환
+        }
+
+        if (first != null) {
+            log.warn("업로드할 파일이 없습니다. 병합을 수행하지 않습니다.");
+            return first; // 기존 PDF만 사용
+        }
+
+        // PDF가 존재하지 않으면 새로 생성합니다.
+        return createEmptyPdf();
+    }
+
 
 
     private byte[] getBytes(String destination) {
@@ -163,15 +215,18 @@ public class IdentityService {
     }
 
     @Transactional
-    public String replacePdfPage(Wallet wallet, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException{
-        // 원래 PDF 가져오기
-        String pdfUrl = wallet.getPdfUrl();
+    public String replacePdfPage(Wallet wallet, String certificateType, int pageNumberToRemove, MultipartFile newPdfFile) throws IOException {
+        // 특정 인증서 타입의 PDF URL 가져오기
+        String pdfUrl = wallet.getPdfUrl(certificateType);
+        if (pdfUrl == null) {
+            throw new RuntimeException("PDF URL not found for certificate type: " + certificateType);
+        }
+
         byte[] originalPdfBytes = getOriginalPdfBytes(pdfUrl);
         String fileName = extractKeyFromUrl(pdfUrl);
 
         // 기존 PDF 로드와 리소스 관리
         PDDocument originalDocument = loadOriginalDocument(originalPdfBytes);
-
         int totalPages = originalDocument.getNumberOfPages();
 
         // 페이지 번호는 0부터 시작하므로 1을 빼줌
@@ -196,11 +251,15 @@ public class IdentityService {
         // 최종 PDF를 S3에 업로드
         uploadToS3(fileName, metadata, finalPdfBytes);
 
+        // 리소스 닫기
         try {
-            originalDocument.close(); // 리소스 닫기
+            originalDocument.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // 최종 PDF URL 업데이트
+        wallet.updatePdfUrl(certificateType, pdfUrl);
 
         return pdfUrl; // 최종 PDF URL 반환
     }
@@ -270,6 +329,30 @@ public class IdentityService {
     }
 
     @Transactional
+    public HashMap<String, String> getCertListByWalletId(Long walletId) {
+        // 지갑을 찾습니다. 주어진 walletId를 사용하여 Wallet 객체를 가져옵니다.
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found")); // 지갑이 존재하지 않으면 예외를 발생시킵니다.
+
+        // 지갑의 PDF URL을 가져옵니다. 지갑의 PDF URL을 Map 형태로 가져옵니다.
+        Map<String, String> pdfUrls = wallet.getPdfUrls();
+        HashMap<String, String> certList = new HashMap<>(); // 인증서 리스트를 저장할 HashMap을 초기화합니다.
+
+        // 각 PDF URL에 대해 인증서 리스트를 가져옵니다.
+        for (String pdfUrl : pdfUrls.values()) { // pdfUrls의 값(PDF URL)을 순회합니다.
+            // getCertList 메서드를 호출하여 메타데이터를 가져옵니다.
+            HashMap<String, String> metadata = getCertList(pdfUrl);
+
+            // 가져온 메타데이터를 certList에 추가합니다.
+            certList.putAll(metadata); // 인증서 리스트에 메타데이터를 병합합니다.
+        }
+
+        return certList; // 최종 인증서 리스트를 반환합니다.
+    }
+
+
+
+    @Transactional
     //인증서 리스트 반환
     public HashMap<String, String> getCertList(String pdfUrl) {
         HashMap<String, String> metadata = getPdfMetadata(pdfUrl);
@@ -308,6 +391,25 @@ public class IdentityService {
         }
 
         return metadata;
+    }
+
+    @Transactional
+    public Set<String> getCertNamesByWalletId(Long walletId) {
+        // 주어진 walletId로 Wallet 객체를 가져옴
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+        // PDF URL 목록 가져오기
+        Map<String, String> pdfUrls = wallet.getPdfUrls();
+
+        Set<String> certNames = new HashSet<>();
+
+        // 각 PDF URL에 대해 인증서 이름 가져오기
+        for (String pdfUrl : pdfUrls.values()) {
+            certNames.addAll(getCertNames(pdfUrl));
+        }
+
+        return certNames; // Set 형태로 반환
     }
 
     @Transactional
@@ -388,8 +490,32 @@ public class IdentityService {
         return getRequest;
     }
 
+    @Transactional
+    public void deleteWalletCertificates(Long walletId) {
+        // Wallet 객체를 DB에서 가져옵니다.
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+
+        // Wallet의 pdfUrls 목록을 순회하며 S3에서 하나씩 삭제합니다.
+        wallet.getPdfUrls().forEach((certificateType, url) -> {
+            String key = extractKeyFromUrl(url);
+            try {
+                s3Client.deleteObject(DeleteObjectRequest.builder()
+                        .bucket(s3Properties.getS3BucketName())
+                        .key(key)
+                        .build());
+            } catch (S3Exception e) {
+                throw new RuntimeException("S3에서 파일 삭제 실패: " + e.getMessage());
+            }
+        });
+
+        // 모든 PDF URL 삭제 후 pdfUrls 맵을 비웁니다.
+        wallet.getPdfUrls().clear(); // 더티 체킹으로 인해 변경사항이 자동 반영됩니다.
+    }
+
+
     @Transactional // 트랜잭션 관리
-    public void deletePdf(String urlToDelete, Long walletId) {
+    public void deletePdf(String urlToDelete, Long walletId, String certificateType) {
         String key = extractKeyFromUrl(urlToDelete);
 
         try {
@@ -403,8 +529,8 @@ public class IdentityService {
             Wallet wallet = walletRepository.findById(walletId)
                     .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
-            // Wallet의 pdfUrl 값을 빈 문자열로 변경
-            wallet.updatePdfUrl(null); // pdfUrl을 빈 문자열로 설정
+            // Wallet의 pdfUrls에서 해당 certificateType 항목 제거
+            wallet.getPdfUrls().remove(certificateType);
 
         } catch (S3Exception e) {
             throw new RuntimeException("Failed to delete photo from S3: " + e.getMessage());
@@ -412,9 +538,10 @@ public class IdentityService {
     }
 
 
+
     @Transactional
-    public void deletePdfForPage(Wallet wallet, int pageNumberToRemove) throws IOException, S3UploadException {
-        String pdfUrl = wallet.getPdfUrl();
+    public void deletePdfForPage(Wallet wallet, String certificateType, int pageNumberToRemove) throws IOException, S3UploadException {
+        String pdfUrl = wallet.getPdfUrl(certificateType); // 인증서 타입을 전달
         byte[] originalPdfBytes = getPdf(pdfUrl).readAllBytes();
         String fileName = extractKeyFromUrl(pdfUrl);
 

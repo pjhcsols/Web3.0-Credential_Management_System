@@ -22,7 +22,7 @@ public class PassportController {
         this.passportService = passportService;
     }
 
-    @Operation(summary = "여권 유효성 검사", description = "여권의 유효성을 검사합니다.")
+    @Operation(summary = "여권 유효성 검사", description = "여권의 유효성을 검사합니다.1")
     @PostMapping("/check-validity")
     public Mono<ResponseEntity<String>> checkPassportValidity(
             @Parameter(description = "여권 요청 정보", required = true)
@@ -40,6 +40,27 @@ public class PassportController {
         String keyFileEncoded = encodeFileToBase64(keyFile);
 
         PassportRequestDto passportRequestDto = new PassportRequestDto(certFileEncoded, keyFileEncoded, certPassword, userName, identity, passportNo, issueDate, expirationDate, birthDate);
+
+        return passportService.checkPassportValidity(passportRequestDto)
+                .map(response -> ResponseEntity.ok("여권 유효성 검사 성공: " + response))
+                .onErrorReturn(ResponseEntity.badRequest().body("여권 유효성 검사에 실패했습니다."));
+    }
+
+    @Operation(summary = "여권 유효성 검사 인코딩 값", description = "여권의 유효성을 검사합니다.2")
+    @PostMapping("/check-validity_2")
+    public Mono<ResponseEntity<String>> checkPassportValidity(
+            @Parameter(description = "여권 요청 정보", required = true)
+            @RequestParam("certFile") String certFile,
+            @RequestParam("keyFile") String keyFile,
+            @RequestParam("certPassword") String certPassword,
+            @RequestParam("userName") String userName,
+            @RequestParam("identity") String identity,
+            @RequestParam("passportNo") String passportNo,
+            @RequestParam("issueDate") String issueDate,
+            @RequestParam("expirationDate") String expirationDate,
+            @RequestParam("birthDate") String birthDate) {
+
+        PassportRequestDto passportRequestDto = new PassportRequestDto(certFile, keyFile, certPassword, userName, identity, passportNo, issueDate, expirationDate, birthDate);
 
         return passportService.checkPassportValidity(passportRequestDto)
                 .map(response -> ResponseEntity.ok("여권 유효성 검사 성공: " + response))

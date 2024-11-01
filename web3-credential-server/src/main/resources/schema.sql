@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS wallet_pdf_urls;
 DROP TABLE IF EXISTS wallets;
 DROP TABLE IF EXISTS users;
 
@@ -10,9 +11,15 @@ CREATE TABLE users (
 CREATE TABLE wallets (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
                          user_id BIGINT NOT NULL,
-                         pdfUrl VARCHAR(255),
-                         privateKey VARCHAR(255) NOT NULL,
-                         publicKey VARCHAR(255) NOT NULL,
+                         private_key VARCHAR(255) NOT NULL,
+                         public_key VARCHAR(255) NOT NULL,
                          FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE wallet_pdf_urls (
+                                 wallet_id BIGINT,
+                                 certificate_type VARCHAR(255),
+                                 pdf_url VARCHAR(255),
+                                 PRIMARY KEY (wallet_id, certificate_type),
+                                 FOREIGN KEY (wallet_id) REFERENCES wallets(id)
+);

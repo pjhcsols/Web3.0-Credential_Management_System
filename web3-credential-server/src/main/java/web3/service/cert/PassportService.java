@@ -32,7 +32,7 @@ public class PassportService {
     private static final String API_URL = "/v1/kr/public/mw/passport-data/status";
     private static final String BASE_TOKEN_URL = "https://oauth.codef.io";
     private static final String ACCESS_TOKEN_URL = "/oauth/token";
-    private static final String CLIENT_ID = "86640213-3b83-461a-97ab-2491d68a2052";
+    private static final String CLIENT_ID = "464ae47d-b662-4f60-b2a9-c80fc9d98c8c";
 
     public PassportService(WebClient.Builder webClientBuilder, PassportProperties passportProperties) {
         this.webClient = webClientBuilder.baseUrl(BASE_URL).build();

@@ -240,7 +240,7 @@ public class KakaoService {
         Map<String, Object> templateObject = new HashMap<>();
         templateObject.put("object_type", "text");
         templateObject.put("text", String.format("지갑 정보\n이메일: %s\nPrivate Key: %s\nPublic Key: %s\n인증서: %s",
-                user.getEmail(), wallet.getPrivateKey(), wallet.getPublicKey(), wallet.getPdfUrl()));
+                user.getEmail(), wallet.getPrivateKey(), wallet.getPublicKey(), wallet.getPdfUrls()));
         templateObject.put("link", Map.of("web_url", "http://your-web-url.com"));
 
         try {
