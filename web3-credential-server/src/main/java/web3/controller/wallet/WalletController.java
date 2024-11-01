@@ -51,11 +51,8 @@ public class WalletController {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청")
             }
     )
-    public ResponseEntity<Wallet> createWallet(
-            @LoginMember User loginUser, // 로그인한 사용자 정보 주입
-            @RequestParam String privateKey,
-            @RequestParam String publicKey) throws WalletAlreadyExistsException {
-        Wallet wallet = walletService.createWallet(loginUser, privateKey, publicKey);
+    public ResponseEntity<Wallet> createWallet(@LoginMember User loginUser) throws WalletAlreadyExistsException {
+        Wallet wallet = walletService.createWallet(loginUser);
         return new ResponseEntity<>(wallet, HttpStatus.CREATED);
     }
 

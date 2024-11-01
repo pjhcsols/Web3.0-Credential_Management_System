@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -64,7 +66,7 @@ public class IdentityService {
 
         try {
             String destination = wallet.getPdfUrls().get(metadataKey);
-            result = handlePdfProcessing(destination, file);
+            result = handlePdfProcessing(destination, file); //pdf 없으면 생성
         } catch (IOException e) {
             throw new RuntimeException("파일 처리 중 오류 발생", e);
         }
@@ -73,8 +75,13 @@ public class IdentityService {
         metadata.put(metadataKey, metadataString);
 
         log.info("metadata = {}", metadata);
-
         uploadToS3(fileName, metadata, result);
+
+        // PDF 파일 해시값 생성
+        String pdfHash = generatePdfHash(result);
+        // 지갑에 해시값 추가
+        wallet.addToPublicKey(pdfHash); // addToPublicKey 메서드는 Wallet 엔티티 내에서 정의
+
         wallet.updatePdfUrl(metadataKey, getPdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
     }
@@ -117,15 +124,34 @@ public class IdentityService {
         metadata.put(metadataKey, metadataString);
 
         log.info("metadata = {}", metadata);
-
-        // S3에 업로드
         uploadToS3(fileName, metadata, result);
+
+        // PDF 파일 해시값 생성
+        String pdfHash = generatePdfHash(result);
+        // 지갑에 해시값 추가
+        wallet.addToPublicKey(pdfHash); // addToPublicKey 메서드는 Wallet 엔티티 내에서 정의
         wallet.updatePdfUrl(metadataKey, getPdfUrl(fileName));
         walletRepository.saveAndFlush(wallet);
     }
 
     private String generatePassportPdfFileName(Long walletId) {
         return walletId + "_passport_certification.pdf";
+    }
+
+    private String generatePdfHash(byte[] fileData) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(fileData);
+            StringBuilder hexString = new StringBuilder(2 * hash.length);
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("해시 알고리즘을 찾을 수 없습니다.", e);
+        }
     }
 
     //pdf 병합 로직

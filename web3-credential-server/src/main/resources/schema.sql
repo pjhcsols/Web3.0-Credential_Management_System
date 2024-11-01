@@ -12,7 +12,7 @@ CREATE TABLE wallets (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
                          user_id BIGINT NOT NULL,
                          private_key VARCHAR(255) NOT NULL,
-                         public_key VARCHAR(255) NOT NULL,
+                         public_key VARCHAR(255),
                          FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

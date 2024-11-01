@@ -11,6 +11,7 @@ import web3.repository.wallet.WalletRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class WalletService {
@@ -24,12 +25,14 @@ public class WalletService {
     }
 
     //지갑 생성
-    public Wallet createWallet(User user, String privateKey, String publicKey) throws WalletAlreadyExistsException {
+    public Wallet createWallet(User user) throws WalletAlreadyExistsException {
         Optional<Wallet> existingWallet = walletRepository.findByUser(user);
         if (existingWallet.isPresent()) {
             throw new WalletAlreadyExistsException("User already has a wallet");
         }
-        Wallet wallet = new Wallet(user, privateKey, publicKey);
+        //pk에 uuid
+        String privateKey = UUID.randomUUID().toString();
+        Wallet wallet = new Wallet(user, privateKey);
         return walletRepository.save(wallet);
     }
 

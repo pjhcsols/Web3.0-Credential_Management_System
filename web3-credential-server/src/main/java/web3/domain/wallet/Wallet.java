@@ -1,5 +1,6 @@
 package web3.domain.wallet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import web3.domain.user.User;
 import java.util.HashMap;
@@ -26,11 +27,12 @@ public class Wallet {
 
     // RSA 암호화를 위한 키
     //uuid를 넣어서 RSA 암호화 할때 같이 사용, 메타데이터 업로드 및 가져올때 디코딩
+    @JsonIgnore
     @Column(name = "private_key", nullable = false)
-    private String privateKey;
+    private String privateKey; // 메타데이터 디코딩 용
 
-    @Column(name = "public_key", nullable = false)
-    private String publicKey;
+    @Column(name = "public_key", nullable = true)
+    private String publicKey; //인증서 해시값 저장
 
     //공동 인증서 정보 추가?
 
@@ -42,8 +44,17 @@ public class Wallet {
         this.publicKey = publicKey;
     }
 
+    public Wallet(User user, String privateKey) {
+        this.user = user;
+        this.privateKey = privateKey;
+    }
+
     public void updateWallet(String privateKey, String publicKey) {
         this.privateKey = privateKey;
+        this.publicKey = publicKey;
+    }
+
+    public void addToPublicKey(String publicKey){
         this.publicKey = publicKey;
     }
 
