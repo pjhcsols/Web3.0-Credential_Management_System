@@ -8,13 +8,23 @@
 import SwiftUI
 
 struct GetUniversityView: View {
+    
+    @Binding var stack: NavigationPath
     @AppStorage("userUniversity") var univName: String = ""
     @AppStorage("checkUniversity") var isUnivChecked: Bool = false
+    @AppStorage("userNickname") var userName: String = ""
     
-    private var userName = UserDefaults.standard.string(forKey: "userNickname")
+    @State private var navigateToVerify = false
+    
+    let onVerificationComplete: () -> Void
+    
+    init(stack: Binding<NavigationPath>, onVerificationComplete: @escaping () -> Void) {
+        _stack = stack
+        self.onVerificationComplete = onVerificationComplete
+    }
     
     var body: some View {
-        NavigationStack {
+        NavigationStack() {
             VStack(alignment: .leading) {
                 Spacer()
                 Text("\(userName ?? "사용자")님의")
@@ -47,13 +57,16 @@ struct GetUniversityView: View {
                                 .stroke(Color(red: 218/255, green: 33/255, blue: 39/255), lineWidth: 1)
                         )
                 }
-                
-                NavigationLink(destination: VerifyUniversityView().navigationBarBackButtonHidden(true), isActive: $isUnivChecked) {
-                    EmptyView()
+                .navigationDestination(isPresented: $navigateToVerify) {
+                        VerifyUniversityView(
+                            stack: $stack,
+                            onVerificationComplete: onVerificationComplete // Pass closure down
+                        )
+                    }
                 }
-            }
             .padding()
             .ignoresSafeArea(.keyboard)
+            .navigationBarBackButtonHidden(true)
         }
     }
 
@@ -63,7 +76,7 @@ struct GetUniversityView: View {
             return
         }
         
-        guard let url = URL(string: "http://220.89.75.210:8080/api/univcert/check-univ?univName=\(encodedUnivName)") else {
+        guard let url = URL(string: "http://121.151.25.247:8080/api/univcert/check-univ?univName=\(encodedUnivName)") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -87,6 +100,8 @@ struct GetUniversityView: View {
                                 print("서버 응답 성공: success == 1")
                                 DispatchQueue.main.async {
                                     self.isUnivChecked = true
+                                    self.navigateToVerify = true
+                                    UserDefaults.standard.set(univName, forKey: "userUniversity")
                                 }
                             } else {
                                 print("서버 응답 실패 또는 다른 상태")
@@ -102,8 +117,4 @@ struct GetUniversityView: View {
         }
         task.resume()
     }
-}
-
-#Preview {
-    GetUniversityView()
 }

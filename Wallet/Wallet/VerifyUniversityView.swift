@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct VerifyUniversityView: View {
+    @Binding var stack: NavigationPath
+    
     @ObservedObject private var walletViewModel = WalletViewModel()
     
     @AppStorage("userUniversity") var univName: String = ""
@@ -16,8 +18,6 @@ struct VerifyUniversityView: View {
     @AppStorage("userWalletId") var walletId: String = ""
     @AppStorage("checkUniversity") var univCheck: Bool = false
     @AppStorage("userPdfUrls") var pdfUrls: String = ""
-    
-
     
     @State private var selectedPdfData: Data? = nil
     @State private var showDocumentPicker = false
@@ -28,8 +28,20 @@ struct VerifyUniversityView: View {
     
     private var userName = UserDefaults.standard.string(forKey: "userNickname")
     
+    let onVerificationComplete: () -> Void
+    
+    init(stack: Binding<NavigationPath>, onVerificationComplete: @escaping () -> Void) {
+        _stack = stack
+        self.onVerificationComplete = onVerificationComplete
+    }
+    
+//    init(stack: Binding<NavigationPath>) {
+//        _stack = stack
+//    }
+    
+    
     var body: some View {
-        NavigationStack {
+        NavigationStack() {
             VStack(alignment: .leading) {
                 Spacer()
                 Text("\(userName ?? "사용자")님의")
@@ -69,7 +81,7 @@ struct VerifyUniversityView: View {
                     .frame(width: 300)
                     .padding(.bottom, 32)
                 
-                Text("(선택)재학증 업로드")
+                Text("재학증 업로드")
                     .font(.title3)
                     .fontWeight(.semibold)
                 Button(action: { showDocumentPicker = true }) {
@@ -83,15 +95,13 @@ struct VerifyUniversityView: View {
                                 .stroke(Color.blue)
                         )
                 }
-                
                 Spacer()
                 Spacer()
-                
                 Button(action: {
                     verifyCode()
                     print("인증 코드: \(codeInput)")
                 }) {
-                    Text("다음")
+                    Text("지갑에 넣기")
                         .foregroundColor(.white)
                         .frame(width: 300, height: 45)
                         .background(Color(red: 218/255, green: 33/255, blue: 39/255))
@@ -101,23 +111,22 @@ struct VerifyUniversityView: View {
                                 .stroke(Color(red: 218/255, green: 33/255, blue: 39/255), lineWidth: 1)
                         )
                 }
-                
-            NavigationLink(destination: ContentView().navigationBarBackButtonHidden(true), isActive: $navigateToContentView) {
-                    EmptyView()
-                }
             }
             .padding()
             .ignoresSafeArea(.keyboard)
             .sheet(isPresented: $showDocumentPicker) {
                 DocumentPicker(selectedPdfData: $selectedPdfData)
             }
-            .onChange(of: selectedPdfData) { newData in
-                if let pdfData = newData {
+            .onChange(of: selectedPdfData) {
+                if let pdfData = selectedPdfData {
                     registerUnivPdf(pdfData: pdfData)
                 }
             }
+            .navigationDestination(isPresented: $navigateToContentView) {
+               ContentView()
+            }
         }
-        .ignoresSafeArea(.keyboard)
+        .navigationBarBackButtonHidden(true)
     }
     
     private func sendCode() {
@@ -129,7 +138,7 @@ struct VerifyUniversityView: View {
         print("user email: \(email)")
         print("encoded userUniversity: \(encodedUnivName)")
         
-        guard let url = URL(string: "http://220.89.75.210:8080/api/univcert/send-code?email=\(userEmail)&univName=\(encodedUnivName)") else {
+        guard let url = URL(string: "http://121.151.25.247:8080/api/univcert/send-code?email=\(userEmail)&univName=\(encodedUnivName)") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -170,7 +179,7 @@ struct VerifyUniversityView: View {
         
         let userEmail = email
         
-        guard let url = URL(string: "http://220.89.75.210:8080/api/univcert/verify-code?email=\(userEmail)&univName=\(encodedUnivName)&code=\(codeInput)") else {
+        guard let url = URL(string: "http://121.151.25.247:8080/api/univcert/verify-code?email=\(userEmail)&univName=\(encodedUnivName)&code=\(codeInput)") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -192,7 +201,11 @@ struct VerifyUniversityView: View {
                             if let jsonData = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
                                let success = jsonData["success"] as? Bool, success {
                                 self.userVerify = true
-                                checkStoredPdfUrls()
+                                self.navigateToContentView = true
+                                UserDefaults.standard.set(email, forKey: "userEmail")
+                                stack = NavigationPath()
+                                print("Verification complete, calling onVerificationComplete()")
+                                onVerificationComplete()
                                 clearCertifiedUserList()
                                 print()
                             }
@@ -210,32 +223,10 @@ struct VerifyUniversityView: View {
         task.resume()
     }
     
-    private func checkStoredPdfUrls() {
-        if let storedPdfUrlsString = UserDefaults.standard.string(forKey: "userPdfUrls"),
-           let storedPdfUrlsData = storedPdfUrlsString.data(using: .utf8) {
-            do {
-                let storedPdfUrls = try JSONDecoder().decode([String: String].self, from: storedPdfUrlsData)
-                print("이미 저장되어 있지롱 VerifyContentView: \(storedPdfUrls)")
-                
-                if !storedPdfUrls.isEmpty {
-                    self.navigateToContentView = true
-                } else {
-                    registerEmptyPdf()
-                }
-            } catch {
-                print("저장된 PDF URLs 디코딩 실패: \(error)")
-                registerEmptyPdf()
-            }
-        } else {
-            registerEmptyPdf()
-        }
-    }
-
-    
     private func clearCertifiedUserList() {
         print("\nclearCertifiedUserList()")
         
-        guard let url = URL(string: "http://220.89.75.210:8080/api/univcert/clear-list") else {
+        guard let url = URL(string: "http://121.151.25.247:8080/api/univcert/clear-list") else {
             print("Invalid URL for clearing user list")
             return
         }
@@ -246,6 +237,7 @@ struct VerifyUniversityView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
                 print("Failed to clear user list: \(error.localizedDescription)")
+                onVerificationComplete()
                 return
             }
             
@@ -261,72 +253,6 @@ struct VerifyUniversityView: View {
         task.resume()
     }
     
-    private func registerEmptyPdf() {
-        print("\nregisterPdf()")
-        guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-            print("대학교 이름 인코딩 실패")
-            return
-        }
-        
-        let userEmail = email
-
-        print("(registerEmptyPdf)walletId: \(walletId)")
-        print("user mail: \(userEmail)")
-        print("encoded userUniversity: \(encodedUnivName)")
-        print("uniVerified: \(univCheck)")
-
-        guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/register?walletId=\(walletId)&email=\(userEmail)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
-            print("유효하지 않은 URL입니다.")
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        let boundary = UUID().uuidString
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-        var body = Data()
-
-        let fileContent = ""
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.pdf\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: application/pdf\r\n\r\n".data(using: .utf8)!)
-        body.append(fileContent.data(using: .utf8)!)
-        body.append("\r\n".data(using: .utf8)!)
-
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-
-        request.httpBody = body
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("요청 실패: \(error.localizedDescription)")
-                return
-            }
-
-            if let httpResponse = response as? HTTPURLResponse {
-                if httpResponse.statusCode == 200 {
-                    if let data = data, let responseString = String(data: data, encoding: .utf8) {
-                
-                        print("서버 응답 데이터: \(responseString)")
-                        
-                        DispatchQueue.main.async {
-                            let walletViewModel = WalletViewModel()
-                            walletViewModel.getWallet()
-                            self.navigateToContentView = true
-                        }
-                    }
-                } else {
-                    if let data = data, let errorResponse = String(data: data, encoding: .utf8) {
-                        print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
-                        print("서버 오류 응답: \(errorResponse)")
-                    }
-                }
-            }
-        }
-        task.resume()
-    }
-    
     private func registerUnivPdf(pdfData: Data) {
            guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
                print("대학교 이름 인코딩 실패")
@@ -334,7 +260,7 @@ struct VerifyUniversityView: View {
            }
            
            let userEmail = email
-           guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/register?walletId=\(walletId)&email=\(userEmail)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
+           guard let url = URL(string: "http://121.151.25.247:8080/api/certifications/register?walletId=\(walletId)&email=\(userEmail)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
                print("유효하지 않은 URL입니다.")
                return
            }
@@ -379,8 +305,4 @@ struct VerifyUniversityView: View {
            }
            task.resume()
        }
-}
-
-#Preview {
-    VerifyUniversityView()
 }

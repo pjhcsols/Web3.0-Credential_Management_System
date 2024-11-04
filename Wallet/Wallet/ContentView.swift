@@ -65,11 +65,6 @@ struct ContentView: View {
                             .padding(.top, 24)
                             .padding(.leading, 24)
                         Spacer()
-//                        Text("2024.01.01.")
-//                            .font(.subheadline)
-//                            .foregroundColor(.black)
-//                            .padding(.top, 24)
-//                            .padding(.trailing, 24)
                     }
                     Text(nickname)
                         .font(isExpanded ? .title : .title2)
@@ -94,93 +89,14 @@ struct ContentView: View {
                    alignment: .top)
             if showCertification {
                 CertificationListView()
-                    .transition(.opacity)
-                    .animation(.easeInOut(duration: 0.1), value: showCertification)
-                        }
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.1), value: showCertification)
+            }
         }
         .padding()
         .frame(maxHeight: .infinity, alignment: .top)
-        .onAppear {
-            if let storedPdfUrlsString = UserDefaults.standard.string(forKey: "userPdfUrls"),
-               let storedPdfUrlsData = storedPdfUrlsString.data(using: .utf8) {
-                do {
-                    let storedPdfUrls = try JSONDecoder().decode([String: String].self, from: storedPdfUrlsData)
-                    print("저장된 PDF URLs (디코딩 후contentView): \(storedPdfUrls)")
-                } catch {
-                    print("저장된 PDF URLs 디코딩 실패: \(error)")
-                }
-            }
-            else {
-                registerEmptyPdf()
-            }
-        }
+        .navigationBarBackButtonHidden(true)
     }
-    
-    private func registerEmptyPdf() {
-        print("\nregisterPdf()")
-        guard let encodedUnivName = univName.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-            print("대학교 이름 인코딩 실패")
-            return
-        }
-        
-        let userEmail = email
-
-        print("(registerEmptyPdf)walletId: \(walletId)")
-        print("user mail: \(userEmail)")
-        print("encoded userUniversity: \(encodedUnivName)")
-        print("uniVerified: \(univCheck)")
-
-        guard let url = URL(string: "http://220.89.75.210:8080/api/certifications/register?walletId=\(walletId)&email=\(userEmail)&univName=\(encodedUnivName)&univCheck=\(univCheck)") else {
-            print("유효하지 않은 URL입니다.")
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        let boundary = UUID().uuidString
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-        var body = Data()
-
-        let fileContent = ""
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"file.pdf\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: application/pdf\r\n\r\n".data(using: .utf8)!)
-        body.append(fileContent.data(using: .utf8)!)
-        body.append("\r\n".data(using: .utf8)!)
-
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-
-        request.httpBody = body
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("요청 실패: \(error.localizedDescription)")
-                return
-            }
-
-            if let httpResponse = response as? HTTPURLResponse {
-                if httpResponse.statusCode == 200 {
-                    if let data = data, let responseString = String(data: data, encoding: .utf8) {
-                
-                        print("서버 응답 데이터: \(responseString)")
-                        
-                        DispatchQueue.main.async {
-                            let walletViewModel = WalletViewModel()
-                            walletViewModel.getWallet()
-                        }
-                    }
-                } else {
-                    if let data = data, let errorResponse = String(data: data, encoding: .utf8) {
-                        print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
-                        print("서버 오류 응답: \(errorResponse)")
-                    }
-                }
-            }
-        }
-        task.resume()
-    }
-    
 }
 
 #Preview {

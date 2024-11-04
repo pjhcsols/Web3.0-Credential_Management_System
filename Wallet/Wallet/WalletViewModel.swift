@@ -33,7 +33,7 @@ class WalletViewModel: ObservableObject {
             return
         }
 
-        guard let url = URL(string: "http://220.89.75.210:8080/api/wallets/me") else {
+        guard let url = URL(string: "http://121.151.25.247:8080/api/wallets/me") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -78,5 +78,17 @@ class WalletViewModel: ObservableObject {
             }
         }
         task.resume()
+    }
+    
+    func loadCertifications() -> [Certification] {
+        guard let pdfUrls = walletResponse?.pdfUrls else {
+            print("지갑에 저장된 인증서가 없습니다.")
+            return []
+        }
+        
+        // pdfUrls의 키를 Certification 이름으로 사용하여 Certification 리스트 생성
+        let certifications = pdfUrls.keys.map { Certification(name: $0) }
+        print("Loaded certifications from wallet: \(certifications)")
+        return certifications
     }
 }

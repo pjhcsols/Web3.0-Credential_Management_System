@@ -87,12 +87,9 @@ struct LockByCodeView: View {
                     .frame(height: 300)
                 }
                 .padding(.horizontal, 40)
-
-                NavigationLink(destination: LockByBioView()
-    .navigationBarBackButtonHidden(true),
-                               isActive: $navigateToBio) {
-                    EmptyView()
-                }
+                .navigationDestination(isPresented: $navigateToBio) {
+                    LockByBioView()
+               }
             }
         }
     }

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		A25C92FC2CB7E2E80015C068 /* AddCertificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25C92FB2CB7E2E80015C068 /* AddCertificationView.swift */; };
 		A25F24C72CC14DB300908411 /* CreateWalletView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25F24C62CC14DB300908411 /* CreateWalletView.swift */; };
-		A25F24C92CC162E000908411 /* GenerateKeyPair.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25F24C82CC162E000908411 /* GenerateKeyPair.swift */; };
 		A25F24CB2CC37D0000908411 /* AddCertificateModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25F24CA2CC37D0000908411 /* AddCertificateModalView.swift */; };
 		A25F24CD2CC39E3F00908411 /* CheckCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25F24CC2CC39E3F00908411 /* CheckCodeView.swift */; };
 		A25F24D22CC4BB8300908411 /* GetUniversityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25F24D12CC4BB8300908411 /* GetUniversityView.swift */; };
@@ -69,7 +68,6 @@
 /* Begin PBXFileReference section */
 		A25C92FB2CB7E2E80015C068 /* AddCertificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCertificationView.swift; sourceTree = "<group>"; };
 		A25F24C62CC14DB300908411 /* CreateWalletView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateWalletView.swift; sourceTree = "<group>"; };
-		A25F24C82CC162E000908411 /* GenerateKeyPair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateKeyPair.swift; sourceTree = "<group>"; };
 		A25F24CA2CC37D0000908411 /* AddCertificateModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCertificateModalView.swift; sourceTree = "<group>"; };
 		A25F24CC2CC39E3F00908411 /* CheckCodeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckCodeView.swift; sourceTree = "<group>"; };
 		A25F24D12CC4BB8300908411 /* GetUniversityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetUniversityView.swift; sourceTree = "<group>"; };
@@ -163,16 +161,16 @@
 				A27B12EA2CA95265004AAF23 /* OnboardingView.swift */,
 				A27AE2A02CB3B8ED005F9A31 /* LockByCodeView.swift */,
 				A27AE2A22CB4F9B0005F9A31 /* LockByBioView.swift */,
-				A25F24C82CC162E000908411 /* GenerateKeyPair.swift */,
 				A25F24C62CC14DB300908411 /* CreateWalletView.swift */,
-				A25F24D12CC4BB8300908411 /* GetUniversityView.swift */,
-				A25F24D52CC514F900908411 /* VerifyUniversityView.swift */,
-				A26B8D572CD0C334005EC6CF /* WalletViewModel.swift */,
-				A26B8D592CD269DB005EC6CF /* DocumentPicker.swift */,
 				A27B12C22CA94BDB004AAF23 /* ContentView.swift */,
+				A26B8D5B2CD29A49005EC6CF /* SettingView.swift */,
+				A26B8D592CD269DB005EC6CF /* DocumentPicker.swift */,
 				A27B13082CB0E721004AAF23 /* CertificationListView.swift */,
 				A25C92FB2CB7E2E80015C068 /* AddCertificationView.swift */,
 				A25F24CA2CC37D0000908411 /* AddCertificateModalView.swift */,
+				A25F24D12CC4BB8300908411 /* GetUniversityView.swift */,
+				A25F24D52CC514F900908411 /* VerifyUniversityView.swift */,
+				A26B8D572CD0C334005EC6CF /* WalletViewModel.swift */,
 				A25F24D32CC4E46800908411 /* CertificationModel.swift */,
 				A25F24CC2CC39E3F00908411 /* CheckCodeView.swift */,
 				A27B12C42CA94BDC004AAF23 /* Assets.xcassets */,
@@ -211,7 +209,6 @@
 			isa = PBXGroup;
 			children = (
 				A27B12ED2CA9C371004AAF23 /* Fonts */,
-				A26B8D5B2CD29A49005EC6CF /* SettingView.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -386,7 +383,6 @@
 				A25F24CB2CC37D0000908411 /* AddCertificateModalView.swift in Sources */,
 				A26B8D5C2CD29A49005EC6CF /* SettingView.swift in Sources */,
 				A25F24D62CC514F900908411 /* VerifyUniversityView.swift in Sources */,
-				A25F24C92CC162E000908411 /* GenerateKeyPair.swift in Sources */,
 				A25C92FC2CB7E2E80015C068 /* AddCertificationView.swift in Sources */,
 				A26B8D5A2CD269DB005EC6CF /* DocumentPicker.swift in Sources */,
 				A26B8D582CD0C334005EC6CF /* WalletViewModel.swift in Sources */,

@@ -58,9 +58,9 @@ struct LockByBioView: View {
                         )
                 }
             }
-            NavigationLink(destination: CreateWalletView().navigationBarBackButtonHidden(true), isActive: $isUnlocked) {
-                EmptyView()
-            }
+            .navigationDestination(isPresented: $isUnlocked) {
+                CreateWalletView()
+           }
             
             if let errorMessage = authErrorMessage {
                 Text(errorMessage)
@@ -69,6 +69,7 @@ struct LockByBioView: View {
             }
             
         }
+        .navigationBarBackButtonHidden(true)
         .padding()
 
         Spacer()

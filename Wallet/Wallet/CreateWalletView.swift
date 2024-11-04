@@ -34,7 +34,7 @@ struct CreateWalletView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 Spacer()
                 Text("지갑 생성을 시작해볼까요?")
@@ -43,9 +43,7 @@ struct CreateWalletView: View {
                 Spacer()
                 
                 Button(action: {
-                    generateKeys()
                     getWallet()
-//                    walletViewModel.getWallet()
                 }) {
                     Text("다음")
                         .foregroundColor(.white)
@@ -58,10 +56,9 @@ struct CreateWalletView: View {
                         )
                 }
                 .padding()
-
                 
-                NavigationLink(destination: GetUniversityView().navigationBarBackButtonHidden(true), isActive: $isWalletExists) {
-                    EmptyView()
+                .navigationDestination(isPresented: $isWalletExists) {
+                    ContentView().navigationBarBackButtonHidden(true)
                 }
             }
             .onAppear {
@@ -70,18 +67,7 @@ struct CreateWalletView: View {
                 }
             }
         }
-    }
-    private func generateKeys() {
-        let keys = generateKeyPair()
-        self.privateKey = keys.privateKey
-        self.publicKey = keys.publicKey
-
-        if let privateKey = self.privateKey, let publicKey = self.publicKey {
-            print("(CreateWalletView)Private Key: \(privateKey)")
-            print("(CreateWalletView)Generated Public Key: \(publicKey)")
-        } else {
-            print("Failed to generate keys")
-        }
+        .navigationBarBackButtonHidden(true)
     }
 
     private func getWallet() {
@@ -92,8 +78,7 @@ struct CreateWalletView: View {
         
         print("jwt토큰(/api/wallets/me): \(jwtToken)")
         
-        
-        guard let url = URL(string: "http://220.89.75.210:8080/api/wallets/me") else {
+        guard let url = URL(string: "http://121.151.25.247:8080/api/wallets/me") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -114,15 +99,15 @@ struct CreateWalletView: View {
                         let walletResponse = try JSONDecoder().decode(Wallet.self, from: data)
                         print("지갑 정보(get): \(walletResponse)")
                         
-                        if let pdfUrls = walletResponse.pdfUrls {
-                                    if let pdfUrlsData = try? JSONEncoder().encode(pdfUrls),
-                                       let pdfUrlsString = String(data: pdfUrlsData, encoding: .utf8) {
-                                        UserDefaults.standard.set(pdfUrlsString, forKey: "userPdfUrls")
-                                        print("PDF URLs 저장 성공: \(pdfUrlsString)")
-                                    }
-                                } else {
-                                    print("pdfUrls가 없습니다.")
-                                }
+//                        if let pdfUrls = walletResponse.pdfUrls {
+//                                    if let pdfUrlsData = try? JSONEncoder().encode(pdfUrls),
+//                                       let pdfUrlsString = String(data: pdfUrlsData, encoding: .utf8) {
+//                                        UserDefaults.standard.set(pdfUrlsString, forKey: "userPdfUrls")
+//                                        print("PDF URLs 저장 성공: \(pdfUrlsString)")
+//                                    }
+//                                } else {
+//                                    print("pdfUrls가 없습니다.")
+//                                }
                         
                         UserDefaults.standard.set(walletResponse.id, forKey: "userWalletId")
                         
@@ -135,32 +120,24 @@ struct CreateWalletView: View {
                     }
                 } else if httpResponse.statusCode == 404 {
                     DispatchQueue.main.async {
-                        guard let privateKey = self.privateKey, let publicKey = self.publicKey else {
-                                                print("Keys are not available.")
-                                                return
-                                            }
-                        self.createWallet(privateKey: privateKey, publicKey: publicKey)
+                        self.createWallet()
                     }
                 } else {
                     print("서버 오류: 상태 코드 \(httpResponse.statusCode)")
                 }
             }
         }
-        
         task.resume()
     }
     
-    private func createWallet(privateKey: String, publicKey: String) {
+    private func createWallet() {
         guard let jwtToken = jwtToken else {
             print("jwt 토큰이 없습니다.")
             return
         }
         
         print("jwt토큰: \(jwtToken)")
-        print("프라이빗키: \(privateKey)")
-        print("퍼블릭키: \(publicKey)")
-        
-        guard let url = URL(string: "http://220.89.75.210:8080/api/wallets?privateKey=\(privateKey)&publicKey=\(publicKey)") else {
+        guard let url = URL(string: "http://121.151.25.247:8080/api/wallets") else {
             print("유효하지 않은 URL입니다.")
             return
         }
@@ -172,8 +149,6 @@ struct CreateWalletView: View {
         
         let body: [String: Any] = [
             "loginUser": jwtToken,
-            "privateKey": privateKey,
-            "publicKey": publicKey
         ]
         
         do {
@@ -196,15 +171,15 @@ struct CreateWalletView: View {
                         let walletResponse = try JSONDecoder().decode(Wallet.self, from: data)
                         print("지갑 생성 성공!")
                         
-                        if let pdfUrls = walletResponse.pdfUrls {
-                                    if let pdfUrlsData = try? JSONEncoder().encode(pdfUrls),
-                                       let pdfUrlsString = String(data: pdfUrlsData, encoding: .utf8) {
-                                        UserDefaults.standard.set(pdfUrlsString, forKey: "userPdfUrls")
-                                        print("PDF URLs 저장 성공: \(pdfUrlsString)")
-                                    }
-                                } else {
-                                    print("pdfUrls가 없습니다.")
-                                }
+//                        if let pdfUrls = walletResponse.pdfUrls {
+//                                    if let pdfUrlsData = try? JSONEncoder().encode(pdfUrls),
+//                                       let pdfUrlsString = String(data: pdfUrlsData, encoding: .utf8) {
+//                                        UserDefaults.standard.set(pdfUrlsString, forKey: "userPdfUrls")
+//                                        print("PDF URLs: \(pdfUrlsString)")
+//                                    }
+//                                } else {
+//                                    print("pdfUrls가 없습니다.")
+//                                }
                         
                         UserDefaults.standard.set(walletResponse.id, forKey: "userWalletId")
                         

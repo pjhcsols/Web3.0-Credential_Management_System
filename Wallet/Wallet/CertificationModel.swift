@@ -23,4 +23,12 @@ struct Certification: Identifiable, Codable, Hashable {
     static func == (lhs: Certification, rhs: Certification) -> Bool {
         return lhs.name == rhs.name
     }
+
+    static let defaultCertifications: [Certification] = [
+        Certification(name: "재학증"),
+        Certification(name: "여권"),
+        Certification(name: "자격증"),
+        Certification(name: "주민등록증"),
+        Certification(name: "운전면허증"),
+    ]
 }
