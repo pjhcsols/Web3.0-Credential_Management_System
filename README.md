@@ -63,7 +63,7 @@
 
 ### OAuth 2.0 소셜 로그인
 
-![image](https://github.com/user-attachments/assets/5994c56f-0d6c-4caa-94f6-9e9bad855472)
+<img width="440" alt="security" src="https://github.com/user-attachments/assets/5994c56f-0d6c-4caa-94f6-9e9bad855472">
 
 * 이 프로젝트에서는 OAuth 2.0 프로토콜을 기반으로 소셜 로그인 기능을 구현하였습니다.
 * 카카오 API를 활용하여 서버에서 카카오 엑세스 토큰을 발급 받아 사용자의 소셜 계정 정보를 안전하게 가져오고,  
@@ -77,11 +77,13 @@
 
 ### 2차 인증: 생체 인증 등 전자 지갑 생성을 위한 2차 인증 절차를 포함
 
-![image](https://github.com/user-attachments/assets/611bc384-68b3-4350-b2b9-8b959bc05d67)
-
-* Android 기기에서는 BiometricPrompt API를, iOS 기기에서는 LocalAuthentication Framework를 사용하여 지문, 얼굴 인식과 같은 생체 정보를 이용한 인증을 수행합니다.
+* LocalAuthentication Framework를 사용하여 지문, 얼굴 인식과 같은 생체 정보를 이용한 인증을 수행합니다.
 * 디바이스 상의 문제로 인하여 생체인증이 불가능한 사용자를 위해 PIN 코드로 2차 인증을 할 수 있는 방안도 마련해 두었습니다.
-
+<img width="320" alt="security" src="https://github.com/user-attachments/assets/8024341a-fe69-4e62-a56f-cc89fcf612c2">
+<br>
+<br>
+<br>
+<br>
 
 기본적인 로그인 절차 외에도 추가적인 보안 강화를 위해 2차 인증 기능을 포함시켰습니다. 2차 인증 절차는 전자 지갑 생성을 위한 필수 단계로, 사용자의 신원을 한층 더 강력하게 보호합니다. 특히, 생체 인증을 활용한 2차 인증 절차를 통해 사용자는 보다 안전하면서도 간편하게 시스템에 접근할 수 있습니다.  
 
