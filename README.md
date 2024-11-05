@@ -27,6 +27,17 @@
 <br>
 <br>
 
+# 팀원
+| <img width="350" src="https://github.com/user-attachments/assets/4bcd0c47-ec39-4552-9220-a1c113464758"> | <img width="350" src="https://github.com/user-attachments/assets/20965095-d0c5-4236-ad4e-74535b963631"> | <img width="350" src="https://github.com/user-attachments/assets/2add8a7b-7a16-4935-83fd-779a73b0ec39"> | <img width="350" src="https://github.com/user-attachments/assets/6a3412a4-2a70-4e2f-a251-de547b88e1a5"> |
+| ---------- | ----------  | ----------|  ---------- |
+| 박한솔(팀장) | 김건아 | 김세아 | 윤진노 |
+| Backend | Backend | iOS, Design | Backend |
+|DevOps<br>Infra Engineer<br>인증서 데이터와 블록 관리<br>외부 API 서비스 구축<br> | 외부API 테스트 | iOS 개발 | 인증서 PDF 관리 |
+<br>
+<br>
+<br>
+<br>
+
 ## 주요 화면
 ### 온보딩 화면 및 로그인 화면
 * 카카오 로그인 API를 사용하여 로그인을 진행합니다.
@@ -93,18 +104,71 @@
 <br>
 <br>
 
-## Web3 지갑 생성 과정
+## 블록체인 & PDF 메타데이터 인증서 관리 시스템 (Certificate Management System)
 
-* 지갑이 생성될 때 블록과 S3 스토리지의 PDF가 생성되며 블록과 PDF의 URL이 사용자 지갑에 저장됩니다.  
-* S3 스토리지에 실물 인증서와 블록에 신원인증 정보를 포함하여 개인의 디바이스에서 증명이 가능합니다.
-
-![image](https://github.com/user-attachments/assets/3bcd06e9-3ee7-4bea-9444-caa2806a9155)
-
-1. 클라이언트가 사용자가 엑세스 토큰을 통해 Web3 지갑 생성을 요청합니다.
-2. 지갑에서 인증서 PDF와 메타데이터 Verifiable Credential (Credential Metadata, Claims, Proofs)를 S3 스토리지에 저장하고 개인 디바이스에 다운로드할 수 있습니다. 이때 데이터베이스에는 해당 사용자의 S3 PDF 주소값을 저장합니다.
-3. 지갑에서 개인 디바이스의 블록(PDF)이 생성되며 블록(PDF)에는 추후 업로드하는 해당 증명에 관한 key : value 값을 저장하고 블록(PDF)이 생성 및 추가되며 이를 통해 외부 인증과의 연동이 수행됩니다.
-4. 지갑에서 해당되는 인증서를 업로드 가능하며 PDF의 페이지 별 메타데이터를 별도로 관리하며 인증과정을 수행하는 메타데이터는 key : value 값으로 Verifiable Credential로 관리합니다.
+이 프로젝트는 사용자가 데이터를 직접 관리하는 암호화 기반의 인증서 관리 시스템으로, OAuth2.0 및 Web3 환경을 통합하여 사용자 지갑과 인증서를 안전하게 관리합니다. 사용자는 자신만의 지갑에서 인증서 발급 및 관리가 가능하며, 블록체인과 PDF 메타데이터를 통해 인증서의 진본성을 확인할 수 있습니다.
 <br>
+<br>
+### 주요 기능 설명
+<img width="880" alt="features13" src="https://github.com/user-attachments/assets/375d83d2-91bb-4d3c-aa6c-8bbe68116a90">
+<img width="880" alt="features14" src="https://github.com/user-attachments/assets/e2830c2f-d9c5-4d27-b02c-426d2b3eceb4">
+<img width="880" alt="features15" src="https://github.com/user-attachments/assets/dd6850a6-c6a4-4f2d-b3e4-d7c6997a5c47">
+<img width="880" alt="features16" src="https://github.com/user-attachments/assets/3293f19b-fa49-42fa-9816-7ce0dbceed75">
+<img width="880" alt="features17" src="https://github.com/user-attachments/assets/2f052612-ecb3-498b-8fa4-bbf537d05615">
+<img width="880" alt="features18" src="https://github.com/user-attachments/assets/fd28833c-693e-464a-92b9-6f9c4291a5ba">
+<img width="880" alt="features19" src="https://github.com/user-attachments/assets/cb8ce313-4207-4978-91b3-a4229c81fbb6">
+<img width="880" alt="features20" src="https://github.com/user-attachments/assets/9fb56b34-9e0e-48db-af76-0057b87ea4de">
+<img width="880" alt="features21" src="https://github.com/user-attachments/assets/157e64ad-9704-468a-b1cb-6c9ef017e03b">
+<img width="880" alt="features22" src="https://github.com/user-attachments/assets/251cd465-d5fa-43aa-b728-9a830d31d854">
+<img width="880" alt="features23" src="https://github.com/user-attachments/assets/3a0c9af1-1a6e-4b34-8abe-01c6da32c6fc">
+<img width="880" alt="features24" src="https://github.com/user-attachments/assets/38e3527e-b2e6-4284-8911-c94b91c31661">
+<img width="880" alt="features25" src="https://github.com/user-attachments/assets/bca3aa99-d157-4e06-9fa3-cd6348d80c0c">
+<img width="880" alt="features26" src="https://github.com/user-attachments/assets/100859c5-efa2-4f12-83ad-ea6b7c5e7236">
+<img width="880" alt="features27" src="https://github.com/user-attachments/assets/b3c6fe49-cd3b-4e8f-bc3a-4e7641db4610">
+<img width="880" alt="features28" src="https://github.com/user-attachments/assets/37187c3c-d843-446c-a353-8804a6803ffd">
+<img width="880" alt="features29" src="https://github.com/user-attachments/assets/578f2f77-efe1-4911-a4cb-039d7a0ab5e4">
+<img width="880" alt="features30" src="https://github.com/user-attachments/assets/668e81f6-9f44-46e7-9a0e-c8aa695072f2">
+<img width="880" alt="features32" src="https://github.com/user-attachments/assets/f9eda760-b4ab-47dd-812a-8a93ca3de6ab">
+<br>
+<br>
+<br>
+<br>
+
+## 데이터베이스 구조
+
+### Wallet 테이블 구조 (SQL)
+
+```sql
+CREATE TABLE wallets (
+   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+   user_id BIGINT NOT NULL,
+   private_key VARCHAR(255) NOT NULL,
+   public_key VARCHAR(255),
+   FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+- **user_id**: 사용자와 지갑을 연결하는 참조 키.
+- **private_key**: 메타데이터 디코딩용 개인 키, RSA 디코딩 시 사용.
+- **public_key**: 메타데이터 암호화용 공개 키, RSA 암호화 시 사용.
+- **pdfHash**: PDF 파일의 해시값을 저장하여 인증서 진본성 확인.
+
+
+이 인증서 관리 시스템은 Web2와 Web3의 장점을 결합하여 사용자 지갑과 인증서를 안전하게 관리하며, 사용자가 요청 시에 직접 인증서 진위를 확인하고 필요한 정보를 안전하게 관리할 수 있는 신뢰성 높은 인증 시스템을 제공합니다.
+
+## 블록체인의 블록과 S3 메타데이터를 통한 인증 수행을 위한 Verifiable Credential 관리
+
+![image](https://github.com/user-attachments/assets/610a4423-7311-4690-8f87-7c0ba3c7808f)
+
+1. S3 스토리지에 실물 인증서와 메타데이터에 외부 인증 Verifiable Credential을 저장하고 사용자가 어플리케이션을 재다운로드하면 해당 S3 스토리지의 인증서와 Verifiable Credential을 통해 블록을 생성하고 사용자의 디바이스에 저장합니다.
+
+![image](https://github.com/user-attachments/assets/a342c8d9-f8b7-4296-81c3-5126884a8fd5)
+<br>
+![image](https://github.com/user-attachments/assets/34af8fde-ea4f-4d23-beae-1c888972aced)
+
+2. Web3 블록체인의 블록(PDF)에 외부 인증 값 및 정보 저장을 처리합니다. 개인 디바이스의 블록에 외부 인증을 수행하는 Verifiable Credential, Credential Metadata, Claims, Proofs를 포함한 블록을 생성 관리합니다.
+3. 외부 인증 API를 활용해 전자지갑의 인증서 사용 시, 외부 인증과의 연동을 수행합니다.
+
 <br>
 <br>
 
@@ -146,74 +210,20 @@
 <br>
 <br>
 
-## 블록체인의 블록과 S3 메타데이터를 통한 인증 수행을 위한 Verifiable Credential 관리
+## Web3 지갑 생성 과정
 
-![image](https://github.com/user-attachments/assets/610a4423-7311-4690-8f87-7c0ba3c7808f)
+* 지갑이 생성될 때 블록과 S3 스토리지의 PDF가 생성되며 블록과 PDF의 URL이 사용자 지갑에 저장됩니다.  
+* S3 스토리지에 실물 인증서와 블록에 신원인증 정보를 포함하여 개인의 디바이스에서 증명이 가능합니다.
 
-1. S3 스토리지에 실물 인증서와 메타데이터에 외부 인증 Verifiable Credential을 저장하고 사용자가 어플리케이션을 재다운로드하면 해당 S3 스토리지의 인증서와 Verifiable Credential을 통해 블록을 생성하고 사용자의 디바이스에 저장합니다.
+![image](https://github.com/user-attachments/assets/3bcd06e9-3ee7-4bea-9444-caa2806a9155)
 
-![image](https://github.com/user-attachments/assets/a342c8d9-f8b7-4296-81c3-5126884a8fd5)
-<br>
-![image](https://github.com/user-attachments/assets/34af8fde-ea4f-4d23-beae-1c888972aced)
-
-2. Web3 블록체인의 블록(PDF)에 외부 인증 값 및 정보 저장을 처리합니다. 개인 디바이스의 블록에 외부 인증을 수행하는 Verifiable Credential, Credential Metadata, Claims, Proofs를 포함한 블록을 생성 관리합니다.
-3. 외부 인증 API를 활용해 전자지갑의 인증서 사용 시, 외부 인증과의 연동을 수행합니다.
-
-<br>
-<br>
-
-
-# 블록체인 & PDF 메타데이터 인증서 관리 시스템 (Certificate Management System)
-
-이 프로젝트는 사용자가 데이터를 직접 관리하는 암호화 기반의 인증서 관리 시스템으로, OAuth2.0 및 Web3 환경을 통합하여 사용자 지갑과 인증서를 안전하게 관리합니다. 사용자는 자신만의 지갑에서 인증서 발급 및 관리가 가능하며, 블록체인과 PDF 메타데이터를 통해 인증서의 진본성을 확인할 수 있습니다.
-
-## 주요 기능 설명
-<img width="880" alt="features13" src="https://github.com/user-attachments/assets/375d83d2-91bb-4d3c-aa6c-8bbe68116a90">
-<img width="880" alt="features14" src="https://github.com/user-attachments/assets/e2830c2f-d9c5-4d27-b02c-426d2b3eceb4">
-<img width="880" alt="features15" src="https://github.com/user-attachments/assets/dd6850a6-c6a4-4f2d-b3e4-d7c6997a5c47">
-<img width="880" alt="features16" src="https://github.com/user-attachments/assets/3293f19b-fa49-42fa-9816-7ce0dbceed75">
-<img width="880" alt="features17" src="https://github.com/user-attachments/assets/2f052612-ecb3-498b-8fa4-bbf537d05615">
-<img width="880" alt="features18" src="https://github.com/user-attachments/assets/fd28833c-693e-464a-92b9-6f9c4291a5ba">
-<img width="880" alt="features19" src="https://github.com/user-attachments/assets/cb8ce313-4207-4978-91b3-a4229c81fbb6">
-<img width="880" alt="features20" src="https://github.com/user-attachments/assets/9fb56b34-9e0e-48db-af76-0057b87ea4de">
-<img width="880" alt="features21" src="https://github.com/user-attachments/assets/157e64ad-9704-468a-b1cb-6c9ef017e03b">
-<img width="880" alt="features22" src="https://github.com/user-attachments/assets/251cd465-d5fa-43aa-b728-9a830d31d854">
-<img width="880" alt="features23" src="https://github.com/user-attachments/assets/3a0c9af1-1a6e-4b34-8abe-01c6da32c6fc">
-<img width="880" alt="features24" src="https://github.com/user-attachments/assets/38e3527e-b2e6-4284-8911-c94b91c31661">
-<img width="880" alt="features25" src="https://github.com/user-attachments/assets/bca3aa99-d157-4e06-9fa3-cd6348d80c0c">
-<img width="880" alt="features26" src="https://github.com/user-attachments/assets/100859c5-efa2-4f12-83ad-ea6b7c5e7236">
-<img width="880" alt="features27" src="https://github.com/user-attachments/assets/b3c6fe49-cd3b-4e8f-bc3a-4e7641db4610">
-<img width="880" alt="features28" src="https://github.com/user-attachments/assets/37187c3c-d843-446c-a353-8804a6803ffd">
-<img width="880" alt="features29" src="https://github.com/user-attachments/assets/578f2f77-efe1-4911-a4cb-039d7a0ab5e4">
-<img width="880" alt="features30" src="https://github.com/user-attachments/assets/668e81f6-9f44-46e7-9a0e-c8aa695072f2">
-<img width="880" alt="features31" src="https://github.com/user-attachments/assets/64cac3e2-95a1-4271-aa84-82e777c3d961">
-<img width="880" alt="features32" src="https://github.com/user-attachments/assets/f9eda760-b4ab-47dd-812a-8a93ca3de6ab">
+1. 클라이언트가 사용자가 엑세스 토큰을 통해 Web3 지갑 생성을 요청합니다.
+2. 지갑에서 인증서 PDF와 메타데이터 Verifiable Credential (Credential Metadata, Claims, Proofs)를 S3 스토리지에 저장하고 개인 디바이스에 다운로드할 수 있습니다. 이때 데이터베이스에는 해당 사용자의 S3 PDF 주소값을 저장합니다.
+3. 지갑에서 개인 디바이스의 블록(PDF)이 생성되며 블록(PDF)에는 추후 업로드하는 해당 증명에 관한 key : value 값을 저장하고 블록(PDF)이 생성 및 추가되며 이를 통해 외부 인증과의 연동이 수행됩니다.
+4. 지갑에서 해당되는 인증서를 업로드 가능하며 PDF 별 메타데이터를 별도로 관리하며 인증과정을 수행하는 메타데이터는 key : value 값으로 Verifiable Credential로 관리합니다.
 <br>
 <br>
 <br>
-<br>
-
-## 데이터베이스 구조
-
-### Wallet 테이블 구조 (SQL)
-
-```sql
-CREATE TABLE wallets (
-   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-   user_id BIGINT NOT NULL,
-   private_key VARCHAR(255) NOT NULL,
-   public_key VARCHAR(255),
-   FOREIGN KEY (user_id) REFERENCES users(id)
-);
-```
-
-- **user_id**: 사용자와 지갑을 연결하는 참조 키.
-- **private_key**: 메타데이터 디코딩용 개인 키, RSA 디코딩 시 사용.
-- **public_key**: 메타데이터 암호화용 공개 키, RSA 암호화 시 사용.
-- **pdfHash**: PDF 파일의 해시값을 저장하여 인증서 진본성 확인.
-
-
-이 인증서 관리 시스템은 Web2와 Web3의 장점을 결합하여 사용자 지갑과 인증서를 안전하게 관리하며, 사용자가 요청 시에 직접 인증서 진위를 확인하고 필요한 정보를 안전하게 관리할 수 있는 신뢰성 높은 인증 시스템을 제공합니다.
 
 
 ## 외부 API를 이용한 인증 (대학 재학 인증, 자격증, 주민등록증, 여권, 운전면허)
@@ -562,10 +572,6 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
     "resAuthenticityDesc2": "{식별번호가일치합니다.}"
 }
 ```
-<br>
-<br>
-<br>
-<br>
 
 ## 라이선스 정보
 
@@ -590,16 +596,7 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
    - [프로젝트 링크](https://github.com/univcert)
 
 <br>
-<br>
-<br>
-<br>
 
-# 팀원
-| <img width="350" src="https://github.com/user-attachments/assets/4bcd0c47-ec39-4552-9220-a1c113464758"> | <img width="350" src="https://github.com/user-attachments/assets/20965095-d0c5-4236-ad4e-74535b963631"> | <img width="350" src="https://github.com/user-attachments/assets/2add8a7b-7a16-4935-83fd-779a73b0ec39"> | <img width="350" src="https://github.com/user-attachments/assets/6a3412a4-2a70-4e2f-a251-de547b88e1a5"> |
-| ---------- | ----------  | ----------|  ---------- |
-| 박한솔(팀장) | 김건아 | 김세아 | 윤진노 |
-| Backend | Backend | iOS, Design | Backend |
-|DevOps<br>Infra Engineer<br>인증서 데이터와 블록 관리<br>외부 API 서비스 구축<br> | 외부API 테스트 | iOS 개발 | 인증서 관리 |
 
 
 
