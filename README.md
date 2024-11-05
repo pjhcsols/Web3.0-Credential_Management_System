@@ -29,7 +29,8 @@
 
 ## 주요 화면
 ### 온보딩 화면 및 로그인 화면
-* 카카오 로그인 API를 사용하여 로그인을 진행합니다. 로그인이 완료되면 4자리 PIN 코드를 설정하고 생체 인증 여부를 확인하게 됩니다.
+* 카카오 로그인 API를 사용하여 로그인을 진행합니다.
+* 로그인이 완료되면 4자리 PIN 코드를 설정하고 생체 인증 여부를 확인하게 됩니다.
 <img width="880" alt="onboarding" src="https://github.com/user-attachments/assets/ab6b83b2-2013-47fd-919d-dc7191fc2c30">
 <br>
 <br>
