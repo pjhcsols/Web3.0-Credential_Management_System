@@ -1,61 +1,59 @@
 # :closed_lock_with_key: [경북멋쟁이] Web 3.0 신원/자격증명 관리 시스템 
+<img width="880" alt="theme" src="https://github.com/user-attachments/assets/4e92c1b0-97d9-45a2-811c-b2ae2ec90f49">
+<br>
+<br>
 
 ## 주제
 **개인이 데이터를 직접 소유하고 관리하는 Web3 전자지갑 시스템 : “Web 3.0 신원/자격증명 관리 시스템"**
 <br>
-<img width="880" alt="설계" src="https://github.com/user-attachments/assets/dd0f8d41-04cc-4073-8aa6-fa07873fc42b">
-
+<br>
 
 이 시스템은 Web3 구조와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
 전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있습니다.
 <br>
+<br>
 
 ### 🔗 Youtube 시연영상
-[[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtube.com/shorts/GkWBhS6io44?feature=share)]
+[[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtu.be/bgmQniGsJ1U)]
+<br>
+<br>
 <br>
 <br>
 
-
+## 시스템 아키텍처
+<img width="880" alt="arch" src="https://github.com/user-attachments/assets/d7139346-dbc6-466c-8955-4bdd134c21f1">
+<br>
+<br>
+<br>
+<br>
 
 ## 주요 화면
 ### 온보딩 화면 및 로그인 화면
 * 카카오 로그인 API를 사용하여 로그인을 진행합니다. 로그인이 완료되면 4자리 PIN 코드를 설정하고 생체 인증 여부를 확인하게 됩니다.
-* 생체 인증 동의 여부 화면에서 ‘다음에’를 클릭할 경우, 설정 화면에서 생체 인증을 활성화할 수 있습니다.
-
-![image](https://github.com/user-attachments/assets/2740d93b-b644-4246-bbcb-234e392df0cf)
-![image](https://github.com/user-attachments/assets/64fd6d22-0486-44ca-984f-726388d46ebf)
-
-![image](https://github.com/user-attachments/assets/b9a1a8fd-32c8-4451-a0da-cf21e46dfb86)
-![image](https://github.com/user-attachments/assets/2b7d8c7d-a741-468d-a13c-5372f848eb51)
-![image](https://github.com/user-attachments/assets/49e76893-f710-48af-94f5-c48b3cadf8c2)
-
+<img width="880" alt="onboarding" src="https://github.com/user-attachments/assets/ab6b83b2-2013-47fd-919d-dc7191fc2c30">
 <br>
-
+<br>
 
 ### 메인 화면
 * 로그인한 사용자의 신원 정보가 표시되는 화면입니다. 
-* 사용자의 이름과 인증서 만료일이 표시되며, 인증서를 클릭하면 인증서 사용 기록을 조회할 수 있습니다.
-* 사용 기록 조회 화면의 오른쪽 상단 내보내기 아이콘을 클릭 시 사용 기록을 전송할 수 있습니다.
-
-![image](https://github.com/user-attachments/assets/76d7729d-c651-49bf-bace-4435072953e5)
-![image](https://github.com/user-attachments/assets/de21b3b3-54a3-4f5e-943a-ed08b5469e1f)
-
+* 메인 화면의 오른쪽 상단에 위치한 '톱니바퀴' 버튼을 클릭하면, 설정 화면으로 들어갑니다.
+* 설정 화면에서 사용자가 발급한 인증서 정보를 볼 수 있고 인증서 전체 삭제가 가능합니다.
+<img width="440" alt="main" src="https://github.com/user-attachments/assets/e8477a14-ac9f-4870-95f9-305517d4e9f8">
+<br>
 <br>
 
 ### 전자 증명서 발급 화면
-* 메인 화면의 오른쪽 상단에 위치한 ‘+’ 버튼을 클릭하면, 각 증명서와 해당 발급처가 표시됩니다.
-* 본인이 발급을 원하는 증명서를 선택한 후, 동의 체크박스를 클릭하고 인증(생체 인증 또는 PIN 코드 인증)을 하면 사용자에게 PDF 형태로 인증서가 표시됩니다.
-
-![image](https://github.com/user-attachments/assets/5ee28388-cd3f-490c-9ca9-05ef420aa525)
-![image](https://github.com/user-attachments/assets/44cc151f-aba9-4b63-9c8c-dcd6673976f8)
-![image](https://github.com/user-attachments/assets/43808704-c95f-4936-ae54-72c0a5d73a78)
-
+* 메인 화면의 오른쪽 상단에 위치한 ‘+’ 버튼을 클릭하면, 증명서를 발급할 수 있습니다.
+* 사용자는 발급을 원하는 증명서를 선택한 후, 동의 체크박스를 클릭하고 간단한 인증을 거치면 지갑에 PDF 형태로 인증서가 들어갑니다.
+<img width="880" alt="add" src="https://github.com/user-attachments/assets/1c2b4a84-6e1e-4ed0-9a87-67a79aa6aaa6">
+<br>
 <br>
 
-![image](https://github.com/user-attachments/assets/d9c18a77-75f4-4ec1-82e0-a8574109bfeb)
-
-* 해당 인증서의 목록을 S3 메타데이터로부터 받아와서 사용자에게 1차적으로 보여주고,  
-인증서를 클릭하면 블록과 메타데이터의 정보로 외부 API를 통해 인증서가 유효한지 확인을 요청하는 흐름입니다.
+### 인증서 보기 화면
+* 메인화면의 카드를 클릭 시, 사용자가 발급한 인증서 목록이 나타납니다.
+* 각 목록을 클릭 시, 해당하는 인증서를 볼 수 있습니다.
+* 각 목록을 옆으로 슬라이드 시, 해당하는 인증서를 삭제할 수 있습니다.
+<img width="720" alt="add" src="https://github.com/user-attachments/assets/10406a08-9e2e-41ec-9c63-0ee6f5bfccf7">
 
 <br>
 <br>
