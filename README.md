@@ -562,10 +562,18 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
     "resAuthenticityDesc2": "{식별번호가일치합니다.}"
 }
 ```
+<br>
+<br>
+<br>
+<br>
 
 ## 라이선스 정보
 
 이 프로젝트는 다음의 오픈 소스 라이브러리를 사용합니다. 각 라이브러리는 Apache License 2.0에 따라 라이센스가 부여됩니다.
+<br>
+<br>
+<br>
+<br>
 
 ## 사용된 라이브러리
 
@@ -580,4 +588,18 @@ API 응답의 검증을 통해 유효한 자격증을 가진 사용자로 인증
 3. **UnivCert (학생 인증)**
    - 라이선스: Apache License 2.0
    - [프로젝트 링크](https://github.com/univcert)
+
+<br>
+<br>
+<br>
+<br>
+
+# 팀원
+| <img width="350" src="https://github.com/user-attachments/assets/4bcd0c47-ec39-4552-9220-a1c113464758"> | <img width="350" src="https://github.com/user-attachments/assets/20965095-d0c5-4236-ad4e-74535b963631"> | <img width="350" src="https://github.com/user-attachments/assets/2add8a7b-7a16-4935-83fd-779a73b0ec39"> | <img width="350" src="https://github.com/user-attachments/assets/6a3412a4-2a70-4e2f-a251-de547b88e1a5"> |
+| ---------- | ----------  | ----------|  ---------- |
+| 박한솔(팀장) | 김건아 | 김세아 | 윤진노 |
+| Backend | Backend | iOS, Design | Backend |
+|DevOps<br>Infra Engineer<br>인증서 데이터와 블록 관리<br>외부 API 서비스 구축<br> | 외부API 테스트 | iOS 개발 | 인증서 관리 |
+
+
 
