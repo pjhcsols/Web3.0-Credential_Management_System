@@ -1,7 +1,6 @@
 package web3.service.Identity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -30,13 +29,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
-
 import web3.service.dto.Identity.PassportCertificationDto;
 import web3.service.dto.Identity.StudentCertificationDto;
 
@@ -674,12 +669,6 @@ public class IdentityService {
         return s3Properties.getS3BucketUrl() + "/" + fileName;
     }
 
-    @PreDestroy
-    public void cleanup() {
-        s3Client.close();
-    }
-
-
     public int getPdfPageCount(String pdfUrl) {
         byte[] pdfBytes = getOriginalPdfBytes(pdfUrl); // PDF URL로부터 바이트 배열 가져오기
 
@@ -690,5 +679,11 @@ public class IdentityService {
         }
     }
 
+/*
+    @PreDestroy
+    public void cleanup() {
+        s3Client.close();
+    }
+ */
 
 }

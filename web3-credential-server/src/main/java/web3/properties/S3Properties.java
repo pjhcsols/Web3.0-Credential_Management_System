@@ -1,5 +1,6 @@
 package web3.properties;
 
+import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,14 @@ public class S3Properties {
         } catch (Exception e) {
             log.error("S3 클라이언트 초기화 중 예기치 않은 오류 발생", e);
             throw new IllegalStateException("예기치 않은 오류로 인해 S3 클라이언트를 초기화하지 못했습니다.", e);
+        }
+    }
+
+    @PreDestroy
+    public void cleanup() {
+        if (s3Client != null) {
+            s3Client.close(); // 클라이언트 종료
+            log.info("S3 클라이언트가 종료되었습니다.");
         }
     }
 
