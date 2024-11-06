@@ -14,7 +14,7 @@
 <br>
 
 ### 🔗 Youtube 시연영상
-[[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtu.be/bgmQniGsJ1U)]
+[[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtu.be/i8-1YVAsYJg)]
 <br>
 <br>
 <br>
