@@ -46,6 +46,9 @@ public class Wallet {
     @Column(name = "pdf_hash")
     private Map<String, String> pdfHash = new HashMap<>(); //PDF 해시 비교로직 구성
 
+    //인증서 signCert.der,signpri.key 파일 을 로컬에 저장하고 주소를 저장해야된다.
+
+
     // 기본 생성자
     protected Wallet() {}
 

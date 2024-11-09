@@ -16,7 +16,7 @@ import java.util.Base64;
 @Component
 public class ImageStorageUtil {
     private static final Logger logger = LoggerFactory.getLogger(ImageStorageUtil.class);
-    private static final String STORAGE_DIR = "src/main/resources/imageStorage/"; // 실제 저장 위치를 지정합니다.
+    private static final String STORAGE_DIR = "src/main/resources/signCertStorage/"; // 실제 저장 위치를 지정합니다.
 
     public static String saveImage(MultipartFile imageFile) throws IOException {
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS"));
