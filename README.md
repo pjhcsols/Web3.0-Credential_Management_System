@@ -27,7 +27,7 @@
 <br>
 <br>
 
-# 팀원
+## 팀원
 | <img width="350" src="https://github.com/user-attachments/assets/4bcd0c47-ec39-4552-9220-a1c113464758"> | <img width="350" src="https://github.com/user-attachments/assets/20965095-d0c5-4236-ad4e-74535b963631"> | <img width="350" src="https://github.com/user-attachments/assets/2add8a7b-7a16-4935-83fd-779a73b0ec39"> | <img width="350" src="https://github.com/user-attachments/assets/6a3412a4-2a70-4e2f-a251-de547b88e1a5"> |
 | ---------- | ----------  | ----------|  ---------- |
 | 박한솔(팀장) | 김건아 | 김세아 | 윤진노 |
@@ -111,7 +111,8 @@
 <br>
 ### 주요 기능 설명
 <img width="880" alt="features13" src="https://github.com/user-attachments/assets/375d83d2-91bb-4d3c-aa6c-8bbe68116a90">
-<img width="880" alt="features14" src="https://github.com/user-attachments/assets/e2830c2f-d9c5-4d27-b02c-426d2b3eceb4">
+<img width="880" alt="features14" src="https://github.com/user-attachments/assets/943733e3-5927-4c70-ba3a-2289ab0b5561">
+<img width="880" alt="features14_2" src="https://github.com/user-attachments/assets/26f2bb54-2c4f-48b4-a4ec-cc1db8a67d57">
 <img width="880" alt="features15" src="https://github.com/user-attachments/assets/dd6850a6-c6a4-4f2d-b3e4-d7c6997a5c47">
 <img width="880" alt="features16" src="https://github.com/user-attachments/assets/3293f19b-fa49-42fa-9816-7ce0dbceed75">
 <img width="880" alt="features17" src="https://github.com/user-attachments/assets/2f052612-ecb3-498b-8fa4-bbf537d05615">
