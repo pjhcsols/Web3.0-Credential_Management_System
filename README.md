@@ -111,8 +111,8 @@
 <br>
 ### 주요 기능 설명
 <img width="880" alt="features13" src="https://github.com/user-attachments/assets/375d83d2-91bb-4d3c-aa6c-8bbe68116a90">
-<img width="880" alt="features14" src="https://github.com/user-attachments/assets/943733e3-5927-4c70-ba3a-2289ab0b5561">
-<img width="880" alt="features14_2" src="https://github.com/user-attachments/assets/26f2bb54-2c4f-48b4-a4ec-cc1db8a67d57">
+<img width="880" alt="features14" src="https://github.com/user-attachments/assets/75b98901-89a0-4c6a-8ee8-4b50c85a97d4">
+<img width="880" alt="features14_2" src="https://github.com/user-attachments/assets/a02fbcc5-07d6-473a-b1a7-f1da050507d7">
 <img width="880" alt="features15" src="https://github.com/user-attachments/assets/dd6850a6-c6a4-4f2d-b3e4-d7c6997a5c47">
 <img width="880" alt="features16" src="https://github.com/user-attachments/assets/3293f19b-fa49-42fa-9816-7ce0dbceed75">
 <img width="880" alt="features17" src="https://github.com/user-attachments/assets/2f052612-ecb3-498b-8fa4-bbf537d05615">
