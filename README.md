@@ -8,41 +8,7 @@
 <br>
 <br>
 <br>
-
-
-### 프로젝트 개요
-
-기존의 전자지갑 시스템은 주로 중앙 집중식 데이터베이스를 통해 신원과 자격증명을 저장하고 관리합니다. 이러한 방식은 개인정보의 유출 위험이 높고 사용자는 데이터에 대한 통제권을 잃게 됩니다.
-<br>
-
 이 프로젝트는 **Web 3.0 시대**의 새로운 신원 및 자격증명 관리 시스템을 구현하여 개인의 **자율성**과 **데이터 보안**을 혁신적으로 향상시키는 차세대 지갑을 제시합니다.
-<br>
-<br>
-<br>
-
-### 지갑 프로그램 메커니즘
-
-지갑 프로그램 내에서 특정 지갑 주소를 입력해 코인을 전송하는 메커니즘은 다음과 같은 방식으로 작동합니다
-
-1. 지갑 프로그램이 개인키를 사용해 트랜잭션 내용을 바탕으로 서명을 생성합니다.
-2. 생성된 서명은 공개키와 함께 블록체인 네트워크에 전송됩니다.
-
-결국 지갑 프로그램에서 가장 중요한 이슈는 **개인키와 인증서 정보를 안전하게 보관하는 방식**입니다.
-<br>
-<br>
-<br>
-
-
-### Web3 신원/자격증명 시스템만의 차별성
-RSA 공개키·개인키를 통해 정보를 지갑에 보관하는 방식
-- 블록의 개인키 위치와 인증서 데이터를 지갑의 RSA 공개키로 암호화하여 블록과 메타데이터에 저장합니다.
-- 인증서 데이터는 블록 및 PDF 메타데이터에 Key(인증서_walletID)와 인증시간 외에는 암호화된 형태로 보관됩니다.
-- 해당 사용자의 지갑 개인키가 없다면, 데이터 복호화 및 인증서 수정이 불가능합니다. 이 방식은 사용자가 인증한 시간 확인을 가능하게 하여, 보안성과 블록체인의 장점을 동시에 활용합니다.
-
-암호화된 개인정보·인증서 데이터는 메타데이터·블록으로 관리되며 S3 스토리지에는 원본 PDF 인증서를 저장하며 PDF 해시값을 통해 진본을 보장합니다.
-<br>
-
-사용자는 이를 직접 관리하여 기존 전자지갑 시스템보다 **높은 데이터 자율성**을 보장받습니다.
 <br>
 <br>
 <br>
@@ -58,13 +24,14 @@ RSA 공개키·개인키를 통해 정보를 지갑에 보관하는 방식
 ## 시스템 아키텍처
 <img width="880" alt="arch" src="https://github.com/user-attachments/assets/d7139346-dbc6-466c-8955-4bdd134c21f1">
 <br>
+Web3 구조와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
+<br>
+전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있습니다.
+<br>
+<br>
+<br>
+<br>
 
-- Web3 구조와 외부 인증 API를 통합하여 사용자의 지갑 생성 및 인증서 관리 기능을 강화하고, 추가적인 보안 및 신원 확인을 제공합니다.  
-- 전체 구조는 사용자 인터페이스에서부터 블록체인 및 서버 측까지 각 단계별로 체계적으로 설계되어 있습니다.
-
-<br>
-<br>
-<br>
 
 ## 팀원
 | <img width="350" src="https://github.com/user-attachments/assets/4bcd0c47-ec39-4552-9220-a1c113464758"> | <img width="350" src="https://github.com/user-attachments/assets/20965095-d0c5-4236-ad4e-74535b963631"> | <img width="350" src="https://github.com/user-attachments/assets/2add8a7b-7a16-4935-83fd-779a73b0ec39"> | <img width="350" src="https://github.com/user-attachments/assets/6a3412a4-2a70-4e2f-a251-de547b88e1a5"> |
@@ -74,6 +41,11 @@ RSA 공개키·개인키를 통해 정보를 지갑에 보관하는 방식
 |DevOps<br>Infra Engineer<br>블록과 인증서 데이터 및 PDF 관리<br>외부 API 서비스 구축<br>인증서 암호화/복호화 관리<br> | 외부API 테스트 | iOS 개발 | 인증서 PDF 관리 |
 <br>
 <br>
+<br>
+<br>
+
+<img width="880" alt="image" src="https://github.com/user-attachments/assets/84e7b85d-c2d7-4dac-bccc-37c48680ccba">
+<img width="880" alt="image" src="https://github.com/user-attachments/assets/7268b1f2-4e3b-4c17-8d6d-cd5e1f7f489d">
 <br>
 <br>
 
@@ -175,24 +147,53 @@ RSA 공개키·개인키를 통해 정보를 지갑에 보관하는 방식
 <br>
 
 ## 데이터베이스 구조
+### User 테이블 구조 (SQL)
+```sql
+CREATE TABLE users (
+                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                       email VARCHAR(255) NOT NULL UNIQUE,
+                       password VARCHAR(255) NOT NULL
+);
+```
 
 ### Wallet 테이블 구조 (SQL)
 
 ```sql
 CREATE TABLE wallets (
-   id BIGINT AUTO_INCREMENT PRIMARY KEY,
-   user_id BIGINT NOT NULL,
-   private_key VARCHAR(255) NOT NULL,
-   public_key VARCHAR(255),
-   FOREIGN KEY (user_id) REFERENCES users(id)
+                         id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                         user_id BIGINT NOT NULL,
+                         private_key TEXT NOT NULL,  -- TEXT로 변경
+                         public_key TEXT NOT NULL,  -- TEXT로 변경
+                         sign_cert_path VARCHAR(255),
+                         sign_pri_key_path VARCHAR(255),
+                         FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+CREATE TABLE wallet_pdf_urls (
+                                 wallet_id BIGINT,
+                                 certificate_type VARCHAR(255),
+                                 pdf_url VARCHAR(255),
+                                 PRIMARY KEY (wallet_id, certificate_type),
+                                 FOREIGN KEY (wallet_id) REFERENCES wallets(id)
+);
+
+CREATE TABLE wallet_pdf_hash (
+                                 wallet_id BIGINT,
+                                 certificate_type VARCHAR(255),
+                                 pdf_hash VARCHAR(255),
+                                 PRIMARY KEY (wallet_id, certificate_type),
+                                 FOREIGN KEY (wallet_id) REFERENCES wallets(id)
+);
+
 ```
 
 - **user_id**: 사용자와 지갑을 연결하는 참조 키.
 - **private_key**: 메타데이터 디코딩용 개인 키, RSA 디코딩 시 사용.
 - **public_key**: 메타데이터 암호화용 공개 키, RSA 암호화 시 사용.
+- **sign_cert_path**: 공인인증서 certFile 경로.
+- **sign_pri_key_path**: 공인인증서 certPriKey 경로.
+- **wallet_pdf_urls**: PDF 파일의 경로만 저장하여 서버에 직접적인 인증서 정보를 저장하지 않음.
 - **pdfHash**: PDF 파일의 해시값을 저장하여 인증서 진본성 확인.
-
 
 이 인증서 관리 시스템은 Web2와 Web3의 장점을 결합하여 사용자 지갑과 인증서를 안전하게 관리하며, 사용자가 요청 시에 직접 인증서 진위를 확인하고 필요한 정보를 안전하게 관리할 수 있는 신뢰성 높은 인증 시스템을 제공합니다.
 
@@ -266,6 +267,34 @@ CREATE TABLE wallets (
 2. 지갑에서 인증서 PDF와 메타데이터 Verifiable Credential (Credential Metadata, Claims, Proofs)를 S3 스토리지에 저장하고 개인 디바이스에 다운로드할 수 있습니다. 이때 데이터베이스에는 해당 사용자의 S3 PDF 주소값을 저장합니다.
 3. 지갑에서 개인 디바이스의 블록(PDF)이 생성되며 블록(PDF)에는 추후 업로드하는 해당 증명에 관한 key : value 값을 저장하고 블록(PDF)이 생성 및 추가되며 이를 통해 외부 인증과의 연동이 수행됩니다.
 4. 지갑에서 해당되는 인증서를 업로드 가능하며 PDF 별 메타데이터를 별도로 관리하며 인증과정을 수행하는 메타데이터는 key : value 값으로 Verifiable Credential로 관리합니다.
+<br>
+<br>
+<br>
+<br>
+
+## 지갑 프로그램 메커니즘
+
+지갑 프로그램 내에서 특정 지갑 주소를 입력해 코인을 전송하는 메커니즘은 다음과 같은 방식으로 작동합니다
+
+1. 지갑 프로그램이 개인키를 사용해 트랜잭션 내용을 바탕으로 서명을 생성합니다.
+2. 생성된 서명은 공개키와 함께 블록체인 네트워크에 전송됩니다.
+
+결국 지갑 프로그램에서 가장 중요한 이슈는 **개인키와 인증서 정보를 안전하게 보관하는 방식**입니다.
+<br>
+<br>
+<br>
+<br>
+
+## Web3 신원/자격증명 시스템만의 차별성
+지갑의 RSA 공개키·개인키를 통해 인증서 정보를 블록과 메타데이터에 보관하는 방식
+- 블록의 개인키 위치와 인증서 데이터를 지갑의 RSA 공개키로 암호화하여 블록과 메타데이터에 저장합니다.
+- 인증서 데이터는 블록 및 PDF 메타데이터에 Key(인증서_walletID)와 인증시간 외에는 암호화된 형태로 보관됩니다.
+- 해당 사용자의 지갑 개인키가 없다면, 데이터 복호화 및 인증서 수정이 불가능합니다. 이 방식은 사용자가 인증한 시간 확인을 가능하게 하여, 보안성과 블록체인의 장점을 동시에 활용합니다.
+
+암호화된 개인정보·인증서 데이터는 메타데이터·블록으로 관리되며 S3 스토리지에는 원본 PDF 인증서를 저장하며 PDF 해시값을 통해 진본을 보장합니다.
+<br>
+
+사용자는 이를 직접 관리하여 기존 전자지갑 시스템보다 **높은 데이터 자율성**을 보장받습니다.
 <br>
 <br>
 <br>
