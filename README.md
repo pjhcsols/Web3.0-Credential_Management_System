@@ -201,7 +201,6 @@ CREATE TABLE wallet_pdf_hash (
 <br>
 <br>
 <br>
-<br>
 
 ## 지갑 프로그램 메커니즘
 
