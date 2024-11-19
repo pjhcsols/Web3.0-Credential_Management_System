@@ -1,4 +1,4 @@
-# :closed_lock_with_key: [경북멋쟁이] Web 3.0 신원/자격증명 관리 시스템 
+# :closed_lock_with_key: [BASILIUM |경북멋쟁이] Web 3.0 신원/자격증명 관리 시스템 
 <img width="880" alt="theme" src="https://github.com/user-attachments/assets/4e92c1b0-97d9-45a2-811c-b2ae2ec90f49">
 <br>
 <br>
@@ -13,7 +13,9 @@
 <br>
 
 ### 🔗 Youtube 시연영상
-[[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtu.be/i8-1YVAsYJg)]
+[[https://www.youtube.com/Web3.0-Credential_Management_System_대회출품용](https://youtu.be/i8-1YVAsYJg)]
+<br>
+[[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtu.be/7qdFPskYgrM?si=RsQIT5WT6ZMYBtmE)]
 <br>
 <br>
 <br>
@@ -36,7 +38,7 @@
 | ---------- | ----------  | ----------|  ---------- |
 | 박한솔(팀장) | 김건아 | 김세아 | 윤진노 |
 | Backend | Backend | iOS, Design | Backend |
-|DevOps<br>Infra Engineer<br>블록과 인증서 데이터 및 PDF 관리<br>외부 API 서비스 구축<br>인증서 암호화/복호화 관리<br> | 외부API 테스트 | iOS 개발 | 인증서 PDF 관리 |
+|Team Leader <br><br> [Infra Cloud Engineer] <br>DevOps Pipeline<br><br>[Server Developer] <br>BlockChain 및 인증서 데이터 및 PDF 관리<br>인증서 암호화/복호화 관리<br>외부 API 인증 서비스 구축<br> | 외부API 테스트 | iOS 개발 | 인증서 PDF 관리 |
 <br>
 <br>
 <br>
