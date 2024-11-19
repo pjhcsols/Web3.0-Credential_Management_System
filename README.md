@@ -13,6 +13,8 @@
 <br>
 
 ### 🔗 Youtube 시연영상
+[[https://www.youtube.com/Web3.0-Credential_Management_System_대회출품용](https://youtu.be/i8-1YVAsYJg)]
+<br>
 [[https://www.youtube.com/Web3.0-Credential_Management_System](https://youtu.be/7qdFPskYgrM?si=RsQIT5WT6ZMYBtmE)]
 <br>
 <br>
