@@ -1,4 +1,4 @@
-# :closed_lock_with_key: [BASILIUM | 경북멋쟁이] Web 3.0 신원/자격증명 관리 시스템 
+# :closed_lock_with_key: [BASILIUM |경북멋쟁이] Web 3.0 신원/자격증명 관리 시스템 
 <img width="880" alt="theme" src="https://github.com/user-attachments/assets/4e92c1b0-97d9-45a2-811c-b2ae2ec90f49">
 <br>
 <br>
