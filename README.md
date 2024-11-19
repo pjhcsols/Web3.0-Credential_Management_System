@@ -36,7 +36,7 @@
 | ---------- | ----------  | ----------|  ---------- |
 | 박한솔(팀장) | 김건아 | 김세아 | 윤진노 |
 | Backend | Backend | iOS, Design | Backend |
-|Server Developer<br>Infra/Cloud Engineer<br>DevOps<br>BlockChain 및 인증서 데이터 PDF 관리<br>인증서 암/복호화 관리<br>외부 API 인증 서비스 구축<br> | 외부API 테스트 | iOS 개발 | 인증서 PDF 관리 |
+|Team Leader[BACKEND] <br> Infra Cloud Engineer <br> DevOps<br>BlockChain 및 인증서 데이터, PDF 관리<br>인증서 암호화/복호화 관리<br>외부 API 인증 서비스 구축<br> | 외부API 테스트 | iOS 개발 | 인증서 PDF 관리 |
 <br>
 <br>
 <br>
