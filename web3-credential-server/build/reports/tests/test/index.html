@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">1</div>
+<div class="counter">15</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">15</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.478s</div>
+<div class="counter">1.076s</div>
 <p>duration</p>
 </div>
 </td>
@@ -47,8 +47,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">0%</div>
 <p>successful</p>
 </div>
 </td>
@@ -58,13 +58,81 @@
 <div id="tabs">
 <ul class="tabLinks">
 <li>
-<a href="#tab0">Packages</a>
+<a href="#tab0">Failed tests</a>
 </li>
 <li>
-<a href="#tab1">Classes</a>
+<a href="#tab1">Packages</a>
+</li>
+<li>
+<a href="#tab2">Classes</a>
 </li>
 </ul>
 <div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<ul class="linkList">
+<li>
+<a href="classes/web3.api.identity.AccessTokenTest.html">AccessTokenTest</a>.
+<a href="classes/web3.api.identity.AccessTokenTest.html#shouldPublishAccessTokenSuccessfully()">shouldPublishAccessTokenSuccessfully()</a>
+</li>
+<li>
+<a href="classes/web3.api.identity.DriverLicenseTest.html">DriverLicenseTest</a>.
+<a href="classes/web3.api.identity.DriverLicenseTest.html#shouldCheckPassportValiditySuccessfully()">shouldCheckPassportValiditySuccessfully()</a>
+</li>
+<li>
+<a href="classes/web3.api.identity.IdentityCheckTest.html">IdentityCheckTest</a>.
+<a href="classes/web3.api.identity.IdentityCheckTest.html#shouldCheckPassportValiditySuccessfully()">shouldCheckPassportValiditySuccessfully()</a>
+</li>
+<li>
+<a href="classes/web3.api.passport.PassportValidityTest.html">PassportValidityTest</a>.
+<a href="classes/web3.api.passport.PassportValidityTest.html#shouldCheckPassportValiditySuccessfully()">shouldCheckPassportValiditySuccessfully()</a>
+</li>
+<li>
+<a href="classes/web3.api.qnet.QnetCertificateStatusTest.html">QnetCertificateStatusTest</a>.
+<a href="classes/web3.api.qnet.QnetCertificateStatusTest.html#shouldCheckQnetCertificateStatusSuccessfully()">shouldCheckQnetCertificateStatusSuccessfully()</a>
+</li>
+<li>
+<a href="classes/web3.api.qnet.QnetTest.html">QnetTest</a>.
+<a href="classes/web3.api.qnet.QnetTest.html#shouldCheckQnetCertificateStatusSuccessfully()">shouldCheckQnetCertificateStatusSuccessfully()</a>
+</li>
+<li>
+<a href="classes/web3.api.univCert.UnivCertApiTest.html">UnivCertApiTest</a>.
+<a href="classes/web3.api.univCert.UnivCertApiTest.html#shouldClearCertifiedUserListSuccessfully()">인증된 사용자 목록 초기화에 성공해야 합니다.</a>
+</li>
+<li>
+<a href="classes/web3.api.univCert.UnivCertApiTest.html">UnivCertApiTest</a>.
+<a href="classes/web3.api.univCert.UnivCertApiTest.html#shouldGetCertifiedUserListSuccessfully()">인증된 사용자 목록 조회에 성공해야 합니다.</a>
+</li>
+<li>
+<a href="classes/web3.api.univCert.UnivCertApiTest.html">UnivCertApiTest</a>.
+<a href="classes/web3.api.univCert.UnivCertApiTest.html#shouldGetEmailCertificationStatusSuccessfully()">이메일 인증 상태를 성공적으로 조회해야 합니다.</a>
+</li>
+<li>
+<a href="classes/web3.api.univCert.UnivCertApiTest.html">UnivCertApiTest</a>.
+<a href="classes/web3.api.univCert.UnivCertApiTest.html#shouldSendCertificationCodeSuccessfully()">인증 코드 전송에 성공해야 합니다.</a>
+</li>
+<li>
+<a href="classes/web3.api.univCert.UnivCertApiTest.html">UnivCertApiTest</a>.
+<a href="classes/web3.api.univCert.UnivCertApiTest.html#shouldSendUnivNameSuccessfully()">인증 요청할 대학명 전송에 성공해야 합니다.</a>
+</li>
+<li>
+<a href="classes/web3.api.univCert.UnivCertApiTest.html">UnivCertApiTest</a>.
+<a href="classes/web3.api.univCert.UnivCertApiTest.html#shouldVerifyCertificationCodeSuccessfully()">인증 코드 검증에 성공해야 합니다.</a>
+</li>
+<li>
+<a href="classes/web3.cors.AcceptanceTest.html">AcceptanceTest</a>.
+<a href="classes/web3.cors.AcceptanceTest.html#cors()">cors()</a>
+</li>
+<li>
+<a href="classes/web3.kakao.RestClientTest.html">RestClientTest</a>.
+<a href="classes/web3.kakao.RestClientTest.html#testKakaoLoginFlowFailure()">testKakaoLoginFlowFailure()</a>
+</li>
+<li>
+<a href="classes/web3.kakao.RestClientTest.html">RestClientTest</a>.
+<a href="classes/web3.kakao.RestClientTest.html#testKakaoLoginFlowSuccess()">testKakaoLoginFlowSuccess()</a>
+</li>
+</ul>
+</div>
+<div id="tab1" class="tab">
 <h2>Packages</h2>
 <table>
 <thead>
@@ -79,19 +147,69 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
-<a href="packages/web3.api.univCert.html">web3.api.univCert</a>
+<td class="failures">
+<a href="packages/web3.api.identity.html">web3.api.identity</a>
+</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>0.006s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="packages/web3.api.passport.html">web3.api.passport</a>
 </td>
 <td>1</td>
+<td>1</td>
 <td>0</td>
+<td>0.610s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="packages/web3.api.qnet.html">web3.api.qnet</a>
+</td>
+<td>2</td>
+<td>2</td>
 <td>0</td>
-<td>0.478s</td>
-<td class="success">100%</td>
+<td>0.447s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="packages/web3.api.univCert.html">web3.api.univCert</a>
+</td>
+<td>6</td>
+<td>6</td>
+<td>0</td>
+<td>0.002s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="packages/web3.cors.html">web3.cors</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="packages/web3.kakao.html">web3.kakao</a>
+</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0.010s</td>
+<td class="failures">0%</td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="tab1" class="tab">
+<div id="tab2" class="tab">
 <h2>Classes</h2>
 <table>
 <thead>
@@ -106,14 +224,94 @@
 </thead>
 <tbody>
 <tr>
-<td class="success">
-<a href="classes/web3.api.univCert.UnivCertApiTest.html">web3.api.univCert.UnivCertApiTest</a>
+<td class="failures">
+<a href="classes/web3.api.identity.AccessTokenTest.html">web3.api.identity.AccessTokenTest</a>
 </td>
 <td>1</td>
+<td>1</td>
 <td>0</td>
+<td>0.005s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.api.identity.DriverLicenseTest.html">web3.api.identity.DriverLicenseTest</a>
+</td>
+<td>1</td>
+<td>1</td>
 <td>0</td>
-<td>0.478s</td>
-<td class="success">100%</td>
+<td>0s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.api.identity.IdentityCheckTest.html">web3.api.identity.IdentityCheckTest</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.api.passport.PassportValidityTest.html">web3.api.passport.PassportValidityTest</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.610s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.api.qnet.QnetCertificateStatusTest.html">web3.api.qnet.QnetCertificateStatusTest</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.447s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.api.qnet.QnetTest.html">web3.api.qnet.QnetTest</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.api.univCert.UnivCertApiTest.html">web3.api.univCert.UnivCertApiTest</a>
+</td>
+<td>6</td>
+<td>6</td>
+<td>0</td>
+<td>0.002s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.cors.AcceptanceTest.html">web3.cors.AcceptanceTest</a>
+</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/web3.kakao.RestClientTest.html">web3.kakao.RestClientTest</a>
+</td>
+<td>2</td>
+<td>2</td>
+<td>0</td>
+<td>0.010s</td>
+<td class="failures">0%</td>
 </tr>
 </tbody>
 </table>
@@ -126,7 +324,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.4</a> at 2024. 10. 6. 오후 9:08:24</p>
+<a href="http://www.gradle.org">Gradle 8.4</a> at 2025. 1. 10. 오전 10:03:42</p>
 </div>
 </div>
 </body>

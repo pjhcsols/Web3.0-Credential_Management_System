@@ -2,7 +2,6 @@ package web3.domain.wallet;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
 import web3.domain.user.User;
 
 import java.security.KeyFactory;
@@ -33,20 +32,25 @@ public class Wallet {
     @Column(name = "pdf_url")
     private Map<String, String> pdfUrls = new HashMap<>();
 
-    //@JsonIgnore
-    @Column(name = "private_key", nullable = false)
-    private String privateKey; // value 복호화
-
-    @Column(name = "public_key", nullable = false)
-    private String publicKey; // value 암호화
-
     @ElementCollection
     @CollectionTable(name = "wallet_pdf_hash", joinColumns = @JoinColumn(name = "wallet_id"))
     @MapKeyColumn(name = "certificate_type")
     @Column(name = "pdf_hash")
     private Map<String, String> pdfHash = new HashMap<>(); //PDF 해시 비교로직 구성
 
-    //인증서 signCert.der,signpri.key 파일 을 로컬에 저장하고 주소를 저장해야된다.
+    @JsonIgnore
+    @Column(name = "private_key", nullable = false)
+    private String privateKey; // 인증서 value 복호화
+
+    @JsonIgnore
+    @Column(name = "public_key", nullable = false)
+    private String publicKey; // 인증서 value 암호화
+
+    @Column(name = "sign_cert_path")
+    private String signCertPath;
+
+    @Column(name = "sign_pri_key_path")
+    private String signPriKeyPath;
 
 
     // 기본 생성자
@@ -57,6 +61,11 @@ public class Wallet {
         this.user = user;
         this.privateKey = privateKey;
         this.publicKey = publicKey;
+    }
+
+    public void updateSignPaths(String signCertPath, String signPriKeyPath) {
+        this.signCertPath = signCertPath;
+        this.signPriKeyPath = signPriKeyPath;
     }
 
     public Map<String, String> getPdfUrls() {
@@ -81,6 +90,14 @@ public class Wallet {
 
     public Map<String, String> getPdfHash() {
         return pdfHash;
+    }
+
+    public String getSignCertPath() {
+        return signCertPath;
+    }
+
+    public String getSignPriKeyPath() {
+        return signPriKeyPath;
     }
 
     @JsonIgnore // 이 메서드는 JSON 직렬화에서 제외합니다.

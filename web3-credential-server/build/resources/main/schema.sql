@@ -14,6 +14,8 @@ CREATE TABLE wallets (
                          user_id BIGINT NOT NULL,
                          private_key TEXT NOT NULL,  -- TEXT로 변경
                          public_key TEXT NOT NULL,  -- TEXT로 변경
+                         sign_cert_path VARCHAR(255),
+                         sign_pri_key_path VARCHAR(255),
                          FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

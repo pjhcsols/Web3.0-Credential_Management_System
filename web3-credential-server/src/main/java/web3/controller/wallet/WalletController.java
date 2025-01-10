@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import web3.domain.user.User;
 import web3.domain.wallet.Wallet;
 import web3.exception.wallet.WalletAlreadyExistsException;
@@ -13,6 +14,7 @@ import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
 import web3.service.wallet.WalletService;
 import web3.validation.LoginMember;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
@@ -116,6 +118,32 @@ public class WalletController {
             throws WalletPrivateKeyNotEqualsException {
         Wallet wallet = walletService.getCertainWallet(id,privateKey);
         return ResponseEntity.ok(wallet);
+    }
+
+    @PostMapping("/certificates")
+    @Operation(
+            summary = "인증서 파일 업로드",
+            description = "signCert.der 및 signpri.key 파일을 업로드하고 경로를 저장합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "인증서 파일 저장 성공"),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            }
+    )
+    public ResponseEntity<Void> uploadCertificateFiles(
+            @RequestParam("walletId") Long walletId,
+            @RequestParam("signCert") MultipartFile signCert,
+            @RequestParam("signPri") MultipartFile signPri) {
+        Optional<Wallet> walletOptional = walletService.getWalletById(walletId);
+        if (walletOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            walletService.storeCertificateFiles(signCert, signPri, walletOptional.get());
+            return ResponseEntity.ok().build();
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }
