@@ -1,29 +1,36 @@
 package web3.service.wallet;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import web3.domain.user.User;
 import web3.domain.wallet.Wallet;
 import web3.exception.wallet.WalletAlreadyExistsException;
 import web3.exception.wallet.WalletPrivateKeyNotEqualsException;
+import web3.properties.SignProperties;
 import web3.repository.wallet.WalletRepository;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@Slf4j
 @Service
 public class WalletService {
 
     private final WalletRepository walletRepository;
+    private final SignProperties signProperties;
 
 
     @Autowired
-    public WalletService(WalletRepository walletRepository) {
+    public WalletService(WalletRepository walletRepository, SignProperties signProperties) {
         this.walletRepository = walletRepository;
+        this.signProperties = signProperties;
     }
 
     public Wallet createWallet(User user) throws WalletAlreadyExistsException, NoSuchAlgorithmException {
@@ -83,6 +90,69 @@ public class WalletService {
         }*/
 
         return wallet;
+    }
+
+    @Transactional
+    public void storeCertificateFiles(MultipartFile signCert, MultipartFile signPri, Wallet wallet) throws IOException {
+        log.info("[인증서 저장 로직 시작]");
+        try {
+            // 기존 파일 경로가 있으면 삭제 (signCertPath, signPriKeyPath)
+            if (wallet.getSignCertPath() != null) {
+                Path oldCertPath = Paths.get(wallet.getSignCertPath());
+                Files.deleteIfExists(oldCertPath);  // 기존 인증서 파일 삭제
+                log.info("기존 인증서 파일 삭제: " + oldCertPath);
+            }
+
+            if (wallet.getSignPriKeyPath() != null) {
+                Path oldPriPath = Paths.get(wallet.getSignPriKeyPath());
+                Files.deleteIfExists(oldPriPath);  // 기존 개인키 파일 삭제
+                log.info("기존 개인키 파일 삭제: " + oldPriPath);
+            }
+
+            String certFileName = wallet.getId() + "_signCert.der";
+            Path certPath = Paths.get(signProperties.getFullSignCertDir(), certFileName);
+            Files.write(certPath, signCert.getBytes());
+            log.info("새로운 인증서 파일 저장: " + certPath);
+
+            String priFileName = wallet.getId() + "_signPri.key";
+            Path priPath = Paths.get(signProperties.getFullSignPriDir(), priFileName);
+            Files.write(priPath, signPri.getBytes());
+            log.info("새로운 개인키 파일 저장: " + priPath);
+
+            // 파일 경로 업데이트
+            wallet.updateSignPaths(certPath.toString(), priPath.toString());
+            log.info("지갑 경로 업데이트 완료: certPath = " + certPath + ", priPath = " + priPath);
+
+        } catch (IOException e) {
+            log.error("인증서 파일 저장 중 오류 발생", e);
+            throw e;
+        }
+    }
+
+
+
+
+    public String retrieveSignCertEncoded(Long walletId) {
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+        log.info("[지갑의 등록된 SignCert encoding....]");
+        return encodeFileToBase64(wallet.getSignCertPath());
+    }
+
+    public String retrieveSignPriKeyEncoded(Long walletId) {
+        Wallet wallet = walletRepository.findById(walletId)
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
+        log.info("[지갑의 등록된 SignPri encoding....]");
+        return encodeFileToBase64(wallet.getSignPriKeyPath());
+    }
+
+    private String encodeFileToBase64(String filePath) {
+        try {
+            byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
+            return Base64.getEncoder().encodeToString(fileContent);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 인코딩 실패", e);
+        }
     }
 
 

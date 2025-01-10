@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: spring-web3
+  profiles:
+    include: secret #application-secret.yaml ?? ???
+
+  jpa:
+    open-in-view: false #Lazy Loading ????
+
+  main:
+    allow-bean-definition-overriding: true
+
+  datasource:
+    url: jdbc:h2:mem:test;MODE=MYSQL;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+    h2:
+      console:
+        enabled: false
+        path: /h2-console
+    jpa:
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MySQLDialect
+          format_sql: true
+      show-sql: true
+      database-platform: org.hibernate.dialect.H2Dialect
+    sql:
+      init:
+        schema-locations: classpath:schema.sql
+        data-locations: classpath:data.sql
+        mode: always
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+jwt:
+  key: ''
+  access-token-validity: 3600000
+  refresh-token-validity: 86400000
+
+mvc:
+  cors:
+    allowed-origin-patterns: http://localhost:8080
+    allow-credentials: true
+
+kakao:
+  #kakao.client-id=
+  #kakao.redirect-uri=
+  token-url: https://kauth.kakao.com/oauth/token
+  user-info-url: https://kapi.kakao.com/v2/user/me
+  message-url: https://kapi.kakao.com/v2/api/talk/memo/default/send
+  code-url: https://kauth.kakao.com/oauth/authorize
+
+cloud:
+  aws:
+    s3-bucket-name: ''
+    s3-bucket-url: ''
+    region-static: ap-northeast-2
+    credentials:
+        accessKey: ''
+        secretKey: ''
+    stack:
+      auto: false
+
+passport:
+  client-secret: ''
+  public-key-str: ''
+
+rsa:
+  public-key: ''
+
+server:
+  http2:
+    enabled: false
+  port: 8080
+
+sign:
+  sign-cert-dir: web3-credential-server/src/main/resources/signCertStorage/
+  sign-pri-dir: web3-credential-server/src/main/resources/signPriStorage/
