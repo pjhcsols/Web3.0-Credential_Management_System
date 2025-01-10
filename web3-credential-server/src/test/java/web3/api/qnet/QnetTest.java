@@ -24,7 +24,7 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.yaml")
 public class QnetTest {
     @Autowired
     private RestTemplate restTemplate;

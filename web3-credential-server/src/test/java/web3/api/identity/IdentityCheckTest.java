@@ -27,7 +27,7 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.yaml")
 public class IdentityCheckTest {
 
     private RestTemplate restTemplate = new RestTemplate();

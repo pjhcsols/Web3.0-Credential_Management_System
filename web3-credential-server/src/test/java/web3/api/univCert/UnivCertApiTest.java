@@ -15,7 +15,7 @@ import com.jayway.jsonpath.PathNotFoundException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.yaml")
 public class UnivCertApiTest {
 
     @Autowired

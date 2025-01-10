@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +26,7 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
 @SpringBootTest
-@TestPropertySource(locations = "classpath:application-test.properties")
+@TestPropertySource(locations = "classpath:application-test.yaml")
 public class DriverLicenseTest {
 
     private RestTemplate restTemplate = new RestTemplate();
